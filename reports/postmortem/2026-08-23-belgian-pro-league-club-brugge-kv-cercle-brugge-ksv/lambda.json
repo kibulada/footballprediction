@@ -1,0 +1,65 @@
+{
+  "final_lambda": {
+    "lambda_home": 2.441,
+    "lambda_away": 1.663,
+    "lambda_total": 4.104,
+    "lambda_source": "features+xg",
+    "pinned": true,
+    "elo_blend_applied": false,
+    "elo_blend_reason": "lambda_samples=5 >= shrinkage_samples=5 -> feature lambda stands as-is (models.py:740-747); pin 'features+xg' reproduced exactly (models.py:800-802)"
+  },
+  "formula_chain_verified_from_source": {
+    "step1_form_averages": "models.py:304-326 _team_stats: xi-decay weighted gf/ga from raw scorelines (xi=0.8, newest weight 1.0)",
+    "step2_strength": "models.py:328-331 atk=gf/1.45, deff=ga/1.25",
+    "step3_poisson": "models.py:249-250 lh=1.45*sqrt(atk_h*deff_a), la=1.25*sqrt(atk_a*deff_h)",
+    "step4_shrinkage": "models.py:245,251-252 w=min(1,min(hs,as_)/5)=1 -> no blend toward base",
+    "step5_xg_blend": "models.py:254-259 xh=(home_xg_for+away_xg_against)/2; xa=(away_xg_for+home_xg_against)/2; lh=lh_f*0.35+xh*0.65 (xg_weight=0.65)",
+    "step6_clamp": "models.py:283-284 clamp [0.3, 3.5] per side"
+  },
+  "xg_window_evidence": {
+    "window_rule": "max 3 most recent finished matches per team with valid xG (multi_source.py:1452-1454)",
+    "attribution_method": "ng_xg_{mid}.json cache files written during the run window (23:04:29-33 local) attributed via nowgoal /match/live-{id} pages on mirror nowgoal26.com (titles + FT scores fetched 2026-08-23 ~23:45 local)",
+    "club_brugge_home_chain": [
+      {"match_id": "3003521", "match": "Club Brugge vs Kortrijk", "ft": "3-0", "xg_for": 3.49, "xg_against": 1.02},
+      {"match_id": "3003534", "match": "Oud-Heverlee Leuven vs Club Brugge", "ft": "0-3", "xg_for": 2.92, "xg_against": 0.72},
+      {"match_id": "3013003", "match": "Club Brugge vs Saint Gilloise", "ft": "1-1", "xg_for": 0.9, "xg_against": 1.25}
+    ],
+    "cercle_brugge_away_chain": [
+      {"match_id": "3003523", "match": "Standard Liege vs Cercle Brugge", "ft": "2-2", "xg_for": 1.47, "xg_against": 2.6},
+      {"match_id": "3003530", "match": "Cercle Brugge vs Sint-Truidense", "ft": "3-3", "xg_for": 4.15, "xg_against": 2.04}
+    ],
+    "cercle_sample_size_note": "only 2 of up-to-3 rows yielded xG; reason for the missing third row not recoverable from disk (fetch failures are not cached) -> INSUFFICIENT_DATA",
+    "averages_recomputed": {
+      "home_xg_for": 2.4367,
+      "home_xg_against": 0.9967,
+      "away_xg_for": 2.81,
+      "away_xg_against": 2.32
+    }
+  },
+  "blend_verification": {
+    "xh": 2.3783,
+    "xa": 1.9033,
+    "back_solved_feature_lh": 2.5574,
+    "back_solved_feature_la": 1.2167,
+    "equal_weight_forward_check": {
+      "feature_lh": 2.456,
+      "feature_la": 1.3646,
+      "resulting_lambda": [2.406, 1.715],
+      "snapshot_lambda": [2.441, 1.663],
+      "note": "difference is the xi-decay weighting of actual per-match scores (raw recent_goals not persisted in snapshot); equal-weight check is within 0.06 goals home / 0.05 away"
+    },
+    "feasibility_envelope": {
+      "feature_lh_feasible_range": [1.496, 3.653],
+      "back_solved_inside": true,
+      "feature_la_feasible_range": [0.831, 2.03],
+      "back_solved_inside": true
+    },
+    "verdict": "RECONSTRUCTED — final lambdas reproduce from attributed xG windows + form features; no data corruption found in this run's inputs"
+  },
+  "root_cause_assessment": {
+    "driver_1": "Club Brugge genuine hot xG start (3.49/2.92/0.90 for across 3-0, 3-0, 1-1)",
+    "driver_2": "Cercle goal-fest windows (2-2, 3-3) giving away_xg_for 2.81 from only 2 samples and away_xg_against 2.32, which lifts xh via the cross-average (Hf+Aa)/2",
+    "driver_3": "xg_weight 0.65 applies regardless of xG sample size (3 vs 2) — small-window variance enters the lambda at full weight",
+    "not_the_cause": ["friendly pollution (filter active)", "wrong-team attribution (titles verified)", "unseeded Elo (both seeded)", "missing/zero xG values (all five files carry positive finite xG)"]
+  }
+}

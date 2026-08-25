@@ -1,0 +1,78 @@
+{
+  "generated_at": "2026-08-12T02:53:17+00:00",
+  "dataset_note": "EPL from football-data cache (odds); LaLiga/Bundesliga/Serie A from FBref local cache (no odds, ROI n/a)",
+  "seasons": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025",
+    "2025-2026"
+  ],
+  "per_league": {
+    "EPL": {
+      "n_matches": 1520,
+      "baseline_ll": 0.9886,
+      "ll_ci": 0.0226,
+      "baseline_hit": 0.5309,
+      "k01_ll": 0.9895,
+      "rest_delta_k01": 0.0009,
+      "opp_adj_ll": 0.9886,
+      "opp_delta": 0.0,
+      "per_season_ll": {
+        "2022-2023": 0.9888,
+        "2023-2024": 0.9503,
+        "2024-2025": 0.9933,
+        "2025-2026": 1.022
+      }
+    },
+    "LaLiga": {
+      "n_matches": 1520,
+      "baseline_ll": 0.9975,
+      "ll_ci": 0.0218,
+      "baseline_hit": 0.523,
+      "k01_ll": 0.9978,
+      "rest_delta_k01": 0.0003,
+      "opp_adj_ll": 0.9974,
+      "opp_delta": -0.0001,
+      "per_season_ll": {
+        "2022-2023": 1.0206,
+        "2023-2024": 0.9832,
+        "2024-2025": 0.9885,
+        "2025-2026": 0.9976
+      }
+    },
+    "Bundesliga": {
+      "n_matches": 1231,
+      "baseline_ll": 1.0036,
+      "ll_ci": 0.0248,
+      "baseline_hit": 0.5053,
+      "k01_ll": 1.0046,
+      "rest_delta_k01": 0.001,
+      "opp_adj_ll": 1.0035,
+      "opp_delta": -0.0001,
+      "per_season_ll": {
+        "2022-2023": 1.0276,
+        "2023-2024": 0.9796,
+        "2024-2025": 1.0336,
+        "2025-2026": 0.9733
+      }
+    },
+    "Serie A": {
+      "n_matches": 1521,
+      "baseline_ll": 1.0033,
+      "ll_ci": 0.0224,
+      "baseline_hit": 0.5187,
+      "k01_ll": 1.0031,
+      "rest_delta_k01": -0.0002,
+      "opp_adj_ll": 1.0034,
+      "opp_delta": 0.0001,
+      "per_season_ll": {
+        "2022-2023": 1.0198,
+        "2023-2024": 0.9992,
+        "2024-2025": 0.9855,
+        "2025-2026": 1.0088
+      }
+    }
+  },
+  "ligue1_status": "UNAVAILABLE offline (no FBref cached page; football-data.co.uk unreachable, Tor proxy down). No fabricated data.",
+  "cross_league_conclusion": "REST DAYS k=0.1: EPL +0.0009, LaLiga +0.0003, Bundesliga +0.0010 (worse), Serie A -0.0002 (negligible). No league improves beyond CI -> RETAIN k=0 in all leagues. | OPP-ADJ FORM: deltas EPL 0.0000 / LaLiga -0.0001 / Bundesliga -0.0001 / Serie A +0.0001, all within noise, mixed direction -> RETAIN baseline in all leagues. | Ligue 1: data unavailable offline, not evaluated."
+}

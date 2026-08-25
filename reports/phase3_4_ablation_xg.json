@@ -1,0 +1,449 @@
+{
+  "generated_at": "2026-08-12T04:18:37+00:00",
+  "dataset": "D:\\Hermes-Football\\cache\\football\\epl_fixtures_2022_2026.json",
+  "n_matches": 1520,
+  "freeze_reference": {
+    "ensemble_log_loss": 0.9886,
+    "ensemble_hit_rate": 0.5309,
+    "ensemble_roi": -0.0191,
+    "ensemble_bets": 623,
+    "file": "D:\\Hermes-Football\\reports\\baseline_freeze_v2.json"
+  },
+  "experiments": {
+    "rest_days": {
+      "0.0": {
+        "ensemble": {
+          "n": 1520,
+          "log_loss": 0.9886,
+          "log_loss_ci": 0.0226,
+          "brier": 0.5901,
+          "ece": 0.011,
+          "hit_rate": 0.5309,
+          "roi": -0.0191,
+          "bets": 623,
+          "max_drawdown": -55.84,
+          "max_losing_streak": 10
+        },
+        "dc": {
+          "n": 1505,
+          "log_loss": 1.0363,
+          "brier": 0.6223,
+          "ece": 0.0174,
+          "hit_rate": 0.489,
+          "roi": -0.0008,
+          "bets": 740
+        },
+        "per_season_ensemble_ll": {
+          "2022-2023": 0.9888,
+          "2023-2024": 0.9503,
+          "2024-2025": 0.9933,
+          "2025-2026": 1.022
+        }
+      },
+      "0.01": {
+        "ensemble": {
+          "n": 1520,
+          "log_loss": 0.9888,
+          "log_loss_ci": 0.0226,
+          "brier": 0.5903,
+          "ece": 0.0104,
+          "hit_rate": 0.5303,
+          "roi": -0.0231,
+          "bets": 630,
+          "max_drawdown": -58.55,
+          "max_losing_streak": 12
+        },
+        "dc": {
+          "n": 1505,
+          "log_loss": 1.0369,
+          "brier": 0.6228,
+          "ece": 0.0165,
+          "hit_rate": 0.4904,
+          "roi": -0.008,
+          "bets": 745
+        },
+        "per_season_ensemble_ll": {
+          "2022-2023": 0.989,
+          "2023-2024": 0.9508,
+          "2024-2025": 0.9934,
+          "2025-2026": 1.0221
+        }
+      },
+      "0.03": {
+        "ensemble": {
+          "n": 1520,
+          "log_loss": 0.9891,
+          "log_loss_ci": 0.0225,
+          "brier": 0.5905,
+          "ece": 0.011,
+          "hit_rate": 0.5296,
+          "roi": -0.0191,
+          "bets": 629,
+          "max_drawdown": -54.23,
+          "max_losing_streak": 11
+        },
+        "dc": {
+          "n": 1505,
+          "log_loss": 1.0381,
+          "brier": 0.6237,
+          "ece": 0.0147,
+          "hit_rate": 0.4877,
+          "roi": -0.0201,
+          "bets": 751
+        },
+        "per_season_ensemble_ll": {
+          "2022-2023": 0.9891,
+          "2023-2024": 0.9513,
+          "2024-2025": 0.9936,
+          "2025-2026": 1.0224
+        }
+      },
+      "0.05": {
+        "ensemble": {
+          "n": 1520,
+          "log_loss": 0.9893,
+          "log_loss_ci": 0.0225,
+          "brier": 0.5906,
+          "ece": 0.0089,
+          "hit_rate": 0.5296,
+          "roi": -0.0203,
+          "bets": 627,
+          "max_drawdown": -55.93,
+          "max_losing_streak": 11
+        },
+        "dc": {
+          "n": 1505,
+          "log_loss": 1.0389,
+          "brier": 0.6243,
+          "ece": 0.016,
+          "hit_rate": 0.4884,
+          "roi": -0.0089,
+          "bets": 753
+        },
+        "per_season_ensemble_ll": {
+          "2022-2023": 0.9891,
+          "2023-2024": 0.9515,
+          "2024-2025": 0.9938,
+          "2025-2026": 1.0227
+        }
+      },
+      "0.1": {
+        "ensemble": {
+          "n": 1520,
+          "log_loss": 0.9895,
+          "log_loss_ci": 0.0225,
+          "brier": 0.5908,
+          "ece": 0.0093,
+          "hit_rate": 0.5303,
+          "roi": -0.0187,
+          "bets": 632,
+          "max_drawdown": -56.01,
+          "max_losing_streak": 12
+        },
+        "dc": {
+          "n": 1505,
+          "log_loss": 1.04,
+          "brier": 0.6251,
+          "ece": 0.0141,
+          "hit_rate": 0.4877,
+          "roi": -0.0091,
+          "bets": 755
+        },
+        "per_season_ensemble_ll": {
+          "2022-2023": 0.989,
+          "2023-2024": 0.9515,
+          "2024-2025": 0.9942,
+          "2025-2026": 1.0232
+        }
+      }
+    },
+    "opp_adj": {
+      "baseline": {
+        "ensemble": {
+          "n": 1520,
+          "log_loss": 0.9886,
+          "log_loss_ci": 0.0226,
+          "brier": 0.5901,
+          "ece": 0.011,
+          "hit_rate": 0.5309,
+          "roi": -0.0191,
+          "bets": 623,
+          "max_drawdown": -55.84,
+          "max_losing_streak": 10
+        },
+        "dc": {
+          "n": 1505,
+          "log_loss": 1.0363,
+          "brier": 0.6223,
+          "ece": 0.0174,
+          "hit_rate": 0.489,
+          "roi": -0.0008,
+          "bets": 740
+        },
+        "per_season_ensemble_ll": {
+          "2022-2023": 0.9888,
+          "2023-2024": 0.9503,
+          "2024-2025": 0.9933,
+          "2025-2026": 1.022
+        }
+      },
+      "opp_adj_form": {
+        "ensemble": {
+          "n": 1520,
+          "log_loss": 0.9886,
+          "log_loss_ci": 0.0226,
+          "brier": 0.5901,
+          "ece": 0.0098,
+          "hit_rate": 0.5296,
+          "roi": -0.0203,
+          "bets": 631,
+          "max_drawdown": -54.71,
+          "max_losing_streak": 12
+        },
+        "dc": {
+          "n": 1505,
+          "log_loss": 1.0363,
+          "brier": 0.6223,
+          "ece": 0.0172,
+          "hit_rate": 0.4884,
+          "roi": -0.0058,
+          "bets": 743
+        },
+        "per_season_ensemble_ll": {
+          "2022-2023": 0.9887,
+          "2023-2024": 0.9503,
+          "2024-2025": 0.9932,
+          "2025-2026": 1.0222
+        }
+      }
+    },
+    "xg_inertness": {
+      "0.0": {
+        "ensemble": {
+          "n": 1520,
+          "log_loss": 0.9886,
+          "log_loss_ci": 0.0226,
+          "brier": 0.5901,
+          "ece": 0.011,
+          "hit_rate": 0.5309,
+          "roi": -0.0191,
+          "bets": 623,
+          "max_drawdown": -55.84,
+          "max_losing_streak": 10
+        },
+        "per_season_ensemble_ll": {
+          "2022-2023": 0.9888,
+          "2023-2024": 0.9503,
+          "2024-2025": 0.9933,
+          "2025-2026": 1.022
+        }
+      },
+      "0.65": {
+        "ensemble": {
+          "n": 1520,
+          "log_loss": 0.9886,
+          "log_loss_ci": 0.0226,
+          "brier": 0.5901,
+          "ece": 0.011,
+          "hit_rate": 0.5309,
+          "roi": -0.0191,
+          "bets": 623,
+          "max_drawdown": -55.84,
+          "max_losing_streak": 10
+        },
+        "per_season_ensemble_ll": {
+          "2022-2023": 0.9888,
+          "2023-2024": 0.9503,
+          "2024-2025": 0.9933,
+          "2025-2026": 1.022
+        }
+      },
+      "inert_proven": true
+    },
+    "xg_source_probe": {
+      "reachable": false,
+      "error": "ConnectionError: Failed to perform, curl: (7) Failed to connect to www.football-data.co.uk:443 over proxy 127.0.0.1 after 2066 ms: Could not connect to server. See https://curl.se/libcurl/c/libcurl-errors.html first for more details."
+    },
+    "xg_evaluation": {
+      "evaluated": true,
+      "coverage": 1.0,
+      "file": "D:\\Hermes-Football\\cache\\football\\epl_fixtures_2022_2026_xg.json",
+      "source": "cache\\football\\understat_xg_rows.json",
+      "xg_weight_0.0": {
+        "ensemble": {
+          "n": 1520,
+          "log_loss": 0.9886,
+          "log_loss_ci": 0.0226,
+          "brier": 0.5901,
+          "ece": 0.011,
+          "hit_rate": 0.5309,
+          "roi": -0.0191,
+          "bets": 623,
+          "max_drawdown": -55.84,
+          "max_losing_streak": 10
+        },
+        "per_season_ensemble_ll": {
+          "2022-2023": 0.9888,
+          "2023-2024": 0.9503,
+          "2024-2025": 0.9933,
+          "2025-2026": 1.022
+        }
+      },
+      "xg_weight_0.65": {
+        "ensemble": {
+          "n": 1520,
+          "log_loss": 0.9851,
+          "log_loss_ci": 0.0218,
+          "brier": 0.5873,
+          "ece": 0.0081,
+          "hit_rate": 0.5322,
+          "roi": -0.0106,
+          "bets": 583,
+          "max_drawdown": -44.27,
+          "max_losing_streak": 9
+        },
+        "per_season_ensemble_ll": {
+          "2022-2023": 0.9839,
+          "2023-2024": 0.9483,
+          "2024-2025": 0.9875,
+          "2025-2026": 1.0205
+        }
+      }
+    }
+  },
+  "delta_table": [
+    {
+      "experiment": "rest_days",
+      "variant": "0.0",
+      "ensemble_log_loss": 0.9886,
+      "delta_vs_freeze": 0.0,
+      "brier": 0.5901,
+      "ece": 0.011,
+      "hit_rate": 0.5309,
+      "roi": -0.0191,
+      "bets": 623,
+      "ll_ci": 0.0226
+    },
+    {
+      "experiment": "rest_days",
+      "variant": "0.01",
+      "ensemble_log_loss": 0.9888,
+      "delta_vs_freeze": 0.0002,
+      "brier": 0.5903,
+      "ece": 0.0104,
+      "hit_rate": 0.5303,
+      "roi": -0.0231,
+      "bets": 630,
+      "ll_ci": 0.0226
+    },
+    {
+      "experiment": "rest_days",
+      "variant": "0.03",
+      "ensemble_log_loss": 0.9891,
+      "delta_vs_freeze": 0.0005,
+      "brier": 0.5905,
+      "ece": 0.011,
+      "hit_rate": 0.5296,
+      "roi": -0.0191,
+      "bets": 629,
+      "ll_ci": 0.0225
+    },
+    {
+      "experiment": "rest_days",
+      "variant": "0.05",
+      "ensemble_log_loss": 0.9893,
+      "delta_vs_freeze": 0.0007,
+      "brier": 0.5906,
+      "ece": 0.0089,
+      "hit_rate": 0.5296,
+      "roi": -0.0203,
+      "bets": 627,
+      "ll_ci": 0.0225
+    },
+    {
+      "experiment": "rest_days",
+      "variant": "0.1",
+      "ensemble_log_loss": 0.9895,
+      "delta_vs_freeze": 0.0009,
+      "brier": 0.5908,
+      "ece": 0.0093,
+      "hit_rate": 0.5303,
+      "roi": -0.0187,
+      "bets": 632,
+      "ll_ci": 0.0225
+    },
+    {
+      "experiment": "opp_adj",
+      "variant": "baseline",
+      "ensemble_log_loss": 0.9886,
+      "delta_vs_freeze": 0.0,
+      "brier": 0.5901,
+      "ece": 0.011,
+      "hit_rate": 0.5309,
+      "roi": -0.0191,
+      "bets": 623,
+      "ll_ci": 0.0226
+    },
+    {
+      "experiment": "opp_adj",
+      "variant": "opp_adj_form",
+      "ensemble_log_loss": 0.9886,
+      "delta_vs_freeze": 0.0,
+      "brier": 0.5901,
+      "ece": 0.0098,
+      "hit_rate": 0.5296,
+      "roi": -0.0203,
+      "bets": 631,
+      "ll_ci": 0.0226
+    },
+    {
+      "experiment": "xg_inertness",
+      "variant": "0.0",
+      "ensemble_log_loss": 0.9886,
+      "delta_vs_freeze": 0.0,
+      "brier": 0.5901,
+      "ece": 0.011,
+      "hit_rate": 0.5309,
+      "roi": -0.0191,
+      "bets": 623,
+      "ll_ci": 0.0226
+    },
+    {
+      "experiment": "xg_inertness",
+      "variant": "0.65",
+      "ensemble_log_loss": 0.9886,
+      "delta_vs_freeze": 0.0,
+      "brier": 0.5901,
+      "ece": 0.011,
+      "hit_rate": 0.5309,
+      "roi": -0.0191,
+      "bets": 623,
+      "ll_ci": 0.0226
+    },
+    {
+      "experiment": "xg_evaluation",
+      "variant": "xg_weight_0.0",
+      "ensemble_log_loss": 0.9886,
+      "delta_vs_freeze": 0.0,
+      "brier": 0.5901,
+      "ece": 0.011,
+      "hit_rate": 0.5309,
+      "roi": -0.0191,
+      "bets": 623,
+      "ll_ci": 0.0226
+    },
+    {
+      "experiment": "xg_evaluation",
+      "variant": "xg_weight_0.65",
+      "ensemble_log_loss": 0.9851,
+      "delta_vs_freeze": -0.0035,
+      "brier": 0.5873,
+      "ece": 0.0081,
+      "hit_rate": 0.5322,
+      "roi": -0.0106,
+      "bets": 583,
+      "ll_ci": 0.0218
+    }
+  ],
+  "conclusion": "REST DAYS: no rest_days_k value improves LL beyond baseline CI -> RETAIN k=0 (off) | OPP-ADJ FORM: LL 0.9886->0.9886 within noise / no improvement -> RETAIN baseline | xG: evaluated on real data (coverage 1.0); xg_weight 0 -> 0.9886, 0.65 -> 0.9851; adopt the better weight only if beyond noise"
+}

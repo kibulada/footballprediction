@@ -1,0 +1,34 @@
+{
+  "decision_summary": "ALL 8 ranking candidates vetoed; card-level G4 lambda_total veto is the primary cause (Over 2.5 / Under 2.5 / Over 3.5 / BTTS candidates all depend on lambda_total). BEST PICK renderer showed rank #1 with HIGH RISK label per _display_best_pick design (format.py:1497-1520).",
+  "g4_state": {
+    "config_path": "models.signal_engine.pick_gates",
+    "lambda_total_sanity": true,
+    "global_band": [1.6, 3.6],
+    "league_overrides_present": {"eredivisie": {"max": 4.0}},
+    "belgian_pro_league_override": false,
+    "applied_band_for_this_match": [1.6, 3.6],
+    "card_level_veto_site": "agents/football/signal_engine.py:2282-2301 ('a broken lambda_total invalidates EVERY candidate')"
+  },
+  "ranking_veto_detail": [
+    {"selection": "Over 2.5", "score": 0.861, "edge_pp": 7.83, "veto_reasons": ["G4 lambda_total 4.10 > 3.6"], "would_pass_G2_agreement_8pp": true},
+    {"selection": "Over 3.5", "score": 0.788, "edge_pp": 8.4, "veto_reasons": ["G4", "G2 deviasi 8.4pp > 8pp"]},
+    {"selection": "BTTS Yes", "score": 0.705, "edge_pp": 19.21, "veto_reasons": ["G4", "G2 deviasi 19.2pp > 8pp"]},
+    {"selection": "Asian Handicap Home +0.25", "score": 0.384, "veto_reasons": ["G4", "G7 no price"]},
+    {"selection": "Asian Handicap Home -0.25", "score": 0.329, "veto_reasons": ["G4", "G7 no price"]},
+    {"selection": "BTTS No", "score": 0.316, "veto_reasons": ["G4", "G2 deviasi 19.2pp"]},
+    {"selection": "Under 2.5", "score": 0.181, "veto_reasons": ["G4"]},
+    {"selection": "Asian Handicap Home -1.5", "score": 0.158, "veto_reasons": ["G4", "G2 deviasi 21.5pp"]}
+  ],
+  "displayed_card": {
+    "best_pick_shown": "OVER 2.5 @ 1.37",
+    "label": "HIGH RISK — gagal gerbang: lambda_total 4.10 di luar band [1.6, 3.6] — estimasi gol rusak (pola SV Ried 2026-08-21: lambda 4.09, FT 1-0)",
+    "confidence": "NO SIGNAL",
+    "note": "'pola SV Ried' text is a hardcoded string in pick_gates.py:226-228 shown on every G4 rejection regardless of context"
+  },
+  "settle_status": "UNSETTLED at evidence time — no settle event for this match_id in cache/football/predictions.jsonl as of 2026-08-23 ~23:50 local",
+  "differences_from_the_sv_ried_precedent": {
+    "sv_ried": {"model_O2.5": 0.775, "market_fair_O2.5": 0.49, "deviation_pp": 28.5, "elo_seeded": false},
+    "this_match": {"model_O2.5": 0.7767, "market_fair_O2.5": 0.69839, "deviation_pp": 7.83, "elo_seeded": true},
+    "implication": "the G4 reason text cites SV Ried, but this card's model-market gap (7.8pp) was inside the G2 tolerance and both teams were seeded — the situations are materially different"
+  }
+}

@@ -1,0 +1,2531 @@
+{
+  "mode": "cross_league",
+  "leagues": [
+    "EPL",
+    "LaLiga",
+    "Bundesliga",
+    "Serie A"
+  ],
+  "fit_seasons": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+  ],
+  "eval_seasons": [
+    "2025-2026"
+  ],
+  "model": "ensemble",
+  "pooled_pairs_n": 17376,
+  "pooled_metrics": {
+    "n": 17376,
+    "brier": 0.1987,
+    "log_loss": 0.5834,
+    "ece": 0.0044
+  },
+  "pooled_buckets": {
+    "buckets": [
+      {
+        "bucket": "[0.00,0.50)",
+        "n": 14425,
+        "predicted": 0.2775,
+        "actual": 0.279,
+        "gap": -0.0014,
+        "wilson_ci": [
+          0.2717,
+          0.2863
+        ],
+        "brier": 0.1917,
+        "log_loss": 0.5681,
+        "ec_contrib": 20.4156
+      },
+      {
+        "bucket": "[0.50,0.55)",
+        "n": 898,
+        "predicted": 0.5236,
+        "actual": 0.5312,
+        "gap": -0.0076,
+        "wilson_ci": [
+          0.4985,
+          0.5636
+        ],
+        "brier": 0.2482,
+        "log_loss": 0.6894,
+        "ec_contrib": 6.8374
+      },
+      {
+        "bucket": "[0.55,0.60)",
+        "n": 665,
+        "predicted": 0.5741,
+        "actual": 0.5263,
+        "gap": 0.0478,
+        "wilson_ci": [
+          0.4883,
+          0.564
+        ],
+        "brier": 0.251,
+        "log_loss": 0.6951,
+        "ec_contrib": 31.7554
+      },
+      {
+        "bucket": "[0.60,0.65)",
+        "n": 572,
+        "predicted": 0.625,
+        "actual": 0.6171,
+        "gap": 0.0078,
+        "wilson_ci": [
+          0.5766,
+          0.6561
+        ],
+        "brier": 0.2361,
+        "log_loss": 0.6651,
+        "ec_contrib": 4.4824
+      },
+      {
+        "bucket": "[0.65,0.70)",
+        "n": 411,
+        "predicted": 0.6738,
+        "actual": 0.6886,
+        "gap": -0.0148,
+        "wilson_ci": [
+          0.6422,
+          0.7314
+        ],
+        "brier": 0.2132,
+        "log_loss": 0.6174,
+        "ec_contrib": 6.0785
+      },
+      {
+        "bucket": "[0.70,0.75)",
+        "n": 252,
+        "predicted": 0.7249,
+        "actual": 0.7302,
+        "gap": -0.0053,
+        "wilson_ci": [
+          0.6722,
+          0.7812
+        ],
+        "brier": 0.1981,
+        "log_loss": 0.5858,
+        "ec_contrib": 1.3241
+      },
+      {
+        "bucket": "[0.75,0.80)",
+        "n": 121,
+        "predicted": 0.7704,
+        "actual": 0.7851,
+        "gap": -0.0147,
+        "wilson_ci": [
+          0.7038,
+          0.8489
+        ],
+        "brier": 0.168,
+        "log_loss": 0.5182,
+        "ec_contrib": 1.7842
+      },
+      {
+        "bucket": "[0.80,0.90)",
+        "n": 32,
+        "predicted": 0.8188,
+        "actual": 0.8125,
+        "gap": 0.0063,
+        "wilson_ci": [
+          0.6469,
+          0.9111
+        ],
+        "brier": 0.1515,
+        "log_loss": 0.4797,
+        "ec_contrib": 0.2021
+      },
+      {
+        "bucket": "[0.90,1.00]",
+        "n": 0
+      }
+    ],
+    "ece": 0.0042
+  },
+  "pooled_oos": {
+    "fit_seasons": [
+      "2022-2023",
+      "2023-2024",
+      "2024-2025"
+    ],
+    "eval_seasons": [
+      "2025-2026"
+    ],
+    "fitted": true,
+    "fit_samples": 13032,
+    "eval_samples": 4344,
+    "fit_a": 0.0087,
+    "fit_b": 1.0136,
+    "raw": {
+      "n": 4344,
+      "brier": 0.1993,
+      "log_loss": 0.5851,
+      "ece": 0.0128
+    },
+    "calibrated": {
+      "n": 4344,
+      "brier": 0.1993,
+      "log_loss": 0.5852,
+      "ece": 0.0126
+    },
+    "improves_ece": true,
+    "improves_brier": false,
+    "improves_log_loss": false,
+    "raw_eval_buckets": {
+      "buckets": [
+        {
+          "bucket": "[0.00,0.50)",
+          "n": 3558,
+          "predicted": 0.2718,
+          "actual": 0.2763,
+          "gap": -0.0044,
+          "wilson_ci": [
+            0.2618,
+            0.2912
+          ],
+          "brier": 0.1918,
+          "log_loss": 0.5688,
+          "ec_contrib": 15.8026,
+          "sum_pred": 967.197449,
+          "sum_out": 983.0
+        },
+        {
+          "bucket": "[0.50,0.55)",
+          "n": 214,
+          "predicted": 0.5237,
+          "actual": 0.5047,
+          "gap": 0.019,
+          "wilson_ci": [
+            0.4382,
+            0.571
+          ],
+          "brier": 0.25,
+          "log_loss": 0.6931,
+          "ec_contrib": 4.0722,
+          "sum_pred": 112.072179,
+          "sum_out": 108.0
+        },
+        {
+          "bucket": "[0.55,0.60)",
+          "n": 183,
+          "predicted": 0.5743,
+          "actual": 0.4918,
+          "gap": 0.0825,
+          "wilson_ci": [
+            0.4203,
+            0.5637
+          ],
+          "brier": 0.2565,
+          "log_loss": 0.7063,
+          "ec_contrib": 15.1032,
+          "sum_pred": 105.103198,
+          "sum_out": 90.0
+        },
+        {
+          "bucket": "[0.60,0.65)",
+          "n": 153,
+          "predicted": 0.6257,
+          "actual": 0.6275,
+          "gap": -0.0018,
+          "wilson_ci": [
+            0.5486,
+            0.7001
+          ],
+          "brier": 0.2346,
+          "log_loss": 0.6621,
+          "ec_contrib": 0.2693,
+          "sum_pred": 95.730731,
+          "sum_out": 96.0
+        },
+        {
+          "bucket": "[0.65,0.70)",
+          "n": 116,
+          "predicted": 0.6729,
+          "actual": 0.681,
+          "gap": -0.0081,
+          "wilson_ci": [
+            0.5916,
+            0.7589
+          ],
+          "brier": 0.2167,
+          "log_loss": 0.625,
+          "ec_contrib": 0.9421,
+          "sum_pred": 78.057892,
+          "sum_out": 79.0
+        },
+        {
+          "bucket": "[0.70,0.75)",
+          "n": 69,
+          "predicted": 0.7239,
+          "actual": 0.7681,
+          "gap": -0.0443,
+          "wilson_ci": [
+            0.656,
+            0.8519
+          ],
+          "brier": 0.181,
+          "log_loss": 0.5488,
+          "ec_contrib": 3.0533,
+          "sum_pred": 49.946697,
+          "sum_out": 53.0
+        },
+        {
+          "bucket": "[0.75,0.80)",
+          "n": 42,
+          "predicted": 0.7736,
+          "actual": 0.8095,
+          "gap": -0.0359,
+          "wilson_ci": [
+            0.667,
+            0.9002
+          ],
+          "brier": 0.1548,
+          "log_loss": 0.4888,
+          "ec_contrib": 1.509,
+          "sum_pred": 32.491036,
+          "sum_out": 34.0
+        },
+        {
+          "bucket": "[0.80,0.90)",
+          "n": 9,
+          "predicted": 0.8223,
+          "actual": 0.5556,
+          "gap": 0.2668,
+          "wilson_ci": [
+            0.2666,
+            0.8112
+          ],
+          "brier": 0.3169,
+          "log_loss": 0.8728,
+          "ec_contrib": 2.4008,
+          "sum_pred": 7.400818,
+          "sum_out": 5.0
+        },
+        {
+          "bucket": "[0.90,1.00]",
+          "n": 0,
+          "predicted": null,
+          "actual": null,
+          "gap": null,
+          "wilson_ci": null,
+          "brier": null,
+          "log_loss": null,
+          "ec_contrib": 0.0,
+          "sum_pred": 0.0,
+          "sum_out": 0.0
+        }
+      ],
+      "ece": 0.0099
+    },
+    "calibrated_eval_buckets": {
+      "buckets": [
+        {
+          "bucket": "[0.00,0.50)",
+          "n": 3549,
+          "predicted": 0.2705,
+          "actual": 0.275,
+          "gap": -0.0045,
+          "wilson_ci": [
+            0.2606,
+            0.2899
+          ],
+          "brier": 0.1917,
+          "log_loss": 0.5686,
+          "ec_contrib": 15.914,
+          "sum_pred": 960.086026,
+          "sum_out": 976.0
+        },
+        {
+          "bucket": "[0.50,0.55)",
+          "n": 212,
+          "predicted": 0.5238,
+          "actual": 0.5094,
+          "gap": 0.0144,
+          "wilson_ci": [
+            0.4426,
+            0.576
+          ],
+          "brier": 0.2507,
+          "log_loss": 0.6945,
+          "ec_contrib": 3.0484,
+          "sum_pred": 111.048382,
+          "sum_out": 108.0
+        },
+        {
+          "bucket": "[0.55,0.60)",
+          "n": 181,
+          "predicted": 0.5742,
+          "actual": 0.4917,
+          "gap": 0.0824,
+          "wilson_ci": [
+            0.4198,
+            0.564
+          ],
+          "brier": 0.2574,
+          "log_loss": 0.7081,
+          "ec_contrib": 14.923,
+          "sum_pred": 103.92297,
+          "sum_out": 89.0
+        },
+        {
+          "bucket": "[0.60,0.65)",
+          "n": 155,
+          "predicted": 0.6254,
+          "actual": 0.6387,
+          "gap": -0.0133,
+          "wilson_ci": [
+            0.5606,
+            0.7101
+          ],
+          "brier": 0.231,
+          "log_loss": 0.6547,
+          "ec_contrib": 2.0605,
+          "sum_pred": 96.939497,
+          "sum_out": 99.0
+        },
+        {
+          "bucket": "[0.65,0.70)",
+          "n": 122,
+          "predicted": 0.6737,
+          "actual": 0.6639,
+          "gap": 0.0097,
+          "wilson_ci": [
+            0.5762,
+            0.7416
+          ],
+          "brier": 0.2217,
+          "log_loss": 0.6351,
+          "ec_contrib": 1.1861,
+          "sum_pred": 82.186069,
+          "sum_out": 81.0
+        },
+        {
+          "bucket": "[0.70,0.75)",
+          "n": 70,
+          "predicted": 0.725,
+          "actual": 0.7714,
+          "gap": -0.0465,
+          "wilson_ci": [
+            0.6605,
+            0.8541
+          ],
+          "brier": 0.1779,
+          "log_loss": 0.5417,
+          "ec_contrib": 3.2532,
+          "sum_pred": 50.746845,
+          "sum_out": 54.0
+        },
+        {
+          "bucket": "[0.75,0.80)",
+          "n": 41,
+          "predicted": 0.7726,
+          "actual": 0.7805,
+          "gap": -0.0079,
+          "wilson_ci": [
+            0.6329,
+            0.88
+          ],
+          "brier": 0.1694,
+          "log_loss": 0.5208,
+          "ec_contrib": 0.3235,
+          "sum_pred": 31.676467,
+          "sum_out": 32.0
+        },
+        {
+          "bucket": "[0.80,0.90)",
+          "n": 14,
+          "predicted": 0.8179,
+          "actual": 0.6429,
+          "gap": 0.175,
+          "wilson_ci": [
+            0.3876,
+            0.8366
+          ],
+          "brier": 0.2625,
+          "log_loss": 0.7452,
+          "ec_contrib": 2.4506,
+          "sum_pred": 11.450622,
+          "sum_out": 9.0
+        },
+        {
+          "bucket": "[0.90,1.00]",
+          "n": 0,
+          "predicted": null,
+          "actual": null,
+          "gap": null,
+          "wilson_ci": null,
+          "brier": null,
+          "log_loss": null,
+          "ec_contrib": 0.0,
+          "sum_pred": 0.0,
+          "sum_out": 0.0
+        }
+      ],
+      "ece": 0.0099
+    }
+  },
+  "per_league": {
+    "EPL": {
+      "n_matches": 1520,
+      "seasons": [
+        "2022-2023",
+        "2023-2024",
+        "2024-2025",
+        "2025-2026"
+      ],
+      "model": "ensemble",
+      "pooled_metrics": {
+        "n": 4560,
+        "brier": 0.1967,
+        "log_loss": 0.5785,
+        "ece": 0.011
+      },
+      "pooled_buckets": {
+        "buckets": [
+          {
+            "bucket": "[0.00,0.50)",
+            "n": 3756,
+            "predicted": 0.2745,
+            "actual": 0.2756,
+            "gap": -0.0011,
+            "wilson_ci": [
+              0.2615,
+              0.2901
+            ],
+            "brier": 0.1892,
+            "log_loss": 0.5621,
+            "ec_contrib": 4.1327,
+            "sum_pred": 1030.867272,
+            "sum_out": 1035.0
+          },
+          {
+            "bucket": "[0.50,0.55)",
+            "n": 243,
+            "predicted": 0.5227,
+            "actual": 0.5432,
+            "gap": -0.0205,
+            "wilson_ci": [
+              0.4804,
+              0.6047
+            ],
+            "brier": 0.2461,
+            "log_loss": 0.6853,
+            "ec_contrib": 4.9742,
+            "sum_pred": 127.025837,
+            "sum_out": 132.0
+          },
+          {
+            "bucket": "[0.55,0.60)",
+            "n": 177,
+            "predicted": 0.5733,
+            "actual": 0.5311,
+            "gap": 0.0422,
+            "wilson_ci": [
+              0.4577,
+              0.6032
+            ],
+            "brier": 0.2487,
+            "log_loss": 0.6904,
+            "ec_contrib": 7.4725,
+            "sum_pred": 101.472522,
+            "sum_out": 94.0
+          },
+          {
+            "bucket": "[0.60,0.65)",
+            "n": 153,
+            "predicted": 0.6249,
+            "actual": 0.6471,
+            "gap": -0.0222,
+            "wilson_ci": [
+              0.5686,
+              0.7183
+            ],
+            "brier": 0.2288,
+            "log_loss": 0.6502,
+            "ec_contrib": 3.3919,
+            "sum_pred": 95.608114,
+            "sum_out": 99.0
+          },
+          {
+            "bucket": "[0.65,0.70)",
+            "n": 113,
+            "predicted": 0.6728,
+            "actual": 0.6106,
+            "gap": 0.0622,
+            "wilson_ci": [
+              0.5185,
+              0.6955
+            ],
+            "brier": 0.2398,
+            "log_loss": 0.673,
+            "ec_contrib": 7.0296,
+            "sum_pred": 76.029571,
+            "sum_out": 69.0
+          },
+          {
+            "bucket": "[0.70,0.75)",
+            "n": 63,
+            "predicted": 0.727,
+            "actual": 0.7302,
+            "gap": -0.0031,
+            "wilson_ci": [
+              0.6097,
+              0.8242
+            ],
+            "brier": 0.1992,
+            "log_loss": 0.5887,
+            "ec_contrib": 0.1977,
+            "sum_pred": 45.802332,
+            "sum_out": 46.0
+          },
+          {
+            "bucket": "[0.75,0.80)",
+            "n": 37,
+            "predicted": 0.7697,
+            "actual": 0.7568,
+            "gap": 0.0129,
+            "wilson_ci": [
+              0.5988,
+              0.8664
+            ],
+            "brier": 0.1821,
+            "log_loss": 0.5493,
+            "ec_contrib": 0.4777,
+            "sum_pred": 28.477655,
+            "sum_out": 28.0
+          },
+          {
+            "bucket": "[0.80,0.90)",
+            "n": 18,
+            "predicted": 0.8176,
+            "actual": 0.9444,
+            "gap": -0.1269,
+            "wilson_ci": [
+              0.7424,
+              0.9901
+            ],
+            "brier": 0.0671,
+            "log_loss": 0.2796,
+            "ec_contrib": 2.2833,
+            "sum_pred": 14.716696,
+            "sum_out": 17.0
+          },
+          {
+            "bucket": "[0.90,1.00]",
+            "n": 0,
+            "predicted": null,
+            "actual": null,
+            "gap": null,
+            "wilson_ci": null,
+            "brier": null,
+            "log_loss": null,
+            "ec_contrib": 0.0,
+            "sum_pred": 0.0,
+            "sum_out": 0.0
+          }
+        ],
+        "ece": 0.0066
+      },
+      "oos": {
+        "fit_seasons": [
+          "2022-2023",
+          "2023-2024",
+          "2024-2025"
+        ],
+        "eval_seasons": [
+          "2025-2026"
+        ],
+        "fitted": true,
+        "fit_samples": 3420,
+        "eval_samples": 1140,
+        "fit_a": 0.0483,
+        "fit_b": 1.0756,
+        "raw": {
+          "n": 1140,
+          "brier": 0.2048,
+          "log_loss": 0.5969,
+          "ece": 0.0291
+        },
+        "calibrated": {
+          "n": 1140,
+          "brier": 0.2054,
+          "log_loss": 0.5984,
+          "ece": 0.0349
+        },
+        "improves_ece": false,
+        "improves_brier": false,
+        "improves_log_loss": false,
+        "raw_eval_buckets": {
+          "buckets": [
+            {
+              "bucket": "[0.00,0.50)",
+              "n": 933,
+              "predicted": 0.2726,
+              "actual": 0.284,
+              "gap": -0.0114,
+              "wilson_ci": [
+                0.256,
+                0.3138
+              ],
+              "brier": 0.1965,
+              "log_loss": 0.5791,
+              "ec_contrib": 10.6334,
+              "sum_pred": 254.36662,
+              "sum_out": 265.0
+            },
+            {
+              "bucket": "[0.50,0.55)",
+              "n": 58,
+              "predicted": 0.5237,
+              "actual": 0.4828,
+              "gap": 0.0409,
+              "wilson_ci": [
+                0.3593,
+                0.6084
+              ],
+              "brier": 0.2522,
+              "log_loss": 0.6975,
+              "ec_contrib": 2.3719,
+              "sum_pred": 30.371906,
+              "sum_out": 28.0
+            },
+            {
+              "bucket": "[0.55,0.60)",
+              "n": 51,
+              "predicted": 0.5746,
+              "actual": 0.451,
+              "gap": 0.1236,
+              "wilson_ci": [
+                0.3227,
+                0.5862
+              ],
+              "brier": 0.2621,
+              "log_loss": 0.7175,
+              "ec_contrib": 6.3043,
+              "sum_pred": 29.30429,
+              "sum_out": 23.0
+            },
+            {
+              "bucket": "[0.60,0.65)",
+              "n": 37,
+              "predicted": 0.6239,
+              "actual": 0.6216,
+              "gap": 0.0022,
+              "wilson_ci": [
+                0.461,
+                0.7594
+              ],
+              "brier": 0.2364,
+              "log_loss": 0.6659,
+              "ec_contrib": 0.083,
+              "sum_pred": 23.082985,
+              "sum_out": 23.0
+            },
+            {
+              "bucket": "[0.65,0.70)",
+              "n": 38,
+              "predicted": 0.6702,
+              "actual": 0.6579,
+              "gap": 0.0123,
+              "wilson_ci": [
+                0.4989,
+                0.7879
+              ],
+              "brier": 0.2254,
+              "log_loss": 0.6432,
+              "ec_contrib": 0.4686,
+              "sum_pred": 25.468598,
+              "sum_out": 25.0
+            },
+            {
+              "bucket": "[0.70,0.75)",
+              "n": 10,
+              "predicted": 0.7297,
+              "actual": 0.6,
+              "gap": 0.1297,
+              "wilson_ci": [
+                0.3127,
+                0.8318
+              ],
+              "brier": 0.2619,
+              "log_loss": 0.7255,
+              "ec_contrib": 1.2974,
+              "sum_pred": 7.29739,
+              "sum_out": 6.0
+            },
+            {
+              "bucket": "[0.75,0.80)",
+              "n": 10,
+              "predicted": 0.7668,
+              "actual": 0.7,
+              "gap": 0.0668,
+              "wilson_ci": [
+                0.3968,
+                0.8922
+              ],
+              "brier": 0.2122,
+              "log_loss": 0.6166,
+              "ec_contrib": 0.6675,
+              "sum_pred": 7.667525,
+              "sum_out": 7.0
+            },
+            {
+              "bucket": "[0.80,0.90)",
+              "n": 3,
+              "predicted": 0.8136,
+              "actual": 1.0,
+              "gap": -0.1864,
+              "wilson_ci": [
+                0.4385,
+                1.0
+              ],
+              "brier": 0.0348,
+              "log_loss": 0.2064,
+              "ec_contrib": 0.5593,
+              "sum_pred": 2.440687,
+              "sum_out": 3.0
+            },
+            {
+              "bucket": "[0.90,1.00]",
+              "n": 0,
+              "predicted": null,
+              "actual": null,
+              "gap": null,
+              "wilson_ci": null,
+              "brier": null,
+              "log_loss": null,
+              "ec_contrib": 0.0,
+              "sum_pred": 0.0,
+              "sum_out": 0.0
+            }
+          ],
+          "ece": 0.0196
+        },
+        "calibrated_eval_buckets": {
+          "buckets": [
+            {
+              "bucket": "[0.00,0.50)",
+              "n": 922,
+              "predicted": 0.2657,
+              "actual": 0.2809,
+              "gap": -0.0152,
+              "wilson_ci": [
+                0.2529,
+                0.3108
+              ],
+              "brier": 0.1961,
+              "log_loss": 0.5786,
+              "ec_contrib": 13.9843,
+              "sum_pred": 245.015711,
+              "sum_out": 259.0
+            },
+            {
+              "bucket": "[0.50,0.55)",
+              "n": 53,
+              "predicted": 0.5251,
+              "actual": 0.5094,
+              "gap": 0.0156,
+              "wilson_ci": [
+                0.3788,
+                0.6388
+              ],
+              "brier": 0.2515,
+              "log_loss": 0.6961,
+              "ec_contrib": 0.8281,
+              "sum_pred": 27.828052,
+              "sum_out": 27.0
+            },
+            {
+              "bucket": "[0.55,0.60)",
+              "n": 49,
+              "predicted": 0.5742,
+              "actual": 0.4286,
+              "gap": 0.1457,
+              "wilson_ci": [
+                0.3002,
+                0.5673
+              ],
+              "brier": 0.2659,
+              "log_loss": 0.7253,
+              "ec_contrib": 7.1369,
+              "sum_pred": 28.136929,
+              "sum_out": 21.0
+            },
+            {
+              "bucket": "[0.60,0.65)",
+              "n": 42,
+              "predicted": 0.6242,
+              "actual": 0.5952,
+              "gap": 0.0289,
+              "wilson_ci": [
+                0.4449,
+                0.7296
+              ],
+              "brier": 0.2393,
+              "log_loss": 0.6714,
+              "ec_contrib": 1.2148,
+              "sum_pred": 26.214823,
+              "sum_out": 25.0
+            },
+            {
+              "bucket": "[0.65,0.70)",
+              "n": 36,
+              "predicted": 0.6738,
+              "actual": 0.5833,
+              "gap": 0.0905,
+              "wilson_ci": [
+                0.422,
+                0.7286
+              ],
+              "brier": 0.2514,
+              "log_loss": 0.6974,
+              "ec_contrib": 3.2564,
+              "sum_pred": 24.256436,
+              "sum_out": 21.0
+            },
+            {
+              "bucket": "[0.70,0.75)",
+              "n": 20,
+              "predicted": 0.7156,
+              "actual": 0.75,
+              "gap": -0.0344,
+              "wilson_ci": [
+                0.5313,
+                0.8881
+              ],
+              "brier": 0.1899,
+              "log_loss": 0.568,
+              "ec_contrib": 0.6887,
+              "sum_pred": 14.311254,
+              "sum_out": 15.0
+            },
+            {
+              "bucket": "[0.75,0.80)",
+              "n": 12,
+              "predicted": 0.7761,
+              "actual": 0.5833,
+              "gap": 0.1928,
+              "wilson_ci": [
+                0.3195,
+                0.8067
+              ],
+              "brier": 0.2757,
+              "log_loss": 0.7585,
+              "ec_contrib": 2.3133,
+              "sum_pred": 9.313328,
+              "sum_out": 7.0
+            },
+            {
+              "bucket": "[0.80,0.90)",
+              "n": 6,
+              "predicted": 0.8228,
+              "actual": 0.8333,
+              "gap": -0.0106,
+              "wilson_ci": [
+                0.4365,
+                0.9699
+              ],
+              "brier": 0.1342,
+              "log_loss": 0.4344,
+              "ec_contrib": 0.0633,
+              "sum_pred": 4.936691,
+              "sum_out": 5.0
+            },
+            {
+              "bucket": "[0.90,1.00]",
+              "n": 0,
+              "predicted": null,
+              "actual": null,
+              "gap": null,
+              "wilson_ci": null,
+              "brier": null,
+              "log_loss": null,
+              "ec_contrib": 0.0,
+              "sum_pred": 0.0,
+              "sum_out": 0.0
+            }
+          ],
+          "ece": 0.0259
+        }
+      },
+      "aggregate_metrics": {
+        "baseline": {
+          "log_loss": 1.0971,
+          "brier": 0.6495,
+          "ece": 0.0196,
+          "hit_rate": 0.4441
+        },
+        "elo": {
+          "log_loss": 0.9914,
+          "brier": 0.5921,
+          "ece": 0.0205,
+          "hit_rate": 0.523
+        },
+        "poisson": {
+          "log_loss": 1.0341,
+          "brier": 0.6213,
+          "ece": 0.0157,
+          "hit_rate": 0.4917
+        },
+        "dc": {
+          "log_loss": 1.0363,
+          "brier": 0.6223,
+          "ece": 0.0174,
+          "hit_rate": 0.489
+        },
+        "ensemble": {
+          "log_loss": 0.9886,
+          "brier": 0.5901,
+          "ece": 0.011,
+          "hit_rate": 0.5309
+        }
+      }
+    },
+    "LaLiga": {
+      "n_matches": 1520,
+      "seasons": [
+        "2022-2023",
+        "2023-2024",
+        "2024-2025",
+        "2025-2026"
+      ],
+      "model": "ensemble",
+      "pooled_metrics": {
+        "n": 4560,
+        "brier": 0.1982,
+        "log_loss": 0.5825,
+        "ece": 0.0119
+      },
+      "pooled_buckets": {
+        "buckets": [
+          {
+            "bucket": "[0.00,0.50)",
+            "n": 3822,
+            "predicted": 0.2812,
+            "actual": 0.2818,
+            "gap": -0.0006,
+            "wilson_ci": [
+              0.2678,
+              0.2963
+            ],
+            "brier": 0.1922,
+            "log_loss": 0.5694,
+            "ec_contrib": 2.3412,
+            "sum_pred": 1074.658751,
+            "sum_out": 1077.0
+          },
+          {
+            "bucket": "[0.50,0.55)",
+            "n": 231,
+            "predicted": 0.5221,
+            "actual": 0.5108,
+            "gap": 0.0113,
+            "wilson_ci": [
+              0.4467,
+              0.5746
+            ],
+            "brier": 0.2499,
+            "log_loss": 0.6929,
+            "ec_contrib": 2.6065,
+            "sum_pred": 120.606534,
+            "sum_out": 118.0
+          },
+          {
+            "bucket": "[0.55,0.60)",
+            "n": 154,
+            "predicted": 0.5736,
+            "actual": 0.5195,
+            "gap": 0.0541,
+            "wilson_ci": [
+              0.4411,
+              0.597
+            ],
+            "brier": 0.2516,
+            "log_loss": 0.6963,
+            "ec_contrib": 8.337,
+            "sum_pred": 88.336986,
+            "sum_out": 80.0
+          },
+          {
+            "bucket": "[0.60,0.65)",
+            "n": 151,
+            "predicted": 0.6278,
+            "actual": 0.596,
+            "gap": 0.0317,
+            "wilson_ci": [
+              0.5163,
+              0.671
+            ],
+            "brier": 0.2419,
+            "log_loss": 0.677,
+            "ec_contrib": 4.7913,
+            "sum_pred": 94.791273,
+            "sum_out": 90.0
+          },
+          {
+            "bucket": "[0.65,0.70)",
+            "n": 118,
+            "predicted": 0.6745,
+            "actual": 0.7458,
+            "gap": -0.0713,
+            "wilson_ci": [
+              0.6603,
+              0.8157
+            ],
+            "brier": 0.1935,
+            "log_loss": 0.5763,
+            "ec_contrib": 8.408,
+            "sum_pred": 79.592008,
+            "sum_out": 88.0
+          },
+          {
+            "bucket": "[0.70,0.75)",
+            "n": 56,
+            "predicted": 0.7219,
+            "actual": 0.75,
+            "gap": -0.0281,
+            "wilson_ci": [
+              0.6231,
+              0.8448
+            ],
+            "brier": 0.1897,
+            "log_loss": 0.5679,
+            "ec_contrib": 1.5756,
+            "sum_pred": 40.424398,
+            "sum_out": 42.0
+          },
+          {
+            "bucket": "[0.75,0.80)",
+            "n": 27,
+            "predicted": 0.7691,
+            "actual": 0.8889,
+            "gap": -0.1197,
+            "wilson_ci": [
+              0.7194,
+              0.9615
+            ],
+            "brier": 0.1106,
+            "log_loss": 0.3887,
+            "ec_contrib": 3.2331,
+            "sum_pred": 20.766936,
+            "sum_out": 24.0
+          },
+          {
+            "bucket": "[0.80,0.90)",
+            "n": 1,
+            "predicted": 0.8231,
+            "actual": 1.0,
+            "gap": -0.1769,
+            "wilson_ci": [
+              0.2065,
+              1.0
+            ],
+            "brier": 0.0313,
+            "log_loss": 0.1947,
+            "ec_contrib": 0.1769,
+            "sum_pred": 0.823114,
+            "sum_out": 1.0
+          },
+          {
+            "bucket": "[0.90,1.00]",
+            "n": 0,
+            "predicted": null,
+            "actual": null,
+            "gap": null,
+            "wilson_ci": null,
+            "brier": null,
+            "log_loss": null,
+            "ec_contrib": 0.0,
+            "sum_pred": 0.0,
+            "sum_out": 0.0
+          }
+        ],
+        "ece": 0.0069
+      },
+      "oos": {
+        "fit_seasons": [
+          "2022-2023",
+          "2023-2024",
+          "2024-2025"
+        ],
+        "eval_seasons": [
+          "2025-2026"
+        ],
+        "fitted": true,
+        "fit_samples": 3420,
+        "eval_samples": 1140,
+        "fit_a": 0.0209,
+        "fit_b": 1.0325,
+        "raw": {
+          "n": 1140,
+          "brier": 0.198,
+          "log_loss": 0.5816,
+          "ece": 0.0161
+        },
+        "calibrated": {
+          "n": 1140,
+          "brier": 0.198,
+          "log_loss": 0.5816,
+          "ece": 0.0163
+        },
+        "improves_ece": false,
+        "improves_brier": false,
+        "improves_log_loss": false,
+        "raw_eval_buckets": {
+          "buckets": [
+            {
+              "bucket": "[0.00,0.50)",
+              "n": 950,
+              "predicted": 0.2797,
+              "actual": 0.2811,
+              "gap": -0.0014,
+              "wilson_ci": [
+                0.2534,
+                0.3105
+              ],
+              "brier": 0.1931,
+              "log_loss": 0.571,
+              "ec_contrib": 1.2946,
+              "sum_pred": 265.705422,
+              "sum_out": 267.0
+            },
+            {
+              "bucket": "[0.50,0.55)",
+              "n": 59,
+              "predicted": 0.5201,
+              "actual": 0.4576,
+              "gap": 0.0625,
+              "wilson_ci": [
+                0.337,
+                0.5834
+              ],
+              "brier": 0.25,
+              "log_loss": 0.6931,
+              "ec_contrib": 3.6848,
+              "sum_pred": 30.684769,
+              "sum_out": 27.0
+            },
+            {
+              "bucket": "[0.55,0.60)",
+              "n": 46,
+              "predicted": 0.5712,
+              "actual": 0.5,
+              "gap": 0.0712,
+              "wilson_ci": [
+                0.3612,
+                0.6388
+              ],
+              "brier": 0.2549,
+              "log_loss": 0.703,
+              "ec_contrib": 3.2753,
+              "sum_pred": 26.275263,
+              "sum_out": 23.0
+            },
+            {
+              "bucket": "[0.60,0.65)",
+              "n": 37,
+              "predicted": 0.6258,
+              "actual": 0.6216,
+              "gap": 0.0042,
+              "wilson_ci": [
+                0.461,
+                0.7594
+              ],
+              "brier": 0.2372,
+              "log_loss": 0.6676,
+              "ec_contrib": 0.1556,
+              "sum_pred": 23.155607,
+              "sum_out": 23.0
+            },
+            {
+              "bucket": "[0.65,0.70)",
+              "n": 21,
+              "predicted": 0.6763,
+              "actual": 0.7143,
+              "gap": -0.038,
+              "wilson_ci": [
+                0.5004,
+                0.8619
+              ],
+              "brier": 0.2064,
+              "log_loss": 0.6035,
+              "ec_contrib": 0.7987,
+              "sum_pred": 14.201295,
+              "sum_out": 15.0
+            },
+            {
+              "bucket": "[0.70,0.75)",
+              "n": 16,
+              "predicted": 0.7183,
+              "actual": 0.875,
+              "gap": -0.1567,
+              "wilson_ci": [
+                0.6398,
+                0.965
+              ],
+              "brier": 0.1327,
+              "log_loss": 0.4445,
+              "ec_contrib": 2.5065,
+              "sum_pred": 11.493452,
+              "sum_out": 14.0
+            },
+            {
+              "bucket": "[0.75,0.80)",
+              "n": 11,
+              "predicted": 0.7713,
+              "actual": 1.0,
+              "gap": -0.2287,
+              "wilson_ci": [
+                0.7412,
+                1.0
+              ],
+              "brier": 0.0525,
+              "log_loss": 0.2599,
+              "ec_contrib": 2.5158,
+              "sum_pred": 8.484191,
+              "sum_out": 11.0
+            },
+            {
+              "bucket": "[0.80,0.90)",
+              "n": 0,
+              "predicted": null,
+              "actual": null,
+              "gap": null,
+              "wilson_ci": null,
+              "brier": null,
+              "log_loss": null,
+              "ec_contrib": 0.0,
+              "sum_pred": 0.0,
+              "sum_out": 0.0
+            },
+            {
+              "bucket": "[0.90,1.00]",
+              "n": 0,
+              "predicted": null,
+              "actual": null,
+              "gap": null,
+              "wilson_ci": null,
+              "brier": null,
+              "log_loss": null,
+              "ec_contrib": 0.0,
+              "sum_pred": 0.0,
+              "sum_out": 0.0
+            }
+          ],
+          "ece": 0.0125
+        },
+        "calibrated_eval_buckets": {
+          "buckets": [
+            {
+              "bucket": "[0.00,0.50)",
+              "n": 946,
+              "predicted": 0.2772,
+              "actual": 0.2791,
+              "gap": -0.0019,
+              "wilson_ci": [
+                0.2514,
+                0.3085
+              ],
+              "brier": 0.1929,
+              "log_loss": 0.5706,
+              "ec_contrib": 1.8054,
+              "sum_pred": 262.19457,
+              "sum_out": 264.0
+            },
+            {
+              "bucket": "[0.50,0.55)",
+              "n": 60,
+              "predicted": 0.5231,
+              "actual": 0.4667,
+              "gap": 0.0564,
+              "wilson_ci": [
+                0.3463,
+                0.5911
+              ],
+              "brier": 0.2514,
+              "log_loss": 0.6959,
+              "ec_contrib": 3.3853,
+              "sum_pred": 31.385336,
+              "sum_out": 28.0
+            },
+            {
+              "bucket": "[0.55,0.60)",
+              "n": 45,
+              "predicted": 0.5747,
+              "actual": 0.5111,
+              "gap": 0.0636,
+              "wilson_ci": [
+                0.37,
+                0.6504
+              ],
+              "brier": 0.2539,
+              "log_loss": 0.7011,
+              "ec_contrib": 2.8615,
+              "sum_pred": 25.861526,
+              "sum_out": 23.0
+            },
+            {
+              "bucket": "[0.60,0.65)",
+              "n": 34,
+              "predicted": 0.6266,
+              "actual": 0.6765,
+              "gap": -0.0499,
+              "wilson_ci": [
+                0.5084,
+                0.8087
+              ],
+              "brier": 0.2188,
+              "log_loss": 0.6294,
+              "ec_contrib": 1.6972,
+              "sum_pred": 21.30275,
+              "sum_out": 23.0
+            },
+            {
+              "bucket": "[0.65,0.70)",
+              "n": 26,
+              "predicted": 0.6764,
+              "actual": 0.6154,
+              "gap": 0.061,
+              "wilson_ci": [
+                0.4253,
+                0.7757
+              ],
+              "brier": 0.2355,
+              "log_loss": 0.6635,
+              "ec_contrib": 1.5863,
+              "sum_pred": 17.586319,
+              "sum_out": 16.0
+            },
+            {
+              "bucket": "[0.70,0.75)",
+              "n": 17,
+              "predicted": 0.7244,
+              "actual": 0.8235,
+              "gap": -0.0991,
+              "wilson_ci": [
+                0.5897,
+                0.9381
+              ],
+              "brier": 0.1529,
+              "log_loss": 0.4872,
+              "ec_contrib": 1.6848,
+              "sum_pred": 12.315179,
+              "sum_out": 14.0
+            },
+            {
+              "bucket": "[0.75,0.80)",
+              "n": 10,
+              "predicted": 0.7741,
+              "actual": 1.0,
+              "gap": -0.2259,
+              "wilson_ci": [
+                0.7225,
+                1.0
+              ],
+              "brier": 0.0512,
+              "log_loss": 0.2562,
+              "ec_contrib": 2.259,
+              "sum_pred": 7.74105,
+              "sum_out": 10.0
+            },
+            {
+              "bucket": "[0.80,0.90)",
+              "n": 2,
+              "predicted": 0.8056,
+              "actual": 1.0,
+              "gap": -0.1944,
+              "wilson_ci": [
+                0.3424,
+                1.0
+              ],
+              "brier": 0.0378,
+              "log_loss": 0.2162,
+              "ec_contrib": 0.3888,
+              "sum_pred": 1.611218,
+              "sum_out": 2.0
+            },
+            {
+              "bucket": "[0.90,1.00]",
+              "n": 0,
+              "predicted": null,
+              "actual": null,
+              "gap": null,
+              "wilson_ci": null,
+              "brier": null,
+              "log_loss": null,
+              "ec_contrib": 0.0,
+              "sum_pred": 0.0,
+              "sum_out": 0.0
+            }
+          ],
+          "ece": 0.0137
+        }
+      },
+      "aggregate_metrics": {
+        "baseline": {
+          "log_loss": 1.0913,
+          "brier": 0.6448,
+          "ece": 0.0067,
+          "hit_rate": 0.4599
+        },
+        "elo": {
+          "log_loss": 0.9986,
+          "brier": 0.595,
+          "ece": 0.0229,
+          "hit_rate": 0.527
+        },
+        "poisson": {
+          "log_loss": 1.0543,
+          "brier": 0.6327,
+          "ece": 0.0217,
+          "hit_rate": 0.4721
+        },
+        "dc": {
+          "log_loss": 1.0578,
+          "brier": 0.6345,
+          "ece": 0.0272,
+          "hit_rate": 0.4707
+        },
+        "ensemble": {
+          "log_loss": 0.9975,
+          "brier": 0.5947,
+          "ece": 0.0119,
+          "hit_rate": 0.523
+        }
+      }
+    },
+    "Bundesliga": {
+      "n_matches": 1231,
+      "seasons": [
+        "2022-2023",
+        "2023-2024",
+        "2024-2025",
+        "2025-2026"
+      ],
+      "model": "ensemble",
+      "pooled_metrics": {
+        "n": 3693,
+        "brier": 0.2,
+        "log_loss": 0.5864,
+        "ece": 0.0167
+      },
+      "pooled_buckets": {
+        "buckets": [
+          {
+            "bucket": "[0.00,0.50)",
+            "n": 3062,
+            "predicted": 0.2772,
+            "actual": 0.2786,
+            "gap": -0.0013,
+            "wilson_ci": [
+              0.263,
+              0.2947
+            ],
+            "brier": 0.1933,
+            "log_loss": 0.5717,
+            "ec_contrib": 4.0965,
+            "sum_pred": 848.903478,
+            "sum_out": 853.0
+          },
+          {
+            "bucket": "[0.50,0.55)",
+            "n": 193,
+            "predicted": 0.5249,
+            "actual": 0.5285,
+            "gap": -0.0036,
+            "wilson_ci": [
+              0.4582,
+              0.5977
+            ],
+            "brier": 0.2478,
+            "log_loss": 0.6888,
+            "ec_contrib": 0.6985,
+            "sum_pred": 101.301482,
+            "sum_out": 102.0
+          },
+          {
+            "bucket": "[0.55,0.60)",
+            "n": 158,
+            "predicted": 0.5747,
+            "actual": 0.5063,
+            "gap": 0.0684,
+            "wilson_ci": [
+              0.4292,
+              0.5832
+            ],
+            "brier": 0.2552,
+            "log_loss": 0.7036,
+            "ec_contrib": 10.8012,
+            "sum_pred": 90.801233,
+            "sum_out": 80.0
+          },
+          {
+            "bucket": "[0.60,0.65)",
+            "n": 107,
+            "predicted": 0.6227,
+            "actual": 0.6355,
+            "gap": -0.0128,
+            "wilson_ci": [
+              0.5411,
+              0.7205
+            ],
+            "brier": 0.2334,
+            "log_loss": 0.6598,
+            "ec_contrib": 1.3681,
+            "sum_pred": 66.631889,
+            "sum_out": 68.0
+          },
+          {
+            "bucket": "[0.65,0.70)",
+            "n": 85,
+            "predicted": 0.6755,
+            "actual": 0.7176,
+            "gap": -0.0422,
+            "wilson_ci": [
+              0.6142,
+              0.8023
+            ],
+            "brier": 0.2031,
+            "log_loss": 0.5962,
+            "ec_contrib": 3.5837,
+            "sum_pred": 57.416334,
+            "sum_out": 61.0
+          },
+          {
+            "bucket": "[0.70,0.75)",
+            "n": 54,
+            "predicted": 0.727,
+            "actual": 0.7778,
+            "gap": -0.0508,
+            "wilson_ci": [
+              0.6506,
+              0.868
+            ],
+            "brier": 0.1755,
+            "log_loss": 0.5367,
+            "ec_contrib": 2.7419,
+            "sum_pred": 39.258121,
+            "sum_out": 42.0
+          },
+          {
+            "bucket": "[0.75,0.80)",
+            "n": 26,
+            "predicted": 0.7727,
+            "actual": 0.8077,
+            "gap": -0.035,
+            "wilson_ci": [
+              0.6212,
+              0.9149
+            ],
+            "brier": 0.1574,
+            "log_loss": 0.4955,
+            "ec_contrib": 0.9095,
+            "sum_pred": 20.090491,
+            "sum_out": 21.0
+          },
+          {
+            "bucket": "[0.80,0.90)",
+            "n": 8,
+            "predicted": 0.8246,
+            "actual": 0.5,
+            "gap": 0.3246,
+            "wilson_ci": [
+              0.2152,
+              0.7848
+            ],
+            "brier": 0.3514,
+            "log_loss": 0.9536,
+            "ec_contrib": 2.597,
+            "sum_pred": 6.596973,
+            "sum_out": 4.0
+          },
+          {
+            "bucket": "[0.90,1.00]",
+            "n": 0,
+            "predicted": null,
+            "actual": null,
+            "gap": null,
+            "wilson_ci": null,
+            "brier": null,
+            "log_loss": null,
+            "ec_contrib": 0.0,
+            "sum_pred": 0.0,
+            "sum_out": 0.0
+          }
+        ],
+        "ece": 0.0073
+      },
+      "oos": {
+        "fit_seasons": [
+          "2022-2023",
+          "2023-2024",
+          "2024-2025"
+        ],
+        "eval_seasons": [
+          "2025-2026"
+        ],
+        "fitted": true,
+        "fit_samples": 2769,
+        "eval_samples": 924,
+        "fit_a": -0.042,
+        "fit_b": 0.9352,
+        "raw": {
+          "n": 924,
+          "brier": 0.1922,
+          "log_loss": 0.5696,
+          "ece": 0.0184
+        },
+        "calibrated": {
+          "n": 924,
+          "brier": 0.1924,
+          "log_loss": 0.57,
+          "ece": 0.019
+        },
+        "improves_ece": false,
+        "improves_brier": false,
+        "improves_log_loss": false,
+        "raw_eval_buckets": {
+          "buckets": [
+            {
+              "bucket": "[0.00,0.50)",
+              "n": 750,
+              "predicted": 0.2667,
+              "actual": 0.2587,
+              "gap": 0.008,
+              "wilson_ci": [
+                0.2286,
+                0.2912
+              ],
+              "brier": 0.1844,
+              "log_loss": 0.5522,
+              "ec_contrib": 6.0051,
+              "sum_pred": 200.005104,
+              "sum_out": 194.0
+            },
+            {
+              "bucket": "[0.50,0.55)",
+              "n": 42,
+              "predicted": 0.5222,
+              "actual": 0.6429,
+              "gap": -0.1207,
+              "wilson_ci": [
+                0.4917,
+                0.7701
+              ],
+              "brier": 0.2424,
+              "log_loss": 0.6778,
+              "ec_contrib": 5.0692,
+              "sum_pred": 21.930793,
+              "sum_out": 27.0
+            },
+            {
+              "bucket": "[0.55,0.60)",
+              "n": 41,
+              "predicted": 0.5761,
+              "actual": 0.561,
+              "gap": 0.0151,
+              "wilson_ci": [
+                0.4104,
+                0.7011
+              ],
+              "brier": 0.2472,
+              "log_loss": 0.6876,
+              "ec_contrib": 0.62,
+              "sum_pred": 23.62003,
+              "sum_out": 23.0
+            },
+            {
+              "bucket": "[0.60,0.65)",
+              "n": 31,
+              "predicted": 0.6249,
+              "actual": 0.6129,
+              "gap": 0.012,
+              "wilson_ci": [
+                0.4382,
+                0.7627
+              ],
+              "brier": 0.2391,
+              "log_loss": 0.6713,
+              "ec_contrib": 0.3714,
+              "sum_pred": 19.371374,
+              "sum_out": 19.0
+            },
+            {
+              "bucket": "[0.65,0.70)",
+              "n": 28,
+              "predicted": 0.6741,
+              "actual": 0.7143,
+              "gap": -0.0402,
+              "wilson_ci": [
+                0.5294,
+                0.8475
+              ],
+              "brier": 0.2056,
+              "log_loss": 0.6018,
+              "ec_contrib": 1.1247,
+              "sum_pred": 18.875348,
+              "sum_out": 20.0
+            },
+            {
+              "bucket": "[0.70,0.75)",
+              "n": 20,
+              "predicted": 0.7266,
+              "actual": 0.85,
+              "gap": -0.1234,
+              "wilson_ci": [
+                0.6396,
+                0.9476
+              ],
+              "brier": 0.1428,
+              "log_loss": 0.466,
+              "ec_contrib": 2.4689,
+              "sum_pred": 14.531082,
+              "sum_out": 17.0
+            },
+            {
+              "bucket": "[0.75,0.80)",
+              "n": 7,
+              "predicted": 0.7882,
+              "actual": 0.8571,
+              "gap": -0.0689,
+              "wilson_ci": [
+                0.4869,
+                0.9743
+              ],
+              "brier": 0.1263,
+              "log_loss": 0.423,
+              "ec_contrib": 0.4824,
+              "sum_pred": 5.517551,
+              "sum_out": 6.0
+            },
+            {
+              "bucket": "[0.80,0.90)",
+              "n": 5,
+              "predicted": 0.8297,
+              "actual": 0.4,
+              "gap": 0.4297,
+              "wilson_ci": [
+                0.1176,
+                0.7693
+              ],
+              "brier": 0.4179,
+              "log_loss": 1.1136,
+              "ec_contrib": 2.1487,
+              "sum_pred": 4.148717,
+              "sum_out": 2.0
+            },
+            {
+              "bucket": "[0.90,1.00]",
+              "n": 0,
+              "predicted": null,
+              "actual": null,
+              "gap": null,
+              "wilson_ci": null,
+              "brier": null,
+              "log_loss": null,
+              "ec_contrib": 0.0,
+              "sum_pred": 0.0,
+              "sum_out": 0.0
+            }
+          ],
+          "ece": 0.0198
+        },
+        "calibrated_eval_buckets": {
+          "buckets": [
+            {
+              "bucket": "[0.00,0.50)",
+              "n": 759,
+              "predicted": 0.2731,
+              "actual": 0.2635,
+              "gap": 0.0096,
+              "wilson_ci": [
+                0.2334,
+                0.296
+              ],
+              "brier": 0.1852,
+              "log_loss": 0.5539,
+              "ec_contrib": 7.2569,
+              "sum_pred": 207.256899,
+              "sum_out": 200.0
+            },
+            {
+              "bucket": "[0.50,0.55)",
+              "n": 42,
+              "predicted": 0.5206,
+              "actual": 0.619,
+              "gap": -0.0985,
+              "wilson_ci": [
+                0.4681,
+                0.75
+              ],
+              "brier": 0.2442,
+              "log_loss": 0.6816,
+              "ec_contrib": 4.1349,
+              "sum_pred": 21.865076,
+              "sum_out": 26.0
+            },
+            {
+              "bucket": "[0.55,0.60)",
+              "n": 44,
+              "predicted": 0.5733,
+              "actual": 0.5909,
+              "gap": -0.0176,
+              "wilson_ci": [
+                0.4441,
+                0.7231
+              ],
+              "brier": 0.2417,
+              "log_loss": 0.6765,
+              "ec_contrib": 0.7758,
+              "sum_pred": 25.224183,
+              "sum_out": 26.0
+            },
+            {
+              "bucket": "[0.60,0.65)",
+              "n": 32,
+              "predicted": 0.6267,
+              "actual": 0.625,
+              "gap": 0.0017,
+              "wilson_ci": [
+                0.4525,
+                0.7707
+              ],
+              "brier": 0.2331,
+              "log_loss": 0.6588,
+              "ec_contrib": 0.0533,
+              "sum_pred": 20.053303,
+              "sum_out": 20.0
+            },
+            {
+              "bucket": "[0.65,0.70)",
+              "n": 22,
+              "predicted": 0.6722,
+              "actual": 0.7727,
+              "gap": -0.1005,
+              "wilson_ci": [
+                0.5656,
+                0.8988
+              ],
+              "brier": 0.1859,
+              "log_loss": 0.5607,
+              "ec_contrib": 2.2113,
+              "sum_pred": 14.788726,
+              "sum_out": 17.0
+            },
+            {
+              "bucket": "[0.70,0.75)",
+              "n": 13,
+              "predicted": 0.715,
+              "actual": 0.8462,
+              "gap": -0.1311,
+              "wilson_ci": [
+                0.5776,
+                0.9567
+              ],
+              "brier": 0.1467,
+              "log_loss": 0.4751,
+              "ec_contrib": 1.7047,
+              "sum_pred": 9.295255,
+              "sum_out": 11.0
+            },
+            {
+              "bucket": "[0.75,0.80)",
+              "n": 9,
+              "predicted": 0.7709,
+              "actual": 0.7778,
+              "gap": -0.0069,
+              "wilson_ci": [
+                0.4526,
+                0.9368
+              ],
+              "brier": 0.1739,
+              "log_loss": 0.5327,
+              "ec_contrib": 0.0622,
+              "sum_pred": 6.937843,
+              "sum_out": 7.0
+            },
+            {
+              "bucket": "[0.80,0.90)",
+              "n": 3,
+              "predicted": 0.8227,
+              "actual": 0.3333,
+              "gap": 0.4894,
+              "wilson_ci": [
+                0.0615,
+                0.7923
+              ],
+              "brier": 0.4475,
+              "log_loss": 1.1702,
+              "ec_contrib": 1.4682,
+              "sum_pred": 2.468178,
+              "sum_out": 1.0
+            },
+            {
+              "bucket": "[0.90,1.00]",
+              "n": 0,
+              "predicted": null,
+              "actual": null,
+              "gap": null,
+              "wilson_ci": null,
+              "brier": null,
+              "log_loss": null,
+              "ec_contrib": 0.0,
+              "sum_pred": 0.0,
+              "sum_out": 0.0
+            }
+          ],
+          "ece": 0.0191
+        }
+      },
+      "aggregate_metrics": {
+        "baseline": {
+          "log_loss": 1.1089,
+          "brier": 0.6541,
+          "ece": 0.0171,
+          "hit_rate": 0.4289
+        },
+        "elo": {
+          "log_loss": 1.0082,
+          "brier": 0.6035,
+          "ece": 0.0266,
+          "hit_rate": 0.4963
+        },
+        "poisson": {
+          "log_loss": 1.0443,
+          "brier": 0.6267,
+          "ece": 0.026,
+          "hit_rate": 0.4876
+        },
+        "dc": {
+          "log_loss": 1.0445,
+          "brier": 0.6264,
+          "ece": 0.0219,
+          "hit_rate": 0.4843
+        },
+        "ensemble": {
+          "log_loss": 1.0036,
+          "brier": 0.6,
+          "ece": 0.0167,
+          "hit_rate": 0.5053
+        }
+      }
+    },
+    "Serie A": {
+      "n_matches": 1521,
+      "seasons": [
+        "2022-2023",
+        "2023-2024",
+        "2024-2025",
+        "2025-2026"
+      ],
+      "model": "ensemble",
+      "pooled_metrics": {
+        "n": 4563,
+        "brier": 0.2001,
+        "log_loss": 0.5867,
+        "ece": 0.0104
+      },
+      "pooled_buckets": {
+        "buckets": [
+          {
+            "bucket": "[0.00,0.50)",
+            "n": 3785,
+            "predicted": 0.2772,
+            "actual": 0.2798,
+            "gap": -0.0026,
+            "wilson_ci": [
+              0.2657,
+              0.2943
+            ],
+            "brier": 0.1924,
+            "log_loss": 0.57,
+            "ec_contrib": 9.8451,
+            "sum_pred": 1049.154855,
+            "sum_out": 1059.0
+          },
+          {
+            "bucket": "[0.50,0.55)",
+            "n": 231,
+            "predicted": 0.5248,
+            "actual": 0.5411,
+            "gap": -0.0163,
+            "wilson_ci": [
+              0.4767,
+              0.6042
+            ],
+            "brier": 0.2489,
+            "log_loss": 0.6909,
+            "ec_contrib": 3.7712,
+            "sum_pred": 121.228756,
+            "sum_out": 125.0
+          },
+          {
+            "bucket": "[0.55,0.60)",
+            "n": 176,
+            "predicted": 0.5747,
+            "actual": 0.5455,
+            "gap": 0.0292,
+            "wilson_ci": [
+              0.4717,
+              0.6173
+            ],
+            "brier": 0.249,
+            "log_loss": 0.6913,
+            "ec_contrib": 5.1447,
+            "sum_pred": 101.144653,
+            "sum_out": 96.0
+          },
+          {
+            "bucket": "[0.60,0.65)",
+            "n": 161,
+            "predicted": 0.6239,
+            "actual": 0.5963,
+            "gap": 0.0276,
+            "wilson_ci": [
+              0.5191,
+              0.669
+            ],
+            "brier": 0.2393,
+            "log_loss": 0.6715,
+            "ec_contrib": 4.4511,
+            "sum_pred": 100.451098,
+            "sum_out": 96.0
+          },
+          {
+            "bucket": "[0.65,0.70)",
+            "n": 95,
+            "predicted": 0.6725,
+            "actual": 0.6842,
+            "gap": -0.0118,
+            "wilson_ci": [
+              0.5851,
+              0.769
+            ],
+            "brier": 0.215,
+            "log_loss": 0.6212,
+            "ec_contrib": 1.1165,
+            "sum_pred": 63.883548,
+            "sum_out": 65.0
+          },
+          {
+            "bucket": "[0.70,0.75)",
+            "n": 79,
+            "predicted": 0.7239,
+            "actual": 0.6835,
+            "gap": 0.0404,
+            "wilson_ci": [
+              0.5745,
+              0.7755
+            ],
+            "brier": 0.2185,
+            "log_loss": 0.6296,
+            "ec_contrib": 3.191,
+            "sum_pred": 57.19105,
+            "sum_out": 54.0
+          },
+          {
+            "bucket": "[0.75,0.80)",
+            "n": 31,
+            "predicted": 0.7703,
+            "actual": 0.7097,
+            "gap": 0.0607,
+            "wilson_ci": [
+              0.5341,
+              0.839
+            ],
+            "brier": 0.2099,
+            "log_loss": 0.6129,
+            "ec_contrib": 1.8807,
+            "sum_pred": 23.880694,
+            "sum_out": 22.0
+          },
+          {
+            "bucket": "[0.80,0.90)",
+            "n": 5,
+            "predicted": 0.8131,
+            "actual": 0.8,
+            "gap": 0.0131,
+            "wilson_ci": [
+              0.3755,
+              0.9638
+            ],
+            "brier": 0.1596,
+            "log_loss": 0.4988,
+            "ec_contrib": 0.0653,
+            "sum_pred": 4.065346,
+            "sum_out": 4.0
+          },
+          {
+            "bucket": "[0.90,1.00]",
+            "n": 0,
+            "predicted": null,
+            "actual": null,
+            "gap": null,
+            "wilson_ci": null,
+            "brier": null,
+            "log_loss": null,
+            "ec_contrib": 0.0,
+            "sum_pred": 0.0,
+            "sum_out": 0.0
+          }
+        ],
+        "ece": 0.0065
+      },
+      "oos": {
+        "fit_seasons": [
+          "2022-2023",
+          "2023-2024",
+          "2024-2025"
+        ],
+        "eval_seasons": [
+          "2025-2026"
+        ],
+        "fitted": true,
+        "fit_samples": 3423,
+        "eval_samples": 1140,
+        "fit_a": -0.0048,
+        "fit_b": 0.9925,
+        "raw": {
+          "n": 1140,
+          "brier": 0.2008,
+          "log_loss": 0.5892,
+          "ece": 0.0192
+        },
+        "calibrated": {
+          "n": 1140,
+          "brier": 0.2007,
+          "log_loss": 0.589,
+          "ece": 0.0181
+        },
+        "improves_ece": true,
+        "improves_brier": true,
+        "improves_log_loss": true,
+        "raw_eval_buckets": {
+          "buckets": [
+            {
+              "bucket": "[0.00,0.50)",
+              "n": 925,
+              "predicted": 0.2672,
+              "actual": 0.2778,
+              "gap": -0.0107,
+              "wilson_ci": [
+                0.2499,
+                0.3076
+              ],
+              "brier": 0.1917,
+              "log_loss": 0.5697,
+              "ec_contrib": 9.8797,
+              "sum_pred": 247.120303,
+              "sum_out": 257.0
+            },
+            {
+              "bucket": "[0.50,0.55)",
+              "n": 55,
+              "predicted": 0.5288,
+              "actual": 0.4727,
+              "gap": 0.0561,
+              "wilson_ci": [
+                0.3469,
+                0.6021
+              ],
+              "brier": 0.2536,
+              "log_loss": 0.7003,
+              "ec_contrib": 3.0847,
+              "sum_pred": 29.084711,
+              "sum_out": 26.0
+            },
+            {
+              "bucket": "[0.55,0.60)",
+              "n": 45,
+              "predicted": 0.5756,
+              "actual": 0.4667,
+              "gap": 0.109,
+              "wilson_ci": [
+                0.3293,
+                0.6092
+              ],
+              "brier": 0.2603,
+              "log_loss": 0.714,
+              "ec_contrib": 4.9036,
+              "sum_pred": 25.903615,
+              "sum_out": 21.0
+            },
+            {
+              "bucket": "[0.60,0.65)",
+              "n": 48,
+              "predicted": 0.6275,
+              "actual": 0.6458,
+              "gap": -0.0183,
+              "wilson_ci": [
+                0.5044,
+                0.7657
+              ],
+              "brier": 0.2282,
+              "log_loss": 0.6489,
+              "ec_contrib": 0.8792,
+              "sum_pred": 30.120766,
+              "sum_out": 31.0
+            },
+            {
+              "bucket": "[0.65,0.70)",
+              "n": 29,
+              "predicted": 0.6729,
+              "actual": 0.6552,
+              "gap": 0.0177,
+              "wilson_ci": [
+                0.4734,
+                0.8006
+              ],
+              "brier": 0.2237,
+              "log_loss": 0.6392,
+              "ec_contrib": 0.5127,
+              "sum_pred": 19.51265,
+              "sum_out": 19.0
+            },
+            {
+              "bucket": "[0.70,0.75)",
+              "n": 23,
+              "predicted": 0.7228,
+              "actual": 0.6957,
+              "gap": 0.0272,
+              "wilson_ci": [
+                0.4913,
+                0.844
+              ],
+              "brier": 0.2126,
+              "log_loss": 0.6166,
+              "ec_contrib": 0.6248,
+              "sum_pred": 16.624773,
+              "sum_out": 16.0
+            },
+            {
+              "bucket": "[0.75,0.80)",
+              "n": 14,
+              "predicted": 0.773,
+              "actual": 0.7143,
+              "gap": 0.0587,
+              "wilson_ci": [
+                0.4535,
+                0.8828
+              ],
+              "brier": 0.2083,
+              "log_loss": 0.6102,
+              "ec_contrib": 0.8218,
+              "sum_pred": 10.821768,
+              "sum_out": 10.0
+            },
+            {
+              "bucket": "[0.80,0.90)",
+              "n": 1,
+              "predicted": 0.8114,
+              "actual": 0.0,
+              "gap": 0.8114,
+              "wilson_ci": [
+                0.0,
+                0.7935
+              ],
+              "brier": 0.6584,
+              "log_loss": 1.6682,
+              "ec_contrib": 0.8114,
+              "sum_pred": 0.811414,
+              "sum_out": 0.0
+            },
+            {
+              "bucket": "[0.90,1.00]",
+              "n": 0,
+              "predicted": null,
+              "actual": null,
+              "gap": null,
+              "wilson_ci": null,
+              "brier": null,
+              "log_loss": null,
+              "ec_contrib": 0.0,
+              "sum_pred": 0.0,
+              "sum_out": 0.0
+            }
+          ],
+          "ece": 0.0189
+        },
+        "calibrated_eval_buckets": {
+          "buckets": [
+            {
+              "bucket": "[0.00,0.50)",
+              "n": 925,
+              "predicted": 0.2676,
+              "actual": 0.2778,
+              "gap": -0.0103,
+              "wilson_ci": [
+                0.2499,
+                0.3076
+              ],
+              "brier": 0.1917,
+              "log_loss": 0.5696,
+              "ec_contrib": 9.4873,
+              "sum_pred": 247.512662,
+              "sum_out": 257.0
+            },
+            {
+              "bucket": "[0.50,0.55)",
+              "n": 57,
+              "predicted": 0.5282,
+              "actual": 0.4912,
+              "gap": 0.0369,
+              "wilson_ci": [
+                0.3662,
+                0.6174
+              ],
+              "brier": 0.2516,
+              "log_loss": 0.6964,
+              "ec_contrib": 2.1061,
+              "sum_pred": 30.106065,
+              "sum_out": 28.0
+            },
+            {
+              "bucket": "[0.55,0.60)",
+              "n": 43,
+              "predicted": 0.575,
+              "actual": 0.4419,
+              "gap": 0.1332,
+              "wilson_ci": [
+                0.3043,
+                0.5889
+              ],
+              "brier": 0.2626,
+              "log_loss": 0.7185,
+              "ec_contrib": 5.7268,
+              "sum_pred": 24.726819,
+              "sum_out": 19.0
+            },
+            {
+              "bucket": "[0.60,0.65)",
+              "n": 50,
+              "predicted": 0.6264,
+              "actual": 0.64,
+              "gap": -0.0136,
+              "wilson_ci": [
+                0.5014,
+                0.7586
+              ],
+              "brier": 0.23,
+              "log_loss": 0.6526,
+              "ec_contrib": 0.6789,
+              "sum_pred": 31.321144,
+              "sum_out": 32.0
+            },
+            {
+              "bucket": "[0.65,0.70)",
+              "n": 28,
+              "predicted": 0.6731,
+              "actual": 0.6786,
+              "gap": -0.0055,
+              "wilson_ci": [
+                0.4934,
+                0.8207
+              ],
+              "brier": 0.2155,
+              "log_loss": 0.622,
+              "ec_contrib": 0.1527,
+              "sum_pred": 18.847316,
+              "sum_out": 19.0
+            },
+            {
+              "bucket": "[0.70,0.75)",
+              "n": 22,
+              "predicted": 0.7214,
+              "actual": 0.6818,
+              "gap": 0.0396,
+              "wilson_ci": [
+                0.4732,
+                0.8364
+              ],
+              "brier": 0.218,
+              "log_loss": 0.6279,
+              "ec_contrib": 0.8718,
+              "sum_pred": 15.871848,
+              "sum_out": 15.0
+            },
+            {
+              "bucket": "[0.75,0.80)",
+              "n": 14,
+              "predicted": 0.7705,
+              "actual": 0.7143,
+              "gap": 0.0562,
+              "wilson_ci": [
+                0.4535,
+                0.8828
+              ],
+              "brier": 0.208,
+              "log_loss": 0.6094,
+              "ec_contrib": 0.7874,
+              "sum_pred": 10.787421,
+              "sum_out": 10.0
+            },
+            {
+              "bucket": "[0.80,0.90)",
+              "n": 1,
+              "predicted": 0.809,
+              "actual": 0.0,
+              "gap": 0.809,
+              "wilson_ci": [
+                0.0,
+                0.7935
+              ],
+              "brier": 0.6545,
+              "log_loss": 1.6555,
+              "ec_contrib": 0.809,
+              "sum_pred": 0.809,
+              "sum_out": 0.0
+            },
+            {
+              "bucket": "[0.90,1.00]",
+              "n": 0,
+              "predicted": null,
+              "actual": null,
+              "gap": null,
+              "wilson_ci": null,
+              "brier": null,
+              "log_loss": null,
+              "ec_contrib": 0.0,
+              "sum_pred": 0.0,
+              "sum_out": 0.0
+            }
+          ],
+          "ece": 0.0181
+        }
+      },
+      "aggregate_metrics": {
+        "baseline": {
+          "log_loss": 1.1143,
+          "brier": 0.6616,
+          "ece": 0.0104,
+          "hit_rate": 0.4043
+        },
+        "elo": {
+          "log_loss": 1.0105,
+          "brier": 0.6062,
+          "ece": 0.0304,
+          "hit_rate": 0.5095
+        },
+        "poisson": {
+          "log_loss": 1.0419,
+          "brier": 0.6247,
+          "ece": 0.0103,
+          "hit_rate": 0.4894
+        },
+        "dc": {
+          "log_loss": 1.0428,
+          "brier": 0.6246,
+          "ece": 0.0176,
+          "hit_rate": 0.4827
+        },
+        "ensemble": {
+          "log_loss": 1.0033,
+          "brier": 0.6003,
+          "ece": 0.0104,
+          "hit_rate": 0.5187
+        }
+      }
+    }
+  }
+}

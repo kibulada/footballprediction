@@ -1,0 +1,109 @@
+{
+  "generated_at": "2026-08-12T02:50:37+00:00",
+  "n_matches": 1520,
+  "provenance": {
+    "documented": [
+      "as_of",
+      "away",
+      "away_form",
+      "away_ga_avg",
+      "away_gf_avg",
+      "away_recent_goals",
+      "away_rest_days",
+      "away_xg_against",
+      "away_xg_for",
+      "consensus_odds",
+      "form_samples",
+      "h2h",
+      "home",
+      "home_form",
+      "home_ga_avg",
+      "home_gf_avg",
+      "home_recent_goals",
+      "home_rest_days",
+      "home_xg_against",
+      "home_xg_for",
+      "kickoff_utc",
+      "league",
+      "market_totals",
+      "sources",
+      "xg_samples"
+    ],
+    "actual": [
+      "as_of",
+      "away",
+      "away_form",
+      "away_ga_avg",
+      "away_gf_avg",
+      "away_recent_goals",
+      "away_rest_days",
+      "away_xg_against",
+      "away_xg_for",
+      "consensus_odds",
+      "form_samples",
+      "h2h",
+      "home",
+      "home_form",
+      "home_ga_avg",
+      "home_gf_avg",
+      "home_recent_goals",
+      "home_rest_days",
+      "home_xg_against",
+      "home_xg_for",
+      "kickoff_utc",
+      "league",
+      "market_totals",
+      "sources",
+      "xg_samples"
+    ],
+    "missing": [],
+    "extra": [],
+    "covered": true
+  },
+  "clv_scope": {
+    "scan_dir": "D:\\Hermes-Football\\agents\\football",
+    "files_with_closing_references": [
+      "baseline_freeze.py",
+      "format.py",
+      "leakage_audit.py",
+      "prediction_log.py",
+      "runner.py",
+      "settler.py"
+    ],
+    "allowed_modules": [
+      "baseline_freeze.py",
+      "format.py",
+      "leakage_audit.py",
+      "prediction_log.py",
+      "runner.py",
+      "settler.py"
+    ],
+    "violations": [],
+    "passed": true
+  },
+  "invariants": [
+    {
+      "name": "predict_before_update",
+      "passed": true,
+      "detail": "0 violation(s); form state must equal the independent prior-match reference (update-before-predict guard)",
+      "violations": []
+    },
+    {
+      "name": "determinism_input_hash",
+      "passed": true,
+      "detail": "1520 matches, 0 hash differences across 2 passes"
+    },
+    {
+      "name": "pipeline_equivalence",
+      "passed": true,
+      "detail": "audit replay LL 0.9886 vs production validate LL 0.9886 (1520 vs 1520 matches)"
+    }
+  ],
+  "all_invariants_passed": true,
+  "same_day_caveat": {
+    "n_dates_with_multiple_matches": 310,
+    "n_matches_involved": 1060,
+    "note": "FBref provides no kickoff time: same-day matches are ordered arbitrarily (date-only sort). In principle a match that kicked off LATER in real time may be processed EARLIER in the replay, making its result visible to an earlier-kickoff match's context (within-day look-ahead). This is a KNOWN day-granularity limitation of the historical dataset, not a production leak: the live bot orders by kickoff timestamp. Mitigation: re-order historical matches by kickoff time when the data provides it."
+  },
+  "verdict": "PASS"
+}

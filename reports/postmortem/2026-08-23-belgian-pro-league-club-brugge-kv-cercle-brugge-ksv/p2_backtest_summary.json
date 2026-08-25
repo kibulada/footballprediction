@@ -1,0 +1,48 @@
+{
+  "method": "replay of cache/football/predictions.jsonl (all snapshots, latest per match_id) joined with settle events; buckets by FINAL lambda_total = lambda_home+lambda_away",
+  "generated": "2026-08-24",
+  "sample": {"matches_with_lambda": 179, "settled": 111},
+  "buckets": {
+    "A_control_lambda_le_3.6": {
+      "n": 153, "settled": 92,
+      "mean_abs_goal_error": 1.16,
+      "realized_over25_freq": 0.59,
+      "model_mean_P_O2.5_vs_realized": {"pred": 0.499, "act": 0.500, "delta_pp": 0.1, "n_with_price": 24}
+    },
+    "B_in_3.6_to_4.0": {
+      "n": 12, "settled": 9,
+      "mean_abs_goal_error": 1.74,
+      "realized_over25_freq": 0.78,
+      "model_mean_P_O2.5_vs_realized": {"pred": 0.710, "act": 0.667, "delta_pp": -4.4, "n_with_price": 3},
+      "note": "overs hit more often than control BUT absolute goal error is WORSE than control (1.74 vs 1.16); n too small for confidence"
+    },
+    "C_out_gt_4.0": {
+      "n": 9, "settled": 5,
+      "mean_abs_goal_error": 1.17,
+      "realized_over25_freq": 0.60,
+      "note": "lambda>4 implies ~85% O2.5 under the model's Poisson matrix; realized only 60% (3/5) -> extreme lambdas OVERPREDICT overs"
+    },
+    "D_low_lt_1.6": {
+      "n": 5, "settled": 5,
+      "mean_abs_goal_error": 1.12,
+      "realized_over25_freq": 0.20,
+      "model_mean_P_O2.5_vs_realized": {"pred": 0.125, "act": 0.000, "n_with_price": 1}
+    }
+  },
+  "conditional_ceiling_check": {
+    "condition": "both teams seeded AND |model-market gap| <= 8pp AND settled",
+    "qualifying_cases_in_B_and_C": 0,
+    "verdict": "INSUFFICIENT_DATA - no historical case satisfies all conditions; threshold cannot be justified"
+  },
+  "notable_settled_rows_gt_3.6": [
+    {"match": "Manchester City v Bournemouth [EPL] 2026-08-23", "lam": 3.70, "ft": "2-1", "tot": 3, "vetoed_by_g4": true, "seeded": true},
+    {"match": "PSV v Groningen [Eredivisie] 2026-08-23", "lam": 3.68, "ft": "5-1", "tot": 6, "vetoed_by_g4": false, "seeded": true},
+    {"match": "Sittard v AZ Alkmaar [Eredivisie] 2026-08-22", "lam": 3.65, "ft": "0-2", "tot": 2, "vetoed_by_g4": false, "seeded": true},
+    {"match": "Ajax v SC Heerenveen [Eredivisie] 2026-08-16", "lam": 4.14, "ft": "2-2", "tot": 4, "vetoed_by_g4": false, "seeded": false},
+    {"match": "Hearts v Benfica [UEL] 2026-08-13", "lam": 4.10, "ft": "1-1", "tot": 2, "vetoed_by_g4": false, "seeded": false},
+    {"match": "SV Ried v Grazer AK [Bundesliga] 2026-08-21", "lam": 4.09, "ft": "1-0", "tot": 1, "vetoed_by_g4": false, "seeded": false},
+    {"match": "Benfica v AGF [UEL] 2026-08-20", "lam": 4.06, "ft": "3-1", "tot": 4, "vetoed_by_g4": false, "seeded": false},
+    {"match": "Hajduk Split v Zalgiris [UECL] 2026-08-13", "lam": 4.46, "ft": "4-0", "tot": 4, "vetoed_by_g4": false, "seeded": false}
+  ],
+  "conclusion": "KEEP current G4 behavior. Bucket C (>4.0 ceiling) shows worse-than-implied over-rate; bucket B is mixed with larger errors; conditional-ceiling has zero qualifying cases. Revisit after >=30 settled B/C cases exist."
+}

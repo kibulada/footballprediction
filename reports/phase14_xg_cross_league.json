@@ -1,0 +1,170 @@
+{
+  "per_league": {
+    "LaLiga": {
+      "n_matches": 1520,
+      "base": {
+        "n": 1520,
+        "log_loss": 0.9943,
+        "log_loss_ci": 0.0214,
+        "brier": 0.5926,
+        "ece": 0.013,
+        "hit_rate": 0.5164,
+        "roi": null,
+        "bets": 0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      },
+      "xg": {
+        "n": 1520,
+        "log_loss": 0.9907,
+        "log_loss_ci": 0.0208,
+        "brier": 0.5897,
+        "ece": 0.0245,
+        "hit_rate": 0.5289,
+        "roi": null,
+        "bets": 0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      },
+      "per_season_base_ll": {
+        "2022-2023": 1.0306,
+        "2023-2024": 0.9787,
+        "2024-2025": 0.98,
+        "2025-2026": 0.988
+      },
+      "per_season_xg_ll": {
+        "2022-2023": 1.0233,
+        "2023-2024": 0.9752,
+        "2024-2025": 0.9779,
+        "2025-2026": 0.9863
+      }
+    },
+    "Serie A": {
+      "n_matches": 1520,
+      "base": {
+        "n": 1520,
+        "log_loss": 1.0031,
+        "log_loss_ci": 0.0224,
+        "brier": 0.6002,
+        "ece": 0.0115,
+        "hit_rate": 0.5191,
+        "roi": null,
+        "bets": 0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      },
+      "xg": {
+        "n": 1520,
+        "log_loss": 1.0009,
+        "log_loss_ci": 0.0216,
+        "brier": 0.5984,
+        "ece": 0.0215,
+        "hit_rate": 0.5164,
+        "roi": null,
+        "bets": 0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      },
+      "per_season_base_ll": {
+        "2022-2023": 1.0192,
+        "2023-2024": 0.999,
+        "2024-2025": 0.9855,
+        "2025-2026": 1.0087
+      },
+      "per_season_xg_ll": {
+        "2022-2023": 1.0181,
+        "2023-2024": 0.9988,
+        "2024-2025": 0.9822,
+        "2025-2026": 1.0043
+      }
+    },
+    "Bundesliga": {
+      "n_matches": 1224,
+      "base": {
+        "n": 1224,
+        "log_loss": 1.0097,
+        "log_loss_ci": 0.0246,
+        "brier": 0.604,
+        "ece": 0.0099,
+        "hit_rate": 0.5074,
+        "roi": null,
+        "bets": 0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      },
+      "xg": {
+        "n": 1224,
+        "log_loss": 1.0057,
+        "log_loss_ci": 0.0235,
+        "brier": 0.601,
+        "ece": 0.0156,
+        "hit_rate": 0.5114,
+        "roi": null,
+        "bets": 0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      },
+      "per_season_base_ll": {
+        "2022-2023": 1.0317,
+        "2023-2024": 0.9907,
+        "2024-2025": 1.0318,
+        "2025-2026": 0.9846
+      },
+      "per_season_xg_ll": {
+        "2022-2023": 1.0282,
+        "2023-2024": 0.9942,
+        "2024-2025": 1.0203,
+        "2025-2026": 0.98
+      }
+    },
+    "Ligue 1": {
+      "n_matches": 1298,
+      "base": {
+        "n": 1298,
+        "log_loss": 1.0141,
+        "log_loss_ci": 0.0232,
+        "brier": 0.6078,
+        "ece": 0.0143,
+        "hit_rate": 0.5085,
+        "roi": null,
+        "bets": 0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      },
+      "xg": {
+        "n": 1298,
+        "log_loss": 1.01,
+        "log_loss_ci": 0.0222,
+        "brier": 0.6048,
+        "ece": 0.0088,
+        "hit_rate": 0.5092,
+        "roi": null,
+        "bets": 0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      },
+      "per_season_base_ll": {
+        "2022-2023": 0.9986,
+        "2023-2024": 1.0497,
+        "2024-2025": 1.0025,
+        "2025-2026": 1.0093
+      },
+      "per_season_xg_ll": {
+        "2022-2023": 0.9994,
+        "2023-2024": 1.0444,
+        "2024-2025": 0.9966,
+        "2025-2026": 1.002
+      }
+    }
+  },
+  "improved_leagues": [
+    "LaLiga",
+    "Serie A",
+    "Bundesliga",
+    "Ligue 1"
+  ],
+  "all_metrics_improve": [
+    "Ligue 1"
+  ],
+  "dataset_note": "understat per-match xG + goals as fixture source; no historical odds (ROI not reported); production config xg_weight=0.65 on both variants -- the only difference is pre-match xG features"
+}

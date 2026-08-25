@@ -1,0 +1,463 @@
+{
+  "EPL": {
+    "odds_api_key": "soccer_epl",
+    "display": "EPL",
+    "country": "England",
+    "football_data_code": "PL",
+    "sofascore_tournament_id": 17,
+    "provider": "football_data",
+    "fallback_provider": "sofascore",
+    "aliases": [
+      "epl",
+      "premier league",
+      "english",
+      "inggris"
+    ]
+  },
+  "LaLiga": {
+    "odds_api_key": "soccer_spain_la_liga",
+    "display": "La Liga",
+    "country": "Spain",
+    "football_data_code": "PD",
+    "sofascore_tournament_id": 8,
+    "provider": "football_data",
+    "fallback_provider": "sofascore",
+    "aliases": [
+      "la liga",
+      "laliga",
+      "spanish",
+      "spanyol",
+      "espana"
+    ]
+  },
+  "Serie A": {
+    "odds_api_key": "soccer_italy_serie_a",
+    "display": "Serie A",
+    "country": "Italy",
+    "football_data_code": "SA",
+    "sofascore_tournament_id": 23,
+    "provider": "football_data",
+    "fallback_provider": "sofascore",
+    "aliases": [
+      "serie a",
+      "italy",
+      "italian",
+      "italia"
+    ]
+  },
+  "Bundesliga": {
+    "odds_api_key": "soccer_germany_bundesliga",
+    "display": "Bundesliga",
+    "country": "Germany",
+    "football_data_code": "BL1",
+    "sofascore_tournament_id": 35,
+    "provider": "football_data",
+    "fallback_provider": "sofascore",
+    "aliases": [
+      "bundesliga",
+      "germany",
+      "german",
+      "jerman"
+    ]
+  },
+  "Ligue 1": {
+    "odds_api_key": "soccer_france_ligue_one",
+    "display": "Ligue 1",
+    "country": "France",
+    "football_data_code": "FL1",
+    "sofascore_tournament_id": 34,
+    "provider": "football_data",
+    "fallback_provider": "sofascore",
+    "aliases": [
+      "ligue 1",
+      "france",
+      "french",
+      "prancis"
+    ]
+  },
+  "Primeira Liga": {
+    "odds_api_key": "soccer_portugal_primeira_liga",
+    "display": "Primeira Liga",
+    "country": "Portugal",
+    "football_data_code": "PPL",
+    "sofascore_tournament_id": 270,
+    "provider": "sofascore",
+    "fallback_provider": "football_data",
+    "aliases": [
+      "liga portugal",
+      "portugal",
+      "portuguese",
+      "primeira",
+      "portugal liga"
+    ]
+  },
+  "Eredivisie": {
+    "odds_api_key": "soccer_netherlands_eredivisie",
+    "display": "Eredivisie",
+    "country": "Netherlands",
+    "football_data_code": "DED",
+    "sofascore_tournament_id": 37,
+    "provider": "football_data",
+    "fallback_provider": "sofascore",
+    "aliases": [
+      "eredivisie",
+      "netherlands",
+      "dutch",
+      "holland",
+      "belanda"
+    ]
+  },
+  "UCL": {
+    "odds_api_key": "soccer_uefa_champs_league",
+    "odds_alt_keys": [
+      "soccer_uefa_champs_league_qualification"
+    ],
+    "display": "UCL",
+    "country": null,
+    "football_data_code": "CL",
+    "sofascore_tournament_id": 7,
+    "provider": "football_data",
+    "fallback_provider": "sofascore",
+    "aliases": [
+      "ucl",
+      "champions league",
+      "champions",
+      "liga champions",
+      "uefa champions league",
+      "uefa champ league"
+    ]
+  },
+  "UEL": {
+    "odds_api_key": "soccer_uefa_europa_league",
+    "odds_alt_keys": [
+      "soccer_uefa_champs_league_qualification"
+    ],
+    "display": "UEL",
+    "country": null,
+    "football_data_code": "EL",
+    "sofascore_tournament_id": 679,
+    "provider": "football_data",
+    "fallback_provider": "sofascore",
+    "aliases": [
+      "uel",
+      "europa league",
+      "europa",
+      "uefa europa league",
+      "uefa europa"
+    ]
+  },
+  "UECL": {
+    "odds_api_key": "soccer_uefa_europa_conference_league",
+    "odds_alt_keys": [
+      "soccer_uefa_champs_league_qualification"
+    ],
+    "display": "UECL",
+    "country": null,
+    "football_data_code": "EC",
+    "sofascore_tournament_id": 17015,
+    "provider": "football_data",
+    "fallback_provider": "sofascore",
+    "aliases": [
+      "uecl",
+      "conference league",
+      "kualifikasi conference"
+    ]
+  },
+  "Scottish Premiership": {
+    "odds_api_key": "soccer_scotland_premiership",
+    "display": "Scottish Premiership",
+    "country": "Scotland",
+    "football_data_code": null,
+    "sofascore_tournament_id": 36,
+    "provider": "sofascore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "scotland",
+      "scottish",
+      "skotlandia"
+    ]
+  },
+  "Super Lig": {
+    "odds_api_key": "soccer_turkey_super_lig",
+    "display": "Süper Lig",
+    "country": "Turkey",
+    "football_data_code": null,
+    "sofascore_tournament_id": 52,
+    "provider": "sofascore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "super lig",
+      "turki",
+      "turkey",
+      "turkish",
+      "süper lig"
+    ]
+  },
+  "Belgian Pro League": {
+    "odds_api_key": "soccer_belgium_first_div",
+    "display": "Belgian Pro League",
+    "country": "Belgium",
+    "football_data_code": null,
+    "sofascore_tournament_id": 38,
+    "provider": "sofascore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "belgian",
+      "belgia",
+      "pro league belgia"
+    ]
+  },
+  "EFL Championship": {
+    "odds_api_key": "soccer_efl_champ",
+    "display": "EFL Championship",
+    "country": "England",
+    "football_data_code": "ELC",
+    "sofascore_tournament_id": 18,
+    "provider": "football_data",
+    "fallback_provider": "sofascore",
+    "aliases": [
+      "efl championship",
+      "championship",
+      "english 2nd"
+    ]
+  },
+  "Saudi Pro League": {
+    "odds_api_key": "soccer_saudi_pro_league",
+    "display": "Saudi Pro League",
+    "country": "Saudi-Arabia",
+    "football_data_code": null,
+    "sofascore_tournament_id": 955,
+    "provider": "sofascore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "saudi",
+      "arab saudi",
+      "roshn",
+      "saudi pro league"
+    ]
+  },
+  "MLS": {
+    "odds_api_key": "soccer_usa_mls",
+    "display": "MLS",
+    "country": "USA",
+    "football_data_code": null,
+    "sofascore_tournament_id": 242,
+    "provider": "sofascore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "mls",
+      "amerika",
+      "usa",
+      "major league soccer"
+    ]
+  },
+  "Ligue 2": {
+    "odds_api_key": "soccer_france_ligue_two",
+    "display": "Ligue 2",
+    "country": "France",
+    "football_data_code": null,
+    "sofascore_tournament_id": 182,
+    "provider": "sofascore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "ligue 2",
+      "france 2nd",
+      "prancis 2"
+    ]
+  },
+  "Serie B": {
+    "odds_api_key": "soccer_italy_serie_b",
+    "display": "Serie B",
+    "country": "Italy",
+    "football_data_code": null,
+    "sofascore_tournament_id": 53,
+    "provider": "sofascore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "serie b",
+      "italy 2nd",
+      "italia 2"
+    ]
+  },
+  "Segunda": {
+    "odds_api_key": "soccer_spain_segunda_division",
+    "display": "Segunda",
+    "country": "Spain",
+    "football_data_code": null,
+    "sofascore_tournament_id": 54,
+    "provider": "sofascore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "segunda",
+      "spain 2nd",
+      "spanyol 2",
+      "la liga 2",
+      "laliga2",
+      "segunda division"
+    ]
+  },
+  "A-League": {
+    "odds_api_key": "soccer_australia_aleague",
+    "display": "A-League",
+    "country": "Australia",
+    "football_data_code": null,
+    "sofascore_tournament_id": 134,
+    "provider": "sofascore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "aleague",
+      "australia",
+      "australian league"
+    ]
+  },
+  "K-League": {
+    "odds_api_key": "soccer_south_korea_kleague",
+    "display": "K-League",
+    "country": "South Korea",
+    "football_data_code": null,
+    "sofascore_tournament_id": 141,
+    "provider": "sofascore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "kleague",
+      "korea",
+      "korean league"
+    ]
+  },
+  "J1 League": {
+    "odds_api_key": "soccer_japan_j1",
+    "display": "J1 League",
+    "country": "Japan",
+    "football_data_code": null,
+    "sofascore_tournament_id": 196,
+    "provider": "sofascore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "j1",
+      "japan",
+      "japanese league"
+    ]
+  },
+  "Liga 1": {
+    "odds_api_key": null,
+    "display": "Liga 1",
+    "country": "Indonesia",
+    "football_data_code": null,
+    "sofascore_tournament_id": 10018,
+    "provider": "sofascore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "liga 1",
+      "indonesia",
+      "indonesian league"
+    ]
+  },
+  "UEFA Super Cup": {
+    "odds_api_key": "soccer_uefa_super_cup",
+    "display": "UEFA Super Cup",
+    "country": null,
+    "football_data_code": null,
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "uefa super cup",
+      "super cup",
+      "piala super eropa"
+    ]
+  },
+  "Community Shield": {
+    "odds_api_key": "soccer_eng_community_shield",
+    "display": "Community Shield",
+    "country": "England",
+    "football_data_code": null,
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "community shield",
+      "english super cup"
+    ]
+  },
+  "Friendly International": {
+    "odds_api_key": "soccer_intl_friendly",
+    "display": "Friendly International",
+    "country": null,
+    "football_data_code": null,
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "friendly international",
+      "international friendly",
+      "persahabatan"
+    ]
+  },
+  "Copa Libertadores": {
+    "odds_api_key": "soccer_conmebol_copa_libertadores",
+    "display": "Copa Libertadores",
+    "country": null,
+    "football_data_code": null,
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "copa libertadores",
+      "libertadores"
+    ]
+  },
+  "Copa Sudamericana": {
+    "odds_api_key": "soccer_conmebol_copa_sudamericana",
+    "display": "Copa Sudamericana",
+    "country": null,
+    "football_data_code": null,
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "copa sudamericana",
+      "sudamericana"
+    ]
+  },
+  "Leagues Cup": {
+    "odds_api_key": "soccer_concacaf_leagues_cup",
+    "display": "Leagues Cup",
+    "country": "USA",
+    "football_data_code": null,
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "leagues cup",
+      "liga mls"
+    ]
+  },
+  "CONCACAF Central American Cup": {
+    "odds_api_key": "soccer_concacaf_central_american_cup",
+    "display": "CONCACAF Central American Cup",
+    "country": null,
+    "football_data_code": null,
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "concacaf central american cup",
+      "central american cup",
+      "concacaf"
+    ]
+  },
+  "OFC Champions League": {
+    "odds_api_key": null,
+    "display": "OFC Champions League",
+    "country": null,
+    "football_data_code": null,
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "ofc champions league",
+      "ofc",
+      "liga champions oceania"
+    ]
+  }
+}

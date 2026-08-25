@@ -1,0 +1,1332 @@
+{
+  "generated_at": "2026-08-16T16:40:11+00:00",
+  "log": "D:\\Hermes-Football\\cache\\football\\predictions.jsonl",
+  "date": "2026-08-16",
+  "coverage": {
+    "settled": 14,
+    "with_closing_odds": 11,
+    "closing_coverage_pct": 78.6,
+    "threshold_pct": 80.0,
+    "passed": false,
+    "closing_by_source": {
+      "last_snapshot": 9,
+      "settle": 2
+    }
+  },
+  "n_segments": 101,
+  "segments": [
+    {
+      "league": "Belgian Pro League",
+      "market": "Total",
+      "timing": "ALL",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Belgian Pro League",
+      "market": "Total",
+      "timing": "T-11m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Belgian Pro League",
+      "market": "Total",
+      "timing": "T-16m",
+      "n": 1,
+      "price_clv_pct": 0.21,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Belgian Pro League",
+      "market": "Total",
+      "timing": "T-5m",
+      "n": 1,
+      "price_clv_pct": 0.21,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Community Shield",
+      "market": "Total",
+      "timing": "ALL",
+      "n": 1,
+      "price_clv_pct": -2.93,
+      "roi": 1.73,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Community Shield",
+      "market": "Total",
+      "timing": "T-11m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": 1.73,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Community Shield",
+      "market": "Total",
+      "timing": "T-16m",
+      "n": 1,
+      "price_clv_pct": -1.85,
+      "roi": 1.73,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Community Shield",
+      "market": "Total",
+      "timing": "T-1h",
+      "n": 1,
+      "price_clv_pct": -9.09,
+      "roi": 1.73,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Community Shield",
+      "market": "Total",
+      "timing": "T-23m",
+      "n": 1,
+      "price_clv_pct": -2.75,
+      "roi": 1.73,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Community Shield",
+      "market": "Total",
+      "timing": "T-28m",
+      "n": 1,
+      "price_clv_pct": -2.75,
+      "roi": 1.73,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Community Shield",
+      "market": "Total",
+      "timing": "T-37m",
+      "n": 1,
+      "price_clv_pct": -2.75,
+      "roi": 1.73,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Community Shield",
+      "market": "Total",
+      "timing": "T-42m",
+      "n": 1,
+      "price_clv_pct": -2.93,
+      "roi": 1.73,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Community Shield",
+      "market": "Total",
+      "timing": "T-48m",
+      "n": 1,
+      "price_clv_pct": -3.81,
+      "roi": 1.73,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Community Shield",
+      "market": "Total",
+      "timing": "T-53m",
+      "n": 1,
+      "price_clv_pct": -2.75,
+      "roi": 1.73,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Community Shield",
+      "market": "Total",
+      "timing": "T-58m",
+      "n": 1,
+      "price_clv_pct": -5.36,
+      "roi": 1.73,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Community Shield",
+      "market": "Total",
+      "timing": "T-5m",
+      "n": 1,
+      "price_clv_pct": -1.85,
+      "roi": 1.73,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "ALL",
+      "n": 1,
+      "price_clv_pct": 0.69,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-12m",
+      "n": 1,
+      "price_clv_pct": 2.82,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-17m",
+      "n": 1,
+      "price_clv_pct": 2.82,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-1h",
+      "n": 1,
+      "price_clv_pct": 0.69,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-1m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-23m",
+      "n": 1,
+      "price_clv_pct": 3.18,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-28m",
+      "n": 1,
+      "price_clv_pct": 3.55,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-33m",
+      "n": 1,
+      "price_clv_pct": 2.46,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-39m",
+      "n": 1,
+      "price_clv_pct": 2.82,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-44m",
+      "n": 1,
+      "price_clv_pct": 2.82,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-49m",
+      "n": 1,
+      "price_clv_pct": 2.1,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-54m",
+      "n": 1,
+      "price_clv_pct": 2.1,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-60m",
+      "n": 1,
+      "price_clv_pct": 2.1,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "1X2",
+      "timing": "T-7m",
+      "n": 1,
+      "price_clv_pct": 0.34,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "ALL",
+      "n": 2,
+      "price_clv_pct": 0.42,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.5,
+        "half_width": 0.4055,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-11m",
+      "n": 1,
+      "price_clv_pct": -0.34,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-14m",
+      "n": 1,
+      "price_clv_pct": -1.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-16m",
+      "n": 1,
+      "price_clv_pct": -0.34,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-19m",
+      "n": 1,
+      "price_clv_pct": -2.37,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-1h",
+      "n": 1,
+      "price_clv_pct": 3.21,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-1m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-21m",
+      "n": 1,
+      "price_clv_pct": 0.17,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-24m",
+      "n": 1,
+      "price_clv_pct": -2.75,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-27m",
+      "n": 1,
+      "price_clv_pct": 1.58,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-29m",
+      "n": 1,
+      "price_clv_pct": -6.25,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-2h",
+      "n": 1,
+      "price_clv_pct": 7.43,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-32m",
+      "n": 1,
+      "price_clv_pct": 2.12,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-34m",
+      "n": 1,
+      "price_clv_pct": -7.48,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-3m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-42m",
+      "n": 1,
+      "price_clv_pct": 2.3,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-47m",
+      "n": 1,
+      "price_clv_pct": 2.48,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-53m",
+      "n": 1,
+      "price_clv_pct": 3.21,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-58m",
+      "n": 1,
+      "price_clv_pct": 3.21,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-6m",
+      "n": 1,
+      "price_clv_pct": -0.34,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Eredivisie",
+      "market": "Total",
+      "timing": "T-8m",
+      "n": 1,
+      "price_clv_pct": -1.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "La Liga",
+      "market": "Total",
+      "timing": "ALL",
+      "n": 1,
+      "price_clv_pct": -4.03,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "La Liga",
+      "market": "Total",
+      "timing": "T-13m",
+      "n": 1,
+      "price_clv_pct": -5.66,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "La Liga",
+      "market": "Total",
+      "timing": "T-19m",
+      "n": 1,
+      "price_clv_pct": -5.3,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "La Liga",
+      "market": "Total",
+      "timing": "T-25m",
+      "n": 1,
+      "price_clv_pct": -5.3,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "La Liga",
+      "market": "Total",
+      "timing": "T-2m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "La Liga",
+      "market": "Total",
+      "timing": "T-31m",
+      "n": 1,
+      "price_clv_pct": -5.3,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "La Liga",
+      "market": "Total",
+      "timing": "T-37m",
+      "n": 1,
+      "price_clv_pct": -5.3,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "La Liga",
+      "market": "Total",
+      "timing": "T-47m",
+      "n": 1,
+      "price_clv_pct": -4.4,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "La Liga",
+      "market": "Total",
+      "timing": "T-53m",
+      "n": 1,
+      "price_clv_pct": -4.03,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "La Liga",
+      "market": "Total",
+      "timing": "T-8m",
+      "n": 1,
+      "price_clv_pct": -5.66,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Primeira Liga",
+      "market": "1X2",
+      "timing": "ALL",
+      "n": 1,
+      "price_clv_pct": 0.37,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Primeira Liga",
+      "market": "1X2",
+      "timing": "LINEUP-CONFIRMED",
+      "n": 1,
+      "price_clv_pct": 0.37,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Primeira Liga",
+      "market": "1X2",
+      "timing": "T-19m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Primeira Liga",
+      "market": "1X2",
+      "timing": "T-25m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Primeira Liga",
+      "market": "1X2",
+      "timing": "T-2m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Primeira Liga",
+      "market": "1X2",
+      "timing": "T-31m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Primeira Liga",
+      "market": "1X2",
+      "timing": "T-37m",
+      "n": 1,
+      "price_clv_pct": 0.37,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Primeira Liga",
+      "market": "1X2",
+      "timing": "T-42m",
+      "n": 1,
+      "price_clv_pct": -0.36,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Primeira Liga",
+      "market": "1X2",
+      "timing": "T-8m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Süper Lig",
+      "market": "Total",
+      "timing": "ALL",
+      "n": 2,
+      "price_clv_pct": 0.77,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.5,
+        "half_width": 0.4055,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Süper Lig",
+      "market": "Total",
+      "timing": "T-13m",
+      "n": 1,
+      "price_clv_pct": 1.54,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Süper Lig",
+      "market": "Total",
+      "timing": "T-18m",
+      "n": 1,
+      "price_clv_pct": 1.54,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Süper Lig",
+      "market": "Total",
+      "timing": "T-26m",
+      "n": 1,
+      "price_clv_pct": 1.8,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Süper Lig",
+      "market": "Total",
+      "timing": "T-2m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": null,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Süper Lig",
+      "market": "Total",
+      "timing": "T-31m",
+      "n": 1,
+      "price_clv_pct": 1.8,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Süper Lig",
+      "market": "Total",
+      "timing": "T-36m",
+      "n": 1,
+      "price_clv_pct": 1.54,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Süper Lig",
+      "market": "Total",
+      "timing": "T-42m",
+      "n": 1,
+      "price_clv_pct": 1.54,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Süper Lig",
+      "market": "Total",
+      "timing": "T-47m",
+      "n": 1,
+      "price_clv_pct": 1.54,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Süper Lig",
+      "market": "Total",
+      "timing": "T-4m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "Süper Lig",
+      "market": "Total",
+      "timing": "T-52m",
+      "n": 1,
+      "price_clv_pct": 1.54,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "Süper Lig",
+      "market": "Total",
+      "timing": "T-8m",
+      "n": 1,
+      "price_clv_pct": 1.54,
+      "roi": null,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Asian Handicap",
+      "timing": "ALL",
+      "n": 1,
+      "price_clv_pct": 1.6,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Asian Handicap",
+      "timing": "T-14m",
+      "n": 1,
+      "price_clv_pct": 0.65,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.6033,
+        "half_width": 0.3967,
+        "n_positive": 1
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Asian Handicap",
+      "timing": "T-4m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Asian Handicap",
+      "timing": "T-9m",
+      "n": 1,
+      "price_clv_pct": -1.19,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "ALL",
+      "n": 1,
+      "price_clv_pct": -5.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-11m",
+      "n": 1,
+      "price_clv_pct": -3.26,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-16m",
+      "n": 1,
+      "price_clv_pct": -5.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-1h",
+      "n": 1,
+      "price_clv_pct": -5.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-1m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-21m",
+      "n": 1,
+      "price_clv_pct": -5.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-26m",
+      "n": 1,
+      "price_clv_pct": -5.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-2h",
+      "n": 1,
+      "price_clv_pct": -8.65,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-32m",
+      "n": 1,
+      "price_clv_pct": -5.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-37m",
+      "n": 1,
+      "price_clv_pct": -5.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-43m",
+      "n": 1,
+      "price_clv_pct": -6.86,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-49m",
+      "n": 1,
+      "price_clv_pct": -5.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-54m",
+      "n": 1,
+      "price_clv_pct": -5.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-59m",
+      "n": 1,
+      "price_clv_pct": -5.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    },
+    {
+      "league": "UCL",
+      "market": "Total",
+      "timing": "T-6m",
+      "n": 1,
+      "price_clv_pct": 0.0,
+      "roi": -1.0,
+      "ci": {
+        "centre": 0.3967,
+        "half_width": 0.3967,
+        "n_positive": 0
+      }
+    }
+  ]
+}

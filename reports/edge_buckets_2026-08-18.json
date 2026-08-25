@@ -1,0 +1,42 @@
+{
+  "generated_at": "2026-08-18T10:07:44+00:00",
+  "log": "D:\\Hermes-Football\\cache\\football\\predictions.jsonl",
+  "date": "2026-08-18",
+  "benchmark": "closing",
+  "buckets": {
+    "0-5%": {
+      "n": 20,
+      "n_with_closing": 18,
+      "roi_vs_closing": -0.0897,
+      "net_negative": true
+    },
+    "10-20%": {
+      "n": 8,
+      "n_with_closing": 7,
+      "roi_vs_closing": -0.3064,
+      "net_negative": true
+    },
+    "20%+": {
+      "n": 7,
+      "n_with_closing": 7,
+      "roi_vs_closing": 0.1571,
+      "net_negative": false
+    },
+    "5-10%": {
+      "n": 6,
+      "n_with_closing": 5,
+      "roi_vs_closing": 0.259,
+      "net_negative": false
+    },
+    "n/a": {
+      "n": 2,
+      "n_with_closing": 0,
+      "roi_vs_closing": null,
+      "net_negative": false
+    }
+  },
+  "net_negative_buckets": [
+    "0-5%",
+    "10-20%"
+  ]
+}

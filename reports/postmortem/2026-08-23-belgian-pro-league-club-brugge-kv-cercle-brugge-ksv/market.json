@@ -1,0 +1,39 @@
+{
+  "source": "snapshot market_totals (pinnacle), ts 2026-08-23T16:10:12Z",
+  "ladder_as_stored": {
+    "Over 3.0": 1.552, "Under 3.0": 2.52,
+    "Over 3.5": 1.99, "Under 3.5": 1.877,
+    "Over 4.0": 2.6, "Under 4.0": 1.523,
+    "Over 4.5": 3.15, "Under 4.5": 1.373,
+    "Over 2.5": 1.369, "Under 2.5": 3.17,
+    "BTTS Yes": 1.751, "BTTS No": 2.12
+  },
+  "devig_method": "proportional (multiplicative) two-way: p_over = (1/o)/((1/o)+(1/u)). Whole-number lines 3.0/4.0 carry push probability and are EXCLUDED from the lambda fit; only push-free half-lines used.",
+  "devigged_points": {
+    "P(over 2.5)": {"raw": [1.369, 3.17], "fair_over": 0.69839},
+    "P(over 3.5)": {"raw": [1.99, 1.877], "fair_over": 0.48539},
+    "P(over 4.5)": {"raw": [3.15, 1.373], "fair_over": 0.30356}
+  },
+  "cross_check": "devigged P(O2.5)=0.69839 equals snapshot best_pick.implied_prob=0.6983917162370566 exactly",
+  "market_implied_total_fit": {
+    "method": "solve Poisson tail P(X>=k) = fair_over for each half-line k in {3,4,5}",
+    "per_line_estimates": {"k=3": 3.606, "k=4": 3.603, "k=5": 3.652},
+    "market_implied_total": 3.62,
+    "consistency": "three independent lines agree within 0.05 goals -> fit is stable"
+  },
+  "comparison": {
+    "model_total_lambda": 4.104,
+    "market_implied_total": 3.62,
+    "difference_goals": 0.484,
+    "difference_pp_O2.5": 7.83,
+    "difference_pp_O3.5": 10.12,
+    "note": "the MARKET itself priced this fixture at ~3.6 expected goals (high-scoring); the model is only +0.48 goals hotter — unlike SV Ried where the market said 49% O2.5 (~2.5 goals) and the model said 4.09"
+  },
+  "movement_context": {
+    "OU_2_5_opening": 1.35,
+    "OU_2_5_latest": 1.35,
+    "ah_home_line_open": -1.5,
+    "ah_home_line_latest": -1.75,
+    "reading": "flat totals price with AH steaming toward the home favourite (deeper line), consistent with a high-scoring mismatch"
+  }
+}

@@ -1,0 +1,45 @@
+# env
+.env
+.env.local
+
+# bot single-instance lock
+.bot.lock
+
+# cache - all generated artifacts (parquet, csv, pkl, logs, tor, odds) except .gitkeep
+cache/**
+!cache/**/
+!cache/**/.gitkeep
+
+# large binaries / logs anywhere
+*.parquet
+*.csv
+*.pkl
+*.log
+pytest_output.txt
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+
+# editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# local backups / temp artifacts
+*.bak
+*.backup
+*.before_adjustments
+*.new
+*.tmp
+*.old_params
+*.old_*
+
+# claude local settings (personal)
+.claude/settings.local.json

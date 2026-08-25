@@ -1,0 +1,2636 @@
+{
+  "n_odds_matches": 1520,
+  "markets": {
+    "1X2": {
+      "by_odds": {
+        "<1.20": {
+          "n": 54,
+          "hits": 49,
+          "hit_rate": 0.9074,
+          "brier": 0.1143,
+          "log_loss": 0.3943,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.801,
+            0.96
+          ]
+        },
+        "1.20-1.40": {
+          "n": 181,
+          "hits": 132,
+          "hit_rate": 0.7293,
+          "brier": 0.2091,
+          "log_loss": 0.6097,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.66,
+            0.789
+          ]
+        },
+        "1.40-1.60": {
+          "n": 216,
+          "hits": 144,
+          "hit_rate": 0.6667,
+          "brier": 0.2398,
+          "log_loss": 0.6734,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.601,
+            0.726
+          ]
+        },
+        "1.60-2.00": {
+          "n": 461,
+          "hits": 247,
+          "hit_rate": 0.5358,
+          "brier": 0.2579,
+          "log_loss": 0.71,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.49,
+            0.581
+          ]
+        },
+        "2.00-3.00": {
+          "n": 846,
+          "hits": 329,
+          "hit_rate": 0.3889,
+          "brier": 0.244,
+          "log_loss": 0.6818,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.357,
+            0.422
+          ]
+        },
+        ">3.00": {
+          "n": 2802,
+          "hits": 619,
+          "hit_rate": 0.2209,
+          "brier": 0.1698,
+          "log_loss": 0.52,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.206,
+            0.237
+          ]
+        }
+      },
+      "by_edge": {
+        "<0pp": {
+          "n": 2289,
+          "hits": 891,
+          "hit_rate": 0.3893,
+          "brier": 0.206,
+          "log_loss": 0.5997,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.369,
+            0.409
+          ]
+        },
+        "0-5pp": {
+          "n": 1385,
+          "hits": 387,
+          "hit_rate": 0.2794,
+          "brier": 0.1818,
+          "log_loss": 0.5452,
+          "roi": -0.0208,
+          "bets": 187,
+          "net_stake": -3.89,
+          "max_drawdown": -18.38,
+          "max_losing_streak": 11,
+          "hit_wilson95": [
+            0.256,
+            0.304
+          ]
+        },
+        "5-10pp": {
+          "n": 554,
+          "hits": 141,
+          "hit_rate": 0.2545,
+          "brier": 0.186,
+          "log_loss": 0.5536,
+          "roi": -0.1104,
+          "bets": 218,
+          "net_stake": -24.06,
+          "max_drawdown": -33.85,
+          "max_losing_streak": 12,
+          "hit_wilson95": [
+            0.22,
+            0.292
+          ]
+        },
+        "10-20pp": {
+          "n": 280,
+          "hits": 84,
+          "hit_rate": 0.3,
+          "brier": 0.2081,
+          "log_loss": 0.6025,
+          "roi": -0.0207,
+          "bets": 174,
+          "net_stake": -3.6,
+          "max_drawdown": -34.36,
+          "max_losing_streak": 13,
+          "hit_wilson95": [
+            0.249,
+            0.356
+          ]
+        },
+        ">20pp": {
+          "n": 52,
+          "hits": 17,
+          "hit_rate": 0.3269,
+          "brier": 0.2395,
+          "log_loss": 0.6712,
+          "roi": 0.4461,
+          "bets": 44,
+          "net_stake": 19.63,
+          "max_drawdown": -4.32,
+          "max_losing_streak": 4,
+          "hit_wilson95": [
+            0.215,
+            0.462
+          ]
+        }
+      },
+      "by_prob": {
+        "[0.00,0.50)": {
+          "n": 3756,
+          "hits": 1035,
+          "hit_rate": 0.2756,
+          "brier": 0.1892,
+          "log_loss": 0.5621,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.262,
+            0.29
+          ]
+        },
+        "[0.50,0.55)": {
+          "n": 243,
+          "hits": 132,
+          "hit_rate": 0.5432,
+          "brier": 0.2461,
+          "log_loss": 0.6853,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.48,
+            0.605
+          ]
+        },
+        "[0.55,0.60)": {
+          "n": 177,
+          "hits": 94,
+          "hit_rate": 0.5311,
+          "brier": 0.2487,
+          "log_loss": 0.6904,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.458,
+            0.603
+          ]
+        },
+        "[0.60,0.65)": {
+          "n": 153,
+          "hits": 99,
+          "hit_rate": 0.6471,
+          "brier": 0.2288,
+          "log_loss": 0.6502,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.569,
+            0.718
+          ]
+        },
+        "[0.65,0.70)": {
+          "n": 113,
+          "hits": 69,
+          "hit_rate": 0.6106,
+          "brier": 0.2398,
+          "log_loss": 0.673,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.518,
+            0.695
+          ]
+        },
+        "[0.70,0.75)": {
+          "n": 63,
+          "hits": 46,
+          "hit_rate": 0.7302,
+          "brier": 0.1992,
+          "log_loss": 0.5887,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.61,
+            0.824
+          ]
+        },
+        "[0.75,0.80)": {
+          "n": 37,
+          "hits": 28,
+          "hit_rate": 0.7568,
+          "brier": 0.1821,
+          "log_loss": 0.5493,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.599,
+            0.866
+          ]
+        },
+        "[0.80,0.90)": {
+          "n": 18,
+          "hits": 17,
+          "hit_rate": 0.9444,
+          "brier": 0.0671,
+          "log_loss": 0.2796,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.742,
+            0.99
+          ]
+        },
+        "[0.90,1.00]": {
+          "n": 0,
+          "hits": 0,
+          "hit_rate": null,
+          "brier": null,
+          "log_loss": null,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        }
+      },
+      "by_season": {
+        "2022-2023": {
+          "n": 1140,
+          "hits": 380,
+          "hit_rate": 0.3333,
+          "brier": 0.1966,
+          "log_loss": 0.579,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.307,
+            0.361
+          ]
+        },
+        "2023-2024": {
+          "n": 1140,
+          "hits": 380,
+          "hit_rate": 0.3333,
+          "brier": 0.1872,
+          "log_loss": 0.5571,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.307,
+            0.361
+          ]
+        },
+        "2024-2025": {
+          "n": 1140,
+          "hits": 380,
+          "hit_rate": 0.3333,
+          "brier": 0.1982,
+          "log_loss": 0.5811,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.307,
+            0.361
+          ]
+        },
+        "2025-2026": {
+          "n": 1140,
+          "hits": 380,
+          "hit_rate": 0.3333,
+          "brier": 0.2048,
+          "log_loss": 0.5969,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.307,
+            0.361
+          ]
+        }
+      },
+      "by_home_away": {
+        "home": {
+          "n": 1520,
+          "hits": 676,
+          "hit_rate": 0.4447,
+          "brier": 0.2177,
+          "log_loss": 0.6238,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        },
+        "away": {
+          "n": 3040,
+          "hits": 844,
+          "hit_rate": 0.2776,
+          "brier": 0.1862,
+          "log_loss": 0.5559,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        },
+        "match": {
+          "n": 0,
+          "hits": 0,
+          "hit_rate": null,
+          "brier": null,
+          "log_loss": null,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        }
+      },
+      "market_benchmark": {
+        "n": 4560,
+        "hits": 1520,
+        "hit_rate": 0.3333,
+        "brier": 0.1913,
+        "log_loss": 0.5653,
+        "roi": null,
+        "bets": 0,
+        "net_stake": 0.0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      }
+    },
+    "Over 2.5": {
+      "by_odds": {
+        "<1.20": {
+          "n": 1,
+          "hits": 1,
+          "hit_rate": 1.0,
+          "brier": 0.023,
+          "log_loss": 0.1646,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.207,
+            1.0
+          ]
+        },
+        "1.20-1.40": {
+          "n": 103,
+          "hits": 75,
+          "hit_rate": 0.7282,
+          "brier": 0.2216,
+          "log_loss": 0.6357,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.635,
+            0.805
+          ]
+        },
+        "1.40-1.60": {
+          "n": 357,
+          "hits": 229,
+          "hit_rate": 0.6415,
+          "brier": 0.2488,
+          "log_loss": 0.6924,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.59,
+            0.689
+          ]
+        },
+        "1.60-2.00": {
+          "n": 808,
+          "hits": 450,
+          "hit_rate": 0.5569,
+          "brier": 0.2659,
+          "log_loss": 0.728,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.522,
+            0.591
+          ]
+        },
+        "2.00-3.00": {
+          "n": 251,
+          "hits": 115,
+          "hit_rate": 0.4582,
+          "brier": 0.2692,
+          "log_loss": 0.7361,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.398,
+            0.52
+          ]
+        },
+        ">3.00": {
+          "n": 0,
+          "hits": 0,
+          "hit_rate": null,
+          "brier": null,
+          "log_loss": null,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        }
+      },
+      "by_edge": {
+        "<0pp": {
+          "n": 949,
+          "hits": 563,
+          "hit_rate": 0.5933,
+          "brier": 0.2617,
+          "log_loss": 0.7194,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.562,
+            0.624
+          ]
+        },
+        "0-5pp": {
+          "n": 222,
+          "hits": 120,
+          "hit_rate": 0.5405,
+          "brier": 0.2486,
+          "log_loss": 0.6901,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.475,
+            0.605
+          ]
+        },
+        "5-10pp": {
+          "n": 173,
+          "hits": 94,
+          "hit_rate": 0.5434,
+          "brier": 0.2478,
+          "log_loss": 0.6877,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.469,
+            0.616
+          ]
+        },
+        "10-20pp": {
+          "n": 154,
+          "hits": 84,
+          "hit_rate": 0.5455,
+          "brier": 0.2598,
+          "log_loss": 0.7174,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.467,
+            0.622
+          ]
+        },
+        ">20pp": {
+          "n": 22,
+          "hits": 9,
+          "hit_rate": 0.4091,
+          "brier": 0.3515,
+          "log_loss": 0.928,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.233,
+            0.613
+          ]
+        }
+      },
+      "by_prob": {
+        "[0.00,0.50)": {
+          "n": 647,
+          "hits": 361,
+          "hit_rate": 0.558,
+          "brier": 0.2735,
+          "log_loss": 0.7443,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.519,
+            0.596
+          ]
+        },
+        "[0.50,0.55)": {
+          "n": 216,
+          "hits": 130,
+          "hit_rate": 0.6019,
+          "brier": 0.245,
+          "log_loss": 0.6832,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.535,
+            0.665
+          ]
+        },
+        "[0.55,0.60)": {
+          "n": 221,
+          "hits": 127,
+          "hit_rate": 0.5747,
+          "brier": 0.2459,
+          "log_loss": 0.6849,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.509,
+            0.638
+          ]
+        },
+        "[0.60,0.65)": {
+          "n": 171,
+          "hits": 93,
+          "hit_rate": 0.5439,
+          "brier": 0.2551,
+          "log_loss": 0.704,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.469,
+            0.617
+          ]
+        },
+        "[0.65,0.70)": {
+          "n": 130,
+          "hits": 70,
+          "hit_rate": 0.5385,
+          "brier": 0.2683,
+          "log_loss": 0.733,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.453,
+            0.622
+          ]
+        },
+        "[0.70,0.75)": {
+          "n": 67,
+          "hits": 41,
+          "hit_rate": 0.6119,
+          "brier": 0.248,
+          "log_loss": 0.6923,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.492,
+            0.72
+          ]
+        },
+        "[0.75,0.80)": {
+          "n": 53,
+          "hits": 38,
+          "hit_rate": 0.717,
+          "brier": 0.2071,
+          "log_loss": 0.6073,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.584,
+            0.82
+          ]
+        },
+        "[0.80,0.90)": {
+          "n": 15,
+          "hits": 10,
+          "hit_rate": 0.6667,
+          "brier": 0.2538,
+          "log_loss": 0.7356,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.417,
+            0.848
+          ]
+        },
+        "[0.90,1.00]": {
+          "n": 0,
+          "hits": 0,
+          "hit_rate": null,
+          "brier": null,
+          "log_loss": null,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        }
+      },
+      "by_season": {
+        "2022-2023": {
+          "n": 380,
+          "hits": 200,
+          "hit_rate": 0.5263,
+          "brier": 0.253,
+          "log_loss": 0.7015,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.476,
+            0.576
+          ]
+        },
+        "2023-2024": {
+          "n": 380,
+          "hits": 246,
+          "hit_rate": 0.6474,
+          "brier": 0.2444,
+          "log_loss": 0.6827,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.598,
+            0.694
+          ]
+        },
+        "2024-2025": {
+          "n": 380,
+          "hits": 215,
+          "hit_rate": 0.5658,
+          "brier": 0.2674,
+          "log_loss": 0.7311,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.516,
+            0.615
+          ]
+        },
+        "2025-2026": {
+          "n": 380,
+          "hits": 209,
+          "hit_rate": 0.55,
+          "brier": 0.2724,
+          "log_loss": 0.7419,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.5,
+            0.599
+          ]
+        }
+      },
+      "by_home_away": {
+        "home": {
+          "n": 0,
+          "hits": 0,
+          "hit_rate": null,
+          "brier": null,
+          "log_loss": null,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        },
+        "away": {
+          "n": 0,
+          "hits": 0,
+          "hit_rate": null,
+          "brier": null,
+          "log_loss": null,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        },
+        "match": {
+          "n": 1520,
+          "hits": 870,
+          "hit_rate": 0.5724,
+          "brier": 0.2593,
+          "log_loss": 0.7143,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        }
+      },
+      "market_benchmark": {
+        "n": 1520,
+        "hits": 870,
+        "hit_rate": 0.5724,
+        "brier": 0.2388,
+        "log_loss": 0.6703,
+        "roi": null,
+        "bets": 0,
+        "net_stake": 0.0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      }
+    },
+    "Under 2.5": {
+      "by_odds": {
+        "<1.20": {
+          "n": 0,
+          "hits": 0,
+          "hit_rate": null,
+          "brier": null,
+          "log_loss": null,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        },
+        "1.20-1.40": {
+          "n": 0,
+          "hits": 0,
+          "hit_rate": null,
+          "brier": null,
+          "log_loss": null,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        },
+        "1.40-1.60": {
+          "n": 4,
+          "hits": 2,
+          "hit_rate": 0.5,
+          "brier": 0.3693,
+          "log_loss": 0.9586,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.15,
+            0.85
+          ]
+        },
+        "1.60-2.00": {
+          "n": 406,
+          "hits": 212,
+          "hit_rate": 0.5222,
+          "brier": 0.2692,
+          "log_loss": 0.7353,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.474,
+            0.57
+          ]
+        },
+        "2.00-3.00": {
+          "n": 987,
+          "hits": 403,
+          "hit_rate": 0.4083,
+          "brier": 0.2593,
+          "log_loss": 0.714,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.378,
+            0.439
+          ]
+        },
+        ">3.00": {
+          "n": 123,
+          "hits": 33,
+          "hit_rate": 0.2683,
+          "brier": 0.2229,
+          "log_loss": 0.64,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.198,
+            0.353
+          ]
+        }
+      },
+      "by_edge": {
+        "<0pp": {
+          "n": 571,
+          "hits": 264,
+          "hit_rate": 0.4623,
+          "brier": 0.2553,
+          "log_loss": 0.7059,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.422,
+            0.503
+          ]
+        },
+        "0-5pp": {
+          "n": 260,
+          "hits": 108,
+          "hit_rate": 0.4154,
+          "brier": 0.2467,
+          "log_loss": 0.6872,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.357,
+            0.476
+          ]
+        },
+        "5-10pp": {
+          "n": 219,
+          "hits": 89,
+          "hit_rate": 0.4064,
+          "brier": 0.2443,
+          "log_loss": 0.6813,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.343,
+            0.473
+          ]
+        },
+        "10-20pp": {
+          "n": 301,
+          "hits": 122,
+          "hit_rate": 0.4053,
+          "brier": 0.2596,
+          "log_loss": 0.7138,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.351,
+            0.462
+          ]
+        },
+        ">20pp": {
+          "n": 169,
+          "hits": 67,
+          "hit_rate": 0.3964,
+          "brier": 0.3108,
+          "log_loss": 0.828,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.326,
+            0.472
+          ]
+        }
+      },
+      "by_prob": {
+        "[0.00,0.50)": {
+          "n": 873,
+          "hits": 364,
+          "hit_rate": 0.417,
+          "brier": 0.2487,
+          "log_loss": 0.6921,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.385,
+            0.45
+          ]
+        },
+        "[0.50,0.55)": {
+          "n": 213,
+          "hits": 92,
+          "hit_rate": 0.4319,
+          "brier": 0.2518,
+          "log_loss": 0.6967,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.367,
+            0.499
+          ]
+        },
+        "[0.55,0.60)": {
+          "n": 158,
+          "hits": 61,
+          "hit_rate": 0.3861,
+          "brier": 0.2714,
+          "log_loss": 0.7362,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.314,
+            0.464
+          ]
+        },
+        "[0.60,0.65)": {
+          "n": 127,
+          "hits": 62,
+          "hit_rate": 0.4882,
+          "brier": 0.2689,
+          "log_loss": 0.7321,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.403,
+            0.574
+          ]
+        },
+        "[0.65,0.70)": {
+          "n": 63,
+          "hits": 29,
+          "hit_rate": 0.4603,
+          "brier": 0.2943,
+          "log_loss": 0.7872,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.343,
+            0.582
+          ]
+        },
+        "[0.70,0.75)": {
+          "n": 40,
+          "hits": 19,
+          "hit_rate": 0.475,
+          "brier": 0.3128,
+          "log_loss": 0.8331,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.329,
+            0.625
+          ]
+        },
+        "[0.75,0.80)": {
+          "n": 26,
+          "hits": 12,
+          "hit_rate": 0.4615,
+          "brier": 0.3468,
+          "log_loss": 0.9213,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.288,
+            0.645
+          ]
+        },
+        "[0.80,0.90)": {
+          "n": 19,
+          "hits": 10,
+          "hit_rate": 0.5263,
+          "brier": 0.3279,
+          "log_loss": 0.8897,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.317,
+            0.727
+          ]
+        },
+        "[0.90,1.00]": {
+          "n": 1,
+          "hits": 1,
+          "hit_rate": 1.0,
+          "brier": 0.0083,
+          "log_loss": 0.0956,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.207,
+            1.0
+          ]
+        }
+      },
+      "by_season": {
+        "2022-2023": {
+          "n": 380,
+          "hits": 180,
+          "hit_rate": 0.4737,
+          "brier": 0.253,
+          "log_loss": 0.7015,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.424,
+            0.524
+          ]
+        },
+        "2023-2024": {
+          "n": 380,
+          "hits": 134,
+          "hit_rate": 0.3526,
+          "brier": 0.2444,
+          "log_loss": 0.6827,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.306,
+            0.402
+          ]
+        },
+        "2024-2025": {
+          "n": 380,
+          "hits": 165,
+          "hit_rate": 0.4342,
+          "brier": 0.2674,
+          "log_loss": 0.7311,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.385,
+            0.484
+          ]
+        },
+        "2025-2026": {
+          "n": 380,
+          "hits": 171,
+          "hit_rate": 0.45,
+          "brier": 0.2724,
+          "log_loss": 0.7419,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0,
+          "hit_wilson95": [
+            0.401,
+            0.5
+          ]
+        }
+      },
+      "by_home_away": {
+        "home": {
+          "n": 0,
+          "hits": 0,
+          "hit_rate": null,
+          "brier": null,
+          "log_loss": null,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        },
+        "away": {
+          "n": 0,
+          "hits": 0,
+          "hit_rate": null,
+          "brier": null,
+          "log_loss": null,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        },
+        "match": {
+          "n": 1520,
+          "hits": 650,
+          "hit_rate": 0.4276,
+          "brier": 0.2593,
+          "log_loss": 0.7143,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        }
+      },
+      "market_benchmark": {
+        "n": 1520,
+        "hits": 650,
+        "hit_rate": 0.4276,
+        "brier": 0.2388,
+        "log_loss": 0.6703,
+        "roi": null,
+        "bets": 0,
+        "net_stake": 0.0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      }
+    }
+  },
+  "leagues": {
+    "EPL": {
+      "1X2": {
+        "by_odds": {
+          "<1.20": {
+            "n": 54,
+            "hits": 49,
+            "hit_rate": 0.9074,
+            "brier": 0.1143,
+            "log_loss": 0.3943,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.801,
+              0.96
+            ]
+          },
+          "1.20-1.40": {
+            "n": 181,
+            "hits": 132,
+            "hit_rate": 0.7293,
+            "brier": 0.2091,
+            "log_loss": 0.6097,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.66,
+              0.789
+            ]
+          },
+          "1.40-1.60": {
+            "n": 216,
+            "hits": 144,
+            "hit_rate": 0.6667,
+            "brier": 0.2398,
+            "log_loss": 0.6734,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.601,
+              0.726
+            ]
+          },
+          "1.60-2.00": {
+            "n": 461,
+            "hits": 247,
+            "hit_rate": 0.5358,
+            "brier": 0.2579,
+            "log_loss": 0.71,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.49,
+              0.581
+            ]
+          },
+          "2.00-3.00": {
+            "n": 846,
+            "hits": 329,
+            "hit_rate": 0.3889,
+            "brier": 0.244,
+            "log_loss": 0.6818,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.357,
+              0.422
+            ]
+          },
+          ">3.00": {
+            "n": 2802,
+            "hits": 619,
+            "hit_rate": 0.2209,
+            "brier": 0.1698,
+            "log_loss": 0.52,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.206,
+              0.237
+            ]
+          }
+        },
+        "by_edge": {
+          "<0pp": {
+            "n": 2289,
+            "hits": 891,
+            "hit_rate": 0.3893,
+            "brier": 0.206,
+            "log_loss": 0.5997,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.369,
+              0.409
+            ]
+          },
+          "0-5pp": {
+            "n": 1385,
+            "hits": 387,
+            "hit_rate": 0.2794,
+            "brier": 0.1818,
+            "log_loss": 0.5452,
+            "roi": -0.0208,
+            "bets": 187,
+            "net_stake": -3.89,
+            "max_drawdown": -18.38,
+            "max_losing_streak": 11,
+            "hit_wilson95": [
+              0.256,
+              0.304
+            ]
+          },
+          "5-10pp": {
+            "n": 554,
+            "hits": 141,
+            "hit_rate": 0.2545,
+            "brier": 0.186,
+            "log_loss": 0.5536,
+            "roi": -0.1104,
+            "bets": 218,
+            "net_stake": -24.06,
+            "max_drawdown": -33.85,
+            "max_losing_streak": 12,
+            "hit_wilson95": [
+              0.22,
+              0.292
+            ]
+          },
+          "10-20pp": {
+            "n": 280,
+            "hits": 84,
+            "hit_rate": 0.3,
+            "brier": 0.2081,
+            "log_loss": 0.6025,
+            "roi": -0.0207,
+            "bets": 174,
+            "net_stake": -3.6,
+            "max_drawdown": -34.36,
+            "max_losing_streak": 13,
+            "hit_wilson95": [
+              0.249,
+              0.356
+            ]
+          },
+          ">20pp": {
+            "n": 52,
+            "hits": 17,
+            "hit_rate": 0.3269,
+            "brier": 0.2395,
+            "log_loss": 0.6712,
+            "roi": 0.4461,
+            "bets": 44,
+            "net_stake": 19.63,
+            "max_drawdown": -4.32,
+            "max_losing_streak": 4,
+            "hit_wilson95": [
+              0.215,
+              0.462
+            ]
+          }
+        },
+        "by_prob": {
+          "[0.00,0.50)": {
+            "n": 3756,
+            "hits": 1035,
+            "hit_rate": 0.2756,
+            "brier": 0.1892,
+            "log_loss": 0.5621,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.262,
+              0.29
+            ]
+          },
+          "[0.50,0.55)": {
+            "n": 243,
+            "hits": 132,
+            "hit_rate": 0.5432,
+            "brier": 0.2461,
+            "log_loss": 0.6853,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.48,
+              0.605
+            ]
+          },
+          "[0.55,0.60)": {
+            "n": 177,
+            "hits": 94,
+            "hit_rate": 0.5311,
+            "brier": 0.2487,
+            "log_loss": 0.6904,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.458,
+              0.603
+            ]
+          },
+          "[0.60,0.65)": {
+            "n": 153,
+            "hits": 99,
+            "hit_rate": 0.6471,
+            "brier": 0.2288,
+            "log_loss": 0.6502,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.569,
+              0.718
+            ]
+          },
+          "[0.65,0.70)": {
+            "n": 113,
+            "hits": 69,
+            "hit_rate": 0.6106,
+            "brier": 0.2398,
+            "log_loss": 0.673,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.518,
+              0.695
+            ]
+          },
+          "[0.70,0.75)": {
+            "n": 63,
+            "hits": 46,
+            "hit_rate": 0.7302,
+            "brier": 0.1992,
+            "log_loss": 0.5887,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.61,
+              0.824
+            ]
+          },
+          "[0.75,0.80)": {
+            "n": 37,
+            "hits": 28,
+            "hit_rate": 0.7568,
+            "brier": 0.1821,
+            "log_loss": 0.5493,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.599,
+              0.866
+            ]
+          },
+          "[0.80,0.90)": {
+            "n": 18,
+            "hits": 17,
+            "hit_rate": 0.9444,
+            "brier": 0.0671,
+            "log_loss": 0.2796,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.742,
+              0.99
+            ]
+          },
+          "[0.90,1.00]": {
+            "n": 0,
+            "hits": 0,
+            "hit_rate": null,
+            "brier": null,
+            "log_loss": null,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          }
+        },
+        "by_season": {
+          "2022-2023": {
+            "n": 1140,
+            "hits": 380,
+            "hit_rate": 0.3333,
+            "brier": 0.1966,
+            "log_loss": 0.579,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.307,
+              0.361
+            ]
+          },
+          "2023-2024": {
+            "n": 1140,
+            "hits": 380,
+            "hit_rate": 0.3333,
+            "brier": 0.1872,
+            "log_loss": 0.5571,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.307,
+              0.361
+            ]
+          },
+          "2024-2025": {
+            "n": 1140,
+            "hits": 380,
+            "hit_rate": 0.3333,
+            "brier": 0.1982,
+            "log_loss": 0.5811,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.307,
+              0.361
+            ]
+          },
+          "2025-2026": {
+            "n": 1140,
+            "hits": 380,
+            "hit_rate": 0.3333,
+            "brier": 0.2048,
+            "log_loss": 0.5969,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.307,
+              0.361
+            ]
+          }
+        },
+        "by_home_away": {
+          "home": {
+            "n": 1520,
+            "hits": 676,
+            "hit_rate": 0.4447,
+            "brier": 0.2177,
+            "log_loss": 0.6238,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "away": {
+            "n": 3040,
+            "hits": 844,
+            "hit_rate": 0.2776,
+            "brier": 0.1862,
+            "log_loss": 0.5559,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "match": {
+            "n": 0,
+            "hits": 0,
+            "hit_rate": null,
+            "brier": null,
+            "log_loss": null,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          }
+        },
+        "market_benchmark": {
+          "n": 4560,
+          "hits": 1520,
+          "hit_rate": 0.3333,
+          "brier": 0.1913,
+          "log_loss": 0.5653,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        }
+      },
+      "Over 2.5": {
+        "by_odds": {
+          "<1.20": {
+            "n": 1,
+            "hits": 1,
+            "hit_rate": 1.0,
+            "brier": 0.023,
+            "log_loss": 0.1646,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.207,
+              1.0
+            ]
+          },
+          "1.20-1.40": {
+            "n": 103,
+            "hits": 75,
+            "hit_rate": 0.7282,
+            "brier": 0.2216,
+            "log_loss": 0.6357,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.635,
+              0.805
+            ]
+          },
+          "1.40-1.60": {
+            "n": 357,
+            "hits": 229,
+            "hit_rate": 0.6415,
+            "brier": 0.2488,
+            "log_loss": 0.6924,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.59,
+              0.689
+            ]
+          },
+          "1.60-2.00": {
+            "n": 808,
+            "hits": 450,
+            "hit_rate": 0.5569,
+            "brier": 0.2659,
+            "log_loss": 0.728,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.522,
+              0.591
+            ]
+          },
+          "2.00-3.00": {
+            "n": 251,
+            "hits": 115,
+            "hit_rate": 0.4582,
+            "brier": 0.2692,
+            "log_loss": 0.7361,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.398,
+              0.52
+            ]
+          },
+          ">3.00": {
+            "n": 0,
+            "hits": 0,
+            "hit_rate": null,
+            "brier": null,
+            "log_loss": null,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          }
+        },
+        "by_edge": {
+          "<0pp": {
+            "n": 949,
+            "hits": 563,
+            "hit_rate": 0.5933,
+            "brier": 0.2617,
+            "log_loss": 0.7194,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.562,
+              0.624
+            ]
+          },
+          "0-5pp": {
+            "n": 222,
+            "hits": 120,
+            "hit_rate": 0.5405,
+            "brier": 0.2486,
+            "log_loss": 0.6901,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.475,
+              0.605
+            ]
+          },
+          "5-10pp": {
+            "n": 173,
+            "hits": 94,
+            "hit_rate": 0.5434,
+            "brier": 0.2478,
+            "log_loss": 0.6877,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.469,
+              0.616
+            ]
+          },
+          "10-20pp": {
+            "n": 154,
+            "hits": 84,
+            "hit_rate": 0.5455,
+            "brier": 0.2598,
+            "log_loss": 0.7174,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.467,
+              0.622
+            ]
+          },
+          ">20pp": {
+            "n": 22,
+            "hits": 9,
+            "hit_rate": 0.4091,
+            "brier": 0.3515,
+            "log_loss": 0.928,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.233,
+              0.613
+            ]
+          }
+        },
+        "by_prob": {
+          "[0.00,0.50)": {
+            "n": 647,
+            "hits": 361,
+            "hit_rate": 0.558,
+            "brier": 0.2735,
+            "log_loss": 0.7443,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.519,
+              0.596
+            ]
+          },
+          "[0.50,0.55)": {
+            "n": 216,
+            "hits": 130,
+            "hit_rate": 0.6019,
+            "brier": 0.245,
+            "log_loss": 0.6832,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.535,
+              0.665
+            ]
+          },
+          "[0.55,0.60)": {
+            "n": 221,
+            "hits": 127,
+            "hit_rate": 0.5747,
+            "brier": 0.2459,
+            "log_loss": 0.6849,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.509,
+              0.638
+            ]
+          },
+          "[0.60,0.65)": {
+            "n": 171,
+            "hits": 93,
+            "hit_rate": 0.5439,
+            "brier": 0.2551,
+            "log_loss": 0.704,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.469,
+              0.617
+            ]
+          },
+          "[0.65,0.70)": {
+            "n": 130,
+            "hits": 70,
+            "hit_rate": 0.5385,
+            "brier": 0.2683,
+            "log_loss": 0.733,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.453,
+              0.622
+            ]
+          },
+          "[0.70,0.75)": {
+            "n": 67,
+            "hits": 41,
+            "hit_rate": 0.6119,
+            "brier": 0.248,
+            "log_loss": 0.6923,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.492,
+              0.72
+            ]
+          },
+          "[0.75,0.80)": {
+            "n": 53,
+            "hits": 38,
+            "hit_rate": 0.717,
+            "brier": 0.2071,
+            "log_loss": 0.6073,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.584,
+              0.82
+            ]
+          },
+          "[0.80,0.90)": {
+            "n": 15,
+            "hits": 10,
+            "hit_rate": 0.6667,
+            "brier": 0.2538,
+            "log_loss": 0.7356,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.417,
+              0.848
+            ]
+          },
+          "[0.90,1.00]": {
+            "n": 0,
+            "hits": 0,
+            "hit_rate": null,
+            "brier": null,
+            "log_loss": null,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          }
+        },
+        "by_season": {
+          "2022-2023": {
+            "n": 380,
+            "hits": 200,
+            "hit_rate": 0.5263,
+            "brier": 0.253,
+            "log_loss": 0.7015,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.476,
+              0.576
+            ]
+          },
+          "2023-2024": {
+            "n": 380,
+            "hits": 246,
+            "hit_rate": 0.6474,
+            "brier": 0.2444,
+            "log_loss": 0.6827,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.598,
+              0.694
+            ]
+          },
+          "2024-2025": {
+            "n": 380,
+            "hits": 215,
+            "hit_rate": 0.5658,
+            "brier": 0.2674,
+            "log_loss": 0.7311,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.516,
+              0.615
+            ]
+          },
+          "2025-2026": {
+            "n": 380,
+            "hits": 209,
+            "hit_rate": 0.55,
+            "brier": 0.2724,
+            "log_loss": 0.7419,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.5,
+              0.599
+            ]
+          }
+        },
+        "by_home_away": {
+          "home": {
+            "n": 0,
+            "hits": 0,
+            "hit_rate": null,
+            "brier": null,
+            "log_loss": null,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "away": {
+            "n": 0,
+            "hits": 0,
+            "hit_rate": null,
+            "brier": null,
+            "log_loss": null,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "match": {
+            "n": 1520,
+            "hits": 870,
+            "hit_rate": 0.5724,
+            "brier": 0.2593,
+            "log_loss": 0.7143,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          }
+        },
+        "market_benchmark": {
+          "n": 1520,
+          "hits": 870,
+          "hit_rate": 0.5724,
+          "brier": 0.2388,
+          "log_loss": 0.6703,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        }
+      },
+      "Under 2.5": {
+        "by_odds": {
+          "<1.20": {
+            "n": 0,
+            "hits": 0,
+            "hit_rate": null,
+            "brier": null,
+            "log_loss": null,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "1.20-1.40": {
+            "n": 0,
+            "hits": 0,
+            "hit_rate": null,
+            "brier": null,
+            "log_loss": null,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "1.40-1.60": {
+            "n": 4,
+            "hits": 2,
+            "hit_rate": 0.5,
+            "brier": 0.3693,
+            "log_loss": 0.9586,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.15,
+              0.85
+            ]
+          },
+          "1.60-2.00": {
+            "n": 406,
+            "hits": 212,
+            "hit_rate": 0.5222,
+            "brier": 0.2692,
+            "log_loss": 0.7353,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.474,
+              0.57
+            ]
+          },
+          "2.00-3.00": {
+            "n": 987,
+            "hits": 403,
+            "hit_rate": 0.4083,
+            "brier": 0.2593,
+            "log_loss": 0.714,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.378,
+              0.439
+            ]
+          },
+          ">3.00": {
+            "n": 123,
+            "hits": 33,
+            "hit_rate": 0.2683,
+            "brier": 0.2229,
+            "log_loss": 0.64,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.198,
+              0.353
+            ]
+          }
+        },
+        "by_edge": {
+          "<0pp": {
+            "n": 571,
+            "hits": 264,
+            "hit_rate": 0.4623,
+            "brier": 0.2553,
+            "log_loss": 0.7059,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.422,
+              0.503
+            ]
+          },
+          "0-5pp": {
+            "n": 260,
+            "hits": 108,
+            "hit_rate": 0.4154,
+            "brier": 0.2467,
+            "log_loss": 0.6872,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.357,
+              0.476
+            ]
+          },
+          "5-10pp": {
+            "n": 219,
+            "hits": 89,
+            "hit_rate": 0.4064,
+            "brier": 0.2443,
+            "log_loss": 0.6813,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.343,
+              0.473
+            ]
+          },
+          "10-20pp": {
+            "n": 301,
+            "hits": 122,
+            "hit_rate": 0.4053,
+            "brier": 0.2596,
+            "log_loss": 0.7138,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.351,
+              0.462
+            ]
+          },
+          ">20pp": {
+            "n": 169,
+            "hits": 67,
+            "hit_rate": 0.3964,
+            "brier": 0.3108,
+            "log_loss": 0.828,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.326,
+              0.472
+            ]
+          }
+        },
+        "by_prob": {
+          "[0.00,0.50)": {
+            "n": 873,
+            "hits": 364,
+            "hit_rate": 0.417,
+            "brier": 0.2487,
+            "log_loss": 0.6921,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.385,
+              0.45
+            ]
+          },
+          "[0.50,0.55)": {
+            "n": 213,
+            "hits": 92,
+            "hit_rate": 0.4319,
+            "brier": 0.2518,
+            "log_loss": 0.6967,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.367,
+              0.499
+            ]
+          },
+          "[0.55,0.60)": {
+            "n": 158,
+            "hits": 61,
+            "hit_rate": 0.3861,
+            "brier": 0.2714,
+            "log_loss": 0.7362,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.314,
+              0.464
+            ]
+          },
+          "[0.60,0.65)": {
+            "n": 127,
+            "hits": 62,
+            "hit_rate": 0.4882,
+            "brier": 0.2689,
+            "log_loss": 0.7321,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.403,
+              0.574
+            ]
+          },
+          "[0.65,0.70)": {
+            "n": 63,
+            "hits": 29,
+            "hit_rate": 0.4603,
+            "brier": 0.2943,
+            "log_loss": 0.7872,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.343,
+              0.582
+            ]
+          },
+          "[0.70,0.75)": {
+            "n": 40,
+            "hits": 19,
+            "hit_rate": 0.475,
+            "brier": 0.3128,
+            "log_loss": 0.8331,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.329,
+              0.625
+            ]
+          },
+          "[0.75,0.80)": {
+            "n": 26,
+            "hits": 12,
+            "hit_rate": 0.4615,
+            "brier": 0.3468,
+            "log_loss": 0.9213,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.288,
+              0.645
+            ]
+          },
+          "[0.80,0.90)": {
+            "n": 19,
+            "hits": 10,
+            "hit_rate": 0.5263,
+            "brier": 0.3279,
+            "log_loss": 0.8897,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.317,
+              0.727
+            ]
+          },
+          "[0.90,1.00]": {
+            "n": 1,
+            "hits": 1,
+            "hit_rate": 1.0,
+            "brier": 0.0083,
+            "log_loss": 0.0956,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.207,
+              1.0
+            ]
+          }
+        },
+        "by_season": {
+          "2022-2023": {
+            "n": 380,
+            "hits": 180,
+            "hit_rate": 0.4737,
+            "brier": 0.253,
+            "log_loss": 0.7015,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.424,
+              0.524
+            ]
+          },
+          "2023-2024": {
+            "n": 380,
+            "hits": 134,
+            "hit_rate": 0.3526,
+            "brier": 0.2444,
+            "log_loss": 0.6827,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.306,
+              0.402
+            ]
+          },
+          "2024-2025": {
+            "n": 380,
+            "hits": 165,
+            "hit_rate": 0.4342,
+            "brier": 0.2674,
+            "log_loss": 0.7311,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.385,
+              0.484
+            ]
+          },
+          "2025-2026": {
+            "n": 380,
+            "hits": 171,
+            "hit_rate": 0.45,
+            "brier": 0.2724,
+            "log_loss": 0.7419,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0,
+            "hit_wilson95": [
+              0.401,
+              0.5
+            ]
+          }
+        },
+        "by_home_away": {
+          "home": {
+            "n": 0,
+            "hits": 0,
+            "hit_rate": null,
+            "brier": null,
+            "log_loss": null,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "away": {
+            "n": 0,
+            "hits": 0,
+            "hit_rate": null,
+            "brier": null,
+            "log_loss": null,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "match": {
+            "n": 1520,
+            "hits": 650,
+            "hit_rate": 0.4276,
+            "brier": 0.2593,
+            "log_loss": 0.7143,
+            "roi": null,
+            "bets": 0,
+            "net_stake": 0.0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          }
+        },
+        "market_benchmark": {
+          "n": 1520,
+          "hits": 650,
+          "hit_rate": 0.4276,
+          "brier": 0.2388,
+          "log_loss": 0.6703,
+          "roi": null,
+          "bets": 0,
+          "net_stake": 0.0,
+          "max_drawdown": null,
+          "max_losing_streak": 0
+        }
+      }
+    }
+  },
+  "edge_threshold": 0.02,
+  "note": "One chronological walk-forward replay; raw (uncalibrated) ensemble/feature-Poisson probabilities; real Pinnacle historical odds; no-vig implied used for edge; ROI = flat stake on the best 1X2 pick with no-vig edge >= threshold (per match, once). 1X2 rows are per-side events (3 per match, exactly one hits); totals rows are per-single-bet events.",
+  "dataset": "cache/football/epl_fixtures_2022_2026.json"
+}

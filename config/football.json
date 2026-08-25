@@ -1,0 +1,445 @@
+{
+  "leagues": [
+    "EPL",
+    "LaLiga",
+    "Serie A",
+    "Bundesliga",
+    "Ligue 1",
+    "UCL",
+    "UEL",
+    "UECL",
+    "Primeira Liga",
+    "Eredivisie",
+    "Saudi Pro League",
+    "MLS",
+    "Scottish Premiership",
+    "Super Lig",
+    "Belgian Pro League",
+    "EFL Championship",
+    "Ligue 2",
+    "Serie B",
+    "Segunda",
+    "Liga 1"
+  ],
+  "rate_limit_seconds": 1.1,
+  "identity_firewall": {
+    "enabled": true,
+    "refuse_divergence": true,
+    "refuse_history_lock": true,
+    "_note": "Plan 2026-08-24 (identity firewall): G-A/G-B menolak analisa saat pasangan query vs fixture-detection vs resolved-teams terbukti beda klub (kasus F3 Atletico->Real Madrid, P0 Barcelona->Espanyol); G-C pre-flight history lock memakai identity_lock_check SEBELUM fase mahal sehingga resolver flip menghentikan analisa ~2 detik, bukan menahan write setelah 250 detik. Fail-open pada nama tak terdecide / log rusak."
+  },
+  "outlier_threshold_pct": 5,
+  "top_n": 5,
+  "cache_dir": "cache/football",
+  "cache_ttl_seconds": {
+    "fixtures": 21600,
+    "homepage": 1200,
+    "odds": 900,
+    "stats": 3600
+  },
+  "analyse": {
+    "budget_seconds": 300.0
+  },
+  "quota_block_threshold": 5,
+  "proxy_auto_detect": {
+    "enabled": true,
+    "socks_ports": [
+      9050,
+      1080,
+      10808,
+      7891
+    ],
+    "http_ports": [
+      7890,
+      10809,
+      8118,
+      8080
+    ],
+    "ttl_found_seconds": 300,
+    "ttl_none_seconds": 60,
+    "tor_auto_start": true,
+    "tor_socks_port": 9050,
+    "tor_start_timeout_seconds": 120,
+    "tor_exe_paths": [],
+    "tor_health_check_enabled": true,
+    "tor_health_check_interval_seconds": 60,
+    "tor_idle_shutdown_seconds": 1800
+  },
+  "feature_flags": {
+    "enable_flashscore": true,
+    "enable_oddspapi": true,
+    "enable_nowgoal": true,
+    "enable_llm_router": true
+  },
+  "data_sources": {
+    "enabled": [
+      "flashscore",
+      "livescore"
+    ],
+    "priority": {
+      "flashscore": 100,
+      "livescore": 80
+    },
+    "fallback": {
+      "enabled": true
+    },
+    "validation": {
+      "enabled": true
+    },
+    "merge": {
+      "prefer_primary_on_conflict": true
+    },
+    "freshness": {
+      "lineup": 30,
+      "injuries": 60,
+      "statistics": 60,
+      "form": 360,
+      "standings": 360,
+      "h2h": 1440
+    },
+    "livescore": {
+      "enabled": true,
+      "base_url": "https://prod-cdn-public-api.lsmedia1.com",
+      "max_pages": 3
+    }
+  },
+  "auto_settle": {
+    "enabled": true,
+    "interval_hours": 6,
+    "days_back": 2,
+    "refresh_calibration": true,
+    "fetch_closing_odds": true
+  },
+  "clv_report": {
+    "enabled": true,
+    "interval_hours": 24
+  },
+  "edge_bucket_audit": {
+    "enabled": true,
+    "interval_hours": 24
+  },
+  "llm_router": {
+    "timeout_seconds": 45,
+    "max_user_text": 800,
+    "model": "gpt-4o-mini"
+  },
+  "models": {
+    "elo": {
+      "k": 32.0,
+      "home_advantage": 65.0,
+      "initial_rating": 1500.0,
+      "base_total_goals": 2.7,
+      "file": "cache/football/elo.json"
+    },
+    "poisson": {
+      "base_home_goals": 1.45,
+      "base_away_goals": 1.25,
+      "dc_rho": 0.0,
+      "shrinkage_samples": 5,
+      "time_decay_xi": 0.8,
+      "xg_weight": 0.65,
+      "min_samples": 2,
+      "lambda_mode": "pinned",
+      "lineup_weight": 0.0,
+      "rest_days_weight": 0.0,
+      "elo_anchor": {
+        "enabled": true,
+        "min_gap": 150,
+        "full_gap": 400
+      },
+      "market_total_calibration": {
+        "enabled": true,
+        "weight": 0.5
+      },
+      "_note_v3": "2026-08-24 (reports/bestpick_evaluasi_elche-barca_2026-08-24.md): elo_anchor menarik lambda FINAL ke arah Elo saat gap rating besar (F1); market_total_calibration menarik total gol lambda FINAL ke fair O/U market (F2). Keduanya deterministik per query, label pin tidak berubah (audit: model_probs.elo_anchor_t / market_total_calibrated)."
+    },
+    "ensemble": {
+      "elo_weight": 0.6,
+      "poisson_weight": 0.4
+    },
+    "calibration": {
+      "file": "cache/football/calibration.json",
+      "min_samples": 200,
+      "league_min_samples": 100,
+      "always_calibrated": [
+        "EPL",
+        "LaLiga",
+        "Serie A",
+        "Bundesliga",
+        "Ligue 1",
+        "UCL",
+        "UEL",
+        "UECL",
+        "Primeira Liga",
+        "Eredivisie",
+        "Saudi Pro League",
+        "MLS",
+        "Super Lig",
+        "Belgian Pro League",
+        "EFL Championship",
+        "Championship"
+      ]
+    },
+    "signal_scorer": {
+      "conf_weights": {
+        "completeness": 0.2,
+        "agreement": 0.3,
+        "calibration": 0.35,
+        "decisiveness": 0.15
+      }
+    },
+    "decision": {
+      "primary_bookmaker": "Pinnacle",
+      "weights": {
+        "probability_quality": 0.3,
+        "calibration_reliability": 0.2,
+        "model_agreement": 0.15,
+        "market_value": 0.15,
+        "data_quality": 0.1,
+        "odds_quality": 0.05,
+        "historical_reliability": 0.05,
+        "ml_agreement": 0.1,
+        "movement": 0.15
+      },
+      "weights_validated": false,
+      "weights_validation_note": "Phase 7: Spearman(decision score, realized ROI) = 0.0015 on EPL 2022-26 walk-forward (n=1520). The 7-component score does NOT rank profitable bets; tercile ROI is non-monotonic and negative at every tercile. Weights are an unvalidated prior. Betting decisions are gated by edge/EV/sample/CI/CLV (Phases 3/4/6), not by this score.",
+      "edge_warning_pp": 10.0,
+      "edge_extreme_pp": 20.0,
+      "min_bookmakers": 3,
+      "min_edge_pp": 3.0,
+      "best_prob_only": true,
+      "min_ev": 0.03,
+      "min_completeness": 0.6,
+      "disagreement_threshold_pp": 15.0,
+      "min_bucket_n": 200,
+      "min_bucket_ci_halfwidth": 0.03,
+      "strong_score": 0.7,
+      "good_score": 0.55,
+      "lean_score": 0.4,
+      "no_clear_max_score": 0.35,
+      "market_prior": true,
+      "market_prior_min_completeness": 0.6,
+      "edge_benchmark": "soft_consensus",
+      "edge_benchmark_label": "soft pre-match consensus (OddsPapi/NowGoal/TheOddsAPI) â€” bukan closing line",
+      "clv_gate": {
+        "enabled": true,
+        "min_bets": 30,
+        "require_roi_positive": true,
+        "max_ci_halfwidth": 0.05
+      },
+      "selection": {
+        "enabled": false,
+        "markets": [
+          "Total",
+          "BTTS",
+          "Asian Handicap",
+          "1X2"
+        ],
+        "leagues_primary": [
+          "Eredivisie",
+          "EFL Championship",
+          "Segunda",
+          "Ligue 2",
+          "Serie B",
+          "Super Lig",
+          "Saudi Pro League"
+        ],
+        "one_x2_leagues": [
+          "Eredivisie",
+          "EFL Championship",
+          "Segunda",
+          "Ligue 2",
+          "Serie B",
+          "Super Lig",
+          "Saudi Pro League"
+        ]
+      },
+      "edge_bucket_gate": {
+        "enabled": true,
+        "min_n": 10
+      },
+      "actionable_gate": {
+        "enabled": false
+      },
+      "market_blend": {
+        "enabled": false
+      }
+    },
+    "ml": {
+      "models_dir": "cache/football/models",
+      "window": 5,
+      "gd_margin": 2,
+      "leagues": [
+        "EPL",
+        "LaLiga",
+        "Serie A",
+        "Bundesliga",
+        "Ligue 1"
+      ],
+      "model": "auto",
+      "sampler": "smote",
+      "min_train_rows": 500,
+      "max_prob": 0.95
+    },
+    "staking": {
+      "enabled": true,
+      "kelly_fraction": 0.25,
+      "max_stake_fraction": 0.02,
+      "bankroll": 100.0,
+      "tier_multiplier": {
+        "STRONG": 1.0,
+        "GOOD": 0.75,
+        "LEAN": 0.5,
+        "WATCH": 0.0
+      }
+    },
+    "movement": {
+      "min_snapshots": 3,
+      "steam_threshold_pct": 2.0,
+      "require_movement_agreement": false,
+      "time_decay_tau": 6.0
+    },
+    "signal_engine": {
+      "model_version": "v2",
+      "allow_negative_edge_pp": -3.0,
+      "pick_gates": {
+        "respect_model_decision": false,
+        "agreement": true,
+        "max_dev_pp": 8.0,
+        "require_price": true,
+        "lambda_total_sanity": true,
+        "lambda_total_min": 1.6,
+        "lambda_total_max": 3.6,
+        "lambda_total_band_by_league": {
+          "eredivisie": {
+            "max": 4.0
+          }
+        },
+        "lambda_1x2_consistency": false,
+        "lambda_1x2_favourite_prob": 0.6,
+        "entity_integrity": true,
+        "entity_veto_asymmetric": true,
+        "elo_integrity": false,
+        "elo_require_seeded": true,
+        "elo_min": 1300.0,
+        "elo_max": 2100.0,
+        "_note": "Post-mortem 2026-08-22 (reports/bestpick_postmortem_2026-08-22.md). agreement (G2) replaces disagreement_gate.max_total_dev_pp: symmetric, all markets. lambda_1x2_consistency (G3) and elo_integrity (G5) default OFF -- both are stricter than the evidence supports and elo_require_seeded would veto every unseeded-Elo league; measure with a replay over the full log before enabling. entity_integrity (G6) needs home/away threaded into run_signal_engine before it does anything. lambda_total_band_by_league (2026-08-22): league-aware G4 band -- Eredivisie averages ~3.2 goals/game so its ceiling is 4.0 (still below the SV Ried broken-lambda case at 4.09)."
+      },
+      "disagreement_gate": {
+        "enabled": true,
+        "max_x2_dev_pp": 25.0,
+        "ah_side_contradiction_prob": 0.6,
+        "_note": "max_total_dev_pp and max_total_dev_pp_unseeded REMOVED 2026-08-22 -- superseded by pick_gates.agreement (G2). They were tuned on the 2026-08-21 losing set only and vetoed two verified 2026-08-20 winners (OFI Crete +26.5pp dev, Gent +21.1pp dev) out of sample."
+      },
+      "weights": {
+        "model": 0.35,
+        "statistical": 0.25,
+        "market": 0.2,
+        "movement": 0.10,
+        "late_movement": 0.0,
+        "data_quality": 0.05,
+        "team_context": 0.05
+      },
+      "weights_validated": false,
+      "weights_validation_note": "Initial configurable prior (spec S17), NOT statistically optimal. Calibrate via backtest before trusting. P3: data_quality weight kept at 0.05 by design -- cross-source odds disagreement (and thin completeness) is enforced as an explicit completeness DOCK (eff_completeness = 0.5x on disagreement) plus a MEDIUM confidence cap plus an explicit reason, not by inflating the weight; a larger weight would only scale an unvalidated prior. The disagreement path is thus visible and confidence-relevant without re-weighting on no evidence.",
+      "min_edge_pp": 3.0,
+      "conflict_pp": 8.0,
+      "best_pick_margin": 0.06,
+      "no_bet_score": 0.45,
+      "min_confluence": 2,
+      "min_data_quality": 0.3,
+      "odds_disagreement_pp": 8.0,
+      "very_high_score": 0.78,
+      "high_score": 0.65,
+      "medium_score": 0.52,
+      "low_score": 0.4,
+      "movement_pct_threshold": 2.0,
+      "reversal_pct": 1.5,
+      "evidence_floor": {
+        "score_cap_both_unavailable": 0.52,
+        "score_cap_one_unavailable": 0.65
+      },
+      "coverage_floor": {
+        "downgrade_below": 0.4,
+        "low_below": 0.25
+      },
+      "stability": {
+        "enabled": true,
+        "max_age_seconds": 21600,
+        "score_threshold_fallback": 0.05,
+        "score_threshold_percentile": 0.95,
+        "score_threshold_min_samples": 20,
+        "market_move_threshold_pct": 3.0,
+        "line_move_threshold": 0.25
+      },
+      "movement_confidence_note": "Layer 4: movement is 1 of 7 evidence components (weight 0.15); an opposing market move does not by itself cap confidence â€” model (0.30) + statistical (0.20) + market edge (0.20) can still produce HIGH. Documented prior, not a hidden inconsistency.",
+      "enable_1x2_signals": true
+    }
+  },
+  "auto_odds_poll": {
+    "enabled": true,
+    "loop_interval_minutes": 5,
+    "lookahead_hours": 24,
+    "live_window_hours": 2.0,
+    "capture_stale_opening": true,
+    "sources": [
+      "nowgoal",
+      "oddspapi"
+    ],
+    "_note_sources": "Re-prioritas 2026-08-24: sources diproses BERURUTAN dan berhenti di sumber pertama yang sah -- nowgoal (gratis, tanpa quota) selalu dicek dulu; oddspapi hanya dipanggil saat nowgoal kosong/gagal (peran fallback+validator). Kuota OddsPapi utamanya terpakai di jalur analisa sebagai validator silang + satu-satunya sumber harga BTTS.",
+    "schedule": [
+      {
+        "until_hours": 1,
+        "interval_minutes": 5
+      },
+      {
+        "until_hours": 24,
+        "interval_minutes": 30
+      }
+    ],
+    "lineup_trigger": {
+      "enabled": true,
+      "check_window_hours": 2
+    }
+  },
+  "prediction_log": {
+    "enabled": true,
+    "file": "cache/football/predictions.jsonl",
+    "paper_trade": true
+  },
+  "validate": {
+    "multileague_leagues": [
+      "Eredivisie",
+      "EFL Championship",
+      "Segunda",
+      "Ligue 2",
+      "Serie B",
+      "Super Lig",
+      "Saudi Pro League"
+    ]
+  },
+  "backtest": {
+    "leagues": [
+      "EPL",
+      "LaLiga",
+      "Serie A",
+      "Bundesliga",
+      "Ligue 1"
+    ],
+    "seasons": [
+      "2025-2026",
+      "2024-2025"
+    ],
+    "fixtures_dir": "cache/football/backtest"
+  },
+  "nowgoal": {
+    "mirrors": [
+      "https://live10.nowgoal26.com/",
+      "https://www.nowgoal26.com/",
+      "http://www.nowgoal.net/",
+      "http://www.nowgoal6.com/",
+      "http://www.nowgoal7.com/"
+    ],
+    "_note_mirrors": "2026-08-24 probe live: keluarga *26 hidup (ajax butuh header Referer); .net/6/7 404 hari ini -- ditaruh di belakang karena mirror nowgoal sering bangkit lagi. Audit: python -m agents.football.nowgoal --probe-mirrors"
+  }
+}

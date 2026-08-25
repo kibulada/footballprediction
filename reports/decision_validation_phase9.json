@@ -1,0 +1,443 @@
+{
+  "n_odds_matches": 1520,
+  "old_rule": {
+    "bets": 623,
+    "hits": 257,
+    "hit_rate": 0.4125,
+    "hit_rate_wilson95": [
+      0.3745,
+      0.4516
+    ],
+    "roi": -0.0191,
+    "net_stake": -11.92,
+    "max_drawdown": -55.84,
+    "max_losing_streak": 10
+  },
+  "new_rule": {
+    "bets": 1057,
+    "hits": 489,
+    "hit_rate": 0.4626,
+    "hit_rate_wilson95": [
+      0.4328,
+      0.4928
+    ],
+    "roi": -0.0451,
+    "net_stake": -47.71,
+    "max_drawdown": -104.23,
+    "max_losing_streak": 12
+  },
+  "new_rule_1x2_only": {
+    "bets": 370,
+    "hits": 149,
+    "hit_rate": 0.4027,
+    "hit_rate_wilson95": [
+      0.354,
+      0.4534
+    ],
+    "roi": -0.0162,
+    "net_stake": -5.98,
+    "max_drawdown": -48.27,
+    "max_losing_streak": 8
+  },
+  "by_decision_type": {
+    "STRONG": {
+      "bets": 107,
+      "hits": 63,
+      "hit_rate": 0.5888,
+      "hit_rate_wilson95": [
+        0.4941,
+        0.6774
+      ],
+      "roi": -0.0153,
+      "net_stake": -1.64,
+      "max_drawdown": -7.91,
+      "max_losing_streak": 6
+    },
+    "GOOD": {
+      "bets": 738,
+      "hits": 331,
+      "hit_rate": 0.4485,
+      "hit_rate_wilson95": [
+        0.413,
+        0.4846
+      ],
+      "roi": -0.0671,
+      "net_stake": -49.49,
+      "max_drawdown": -79.01,
+      "max_losing_streak": 13
+    },
+    "LEAN": {
+      "bets": 212,
+      "hits": 95,
+      "hit_rate": 0.4481,
+      "hit_rate_wilson95": [
+        0.3827,
+        0.5154
+      ],
+      "roi": 0.0161,
+      "net_stake": 3.42,
+      "max_drawdown": -27.53,
+      "max_losing_streak": 14
+    },
+    "NO CLEAR DECISION": {
+      "bets": 0,
+      "hits": 0,
+      "hit_rate": null,
+      "hit_rate_wilson95": null,
+      "roi": null,
+      "net_stake": 0.0,
+      "max_drawdown": null,
+      "max_losing_streak": 0
+    },
+    "NO BET": {
+      "bets": 0,
+      "hits": 0,
+      "hit_rate": null,
+      "hit_rate_wilson95": null,
+      "roi": null,
+      "net_stake": 0.0,
+      "max_drawdown": null,
+      "max_losing_streak": 0
+    }
+  },
+  "by_season": {
+    "2022-2023": {
+      "bets": 296,
+      "hits": 156,
+      "hit_rate": 0.527,
+      "hit_rate_wilson95": [
+        0.4702,
+        0.5832
+      ],
+      "roi": 0.1392,
+      "net_stake": 41.21,
+      "max_drawdown": -14.11,
+      "max_losing_streak": 9
+    },
+    "2023-2024": {
+      "bets": 240,
+      "hits": 118,
+      "hit_rate": 0.4917,
+      "hit_rate_wilson95": [
+        0.429,
+        0.5545
+      ],
+      "roi": -0.0347,
+      "net_stake": -8.33,
+      "max_drawdown": -19.05,
+      "max_losing_streak": 11
+    },
+    "2024-2025": {
+      "bets": 243,
+      "hits": 106,
+      "hit_rate": 0.4362,
+      "hit_rate_wilson95": [
+        0.3753,
+        0.4991
+      ],
+      "roi": -0.1537,
+      "net_stake": -37.36,
+      "max_drawdown": -43.85,
+      "max_losing_streak": 8
+    },
+    "2025-2026": {
+      "bets": 278,
+      "hits": 109,
+      "hit_rate": 0.3921,
+      "hit_rate_wilson95": [
+        0.3365,
+        0.4506
+      ],
+      "roi": -0.1555,
+      "net_stake": -43.23,
+      "max_drawdown": -53.23,
+      "max_losing_streak": 12
+    }
+  },
+  "by_decision_type_by_season": {
+    "2022-2023": {
+      "STRONG": {
+        "bets": 36,
+        "hits": 21,
+        "hit_rate": 0.5833,
+        "hit_rate_wilson95": [
+          0.422,
+          0.7286
+        ],
+        "roi": 0.0006,
+        "net_stake": 0.02,
+        "max_drawdown": -6.62,
+        "max_losing_streak": 6
+      },
+      "GOOD": {
+        "bets": 183,
+        "hits": 94,
+        "hit_rate": 0.5137,
+        "hit_rate_wilson95": [
+          0.4417,
+          0.585
+        ],
+        "roi": 0.1041,
+        "net_stake": 19.05,
+        "max_drawdown": -6.84,
+        "max_losing_streak": 5
+      },
+      "LEAN": {
+        "bets": 77,
+        "hits": 41,
+        "hit_rate": 0.5325,
+        "hit_rate_wilson95": [
+          0.4221,
+          0.6397
+        ],
+        "roi": 0.2875,
+        "net_stake": 22.14,
+        "max_drawdown": -8.0,
+        "max_losing_streak": 4
+      },
+      "NO CLEAR DECISION": {
+        "bets": 0,
+        "hits": 0,
+        "hit_rate": null,
+        "hit_rate_wilson95": null,
+        "roi": null,
+        "net_stake": 0.0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      },
+      "NO BET": {
+        "bets": 0,
+        "hits": 0,
+        "hit_rate": null,
+        "hit_rate_wilson95": null,
+        "roi": null,
+        "net_stake": 0.0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      }
+    },
+    "2023-2024": {
+      "STRONG": {
+        "bets": 37,
+        "hits": 21,
+        "hit_rate": 0.5676,
+        "hit_rate_wilson95": [
+          0.4091,
+          0.7133
+        ],
+        "roi": -0.0827,
+        "net_stake": -3.06,
+        "max_drawdown": -6.03,
+        "max_losing_streak": 5
+      },
+      "GOOD": {
+        "bets": 165,
+        "hits": 80,
+        "hit_rate": 0.4848,
+        "hit_rate_wilson95": [
+          0.4098,
+          0.5606
+        ],
+        "roi": -0.022,
+        "net_stake": -3.63,
+        "max_drawdown": -12.96,
+        "max_losing_streak": 7
+      },
+      "LEAN": {
+        "bets": 38,
+        "hits": 17,
+        "hit_rate": 0.4474,
+        "hit_rate_wilson95": [
+          0.3015,
+          0.6029
+        ],
+        "roi": -0.0432,
+        "net_stake": -1.64,
+        "max_drawdown": -7.0,
+        "max_losing_streak": 7
+      },
+      "NO CLEAR DECISION": {
+        "bets": 0,
+        "hits": 0,
+        "hit_rate": null,
+        "hit_rate_wilson95": null,
+        "roi": null,
+        "net_stake": 0.0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      },
+      "NO BET": {
+        "bets": 0,
+        "hits": 0,
+        "hit_rate": null,
+        "hit_rate_wilson95": null,
+        "roi": null,
+        "net_stake": 0.0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      }
+    },
+    "2024-2025": {
+      "STRONG": {
+        "bets": 19,
+        "hits": 12,
+        "hit_rate": 0.6316,
+        "hit_rate_wilson95": [
+          0.4104,
+          0.8085
+        ],
+        "roi": 0.0353,
+        "net_stake": 0.67,
+        "max_drawdown": -2.66,
+        "max_losing_streak": 2
+      },
+      "GOOD": {
+        "bets": 187,
+        "hits": 76,
+        "hit_rate": 0.4064,
+        "hit_rate_wilson95": [
+          0.3386,
+          0.478
+        ],
+        "roi": -0.2127,
+        "net_stake": -39.78,
+        "max_drawdown": -47.27,
+        "max_losing_streak": 9
+      },
+      "LEAN": {
+        "bets": 37,
+        "hits": 18,
+        "hit_rate": 0.4865,
+        "hit_rate_wilson95": [
+          0.3345,
+          0.6411
+        ],
+        "roi": 0.0473,
+        "net_stake": 1.75,
+        "max_drawdown": -3.25,
+        "max_losing_streak": 3
+      },
+      "NO CLEAR DECISION": {
+        "bets": 0,
+        "hits": 0,
+        "hit_rate": null,
+        "hit_rate_wilson95": null,
+        "roi": null,
+        "net_stake": 0.0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      },
+      "NO BET": {
+        "bets": 0,
+        "hits": 0,
+        "hit_rate": null,
+        "hit_rate_wilson95": null,
+        "roi": null,
+        "net_stake": 0.0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      }
+    },
+    "2025-2026": {
+      "STRONG": {
+        "bets": 15,
+        "hits": 9,
+        "hit_rate": 0.6,
+        "hit_rate_wilson95": [
+          0.3575,
+          0.8018
+        ],
+        "roi": 0.0487,
+        "net_stake": 0.73,
+        "max_drawdown": -2.27,
+        "max_losing_streak": 2
+      },
+      "GOOD": {
+        "bets": 203,
+        "hits": 81,
+        "hit_rate": 0.399,
+        "hit_rate_wilson95": [
+          0.3341,
+          0.4677
+        ],
+        "roi": -0.1238,
+        "net_stake": -25.13,
+        "max_drawdown": -33.6,
+        "max_losing_streak": 13
+      },
+      "LEAN": {
+        "bets": 60,
+        "hits": 19,
+        "hit_rate": 0.3167,
+        "hit_rate_wilson95": [
+          0.2131,
+          0.4423
+        ],
+        "roi": -0.3138,
+        "net_stake": -18.83,
+        "max_drawdown": -25.36,
+        "max_losing_streak": 14
+      },
+      "NO CLEAR DECISION": {
+        "bets": 0,
+        "hits": 0,
+        "hit_rate": null,
+        "hit_rate_wilson95": null,
+        "roi": null,
+        "net_stake": 0.0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      },
+      "NO BET": {
+        "bets": 0,
+        "hits": 0,
+        "hit_rate": null,
+        "hit_rate_wilson95": null,
+        "roi": null,
+        "net_stake": 0.0,
+        "max_drawdown": null,
+        "max_losing_streak": 0
+      }
+    }
+  },
+  "n_no_decision": 463,
+  "examples_no_clear": [
+    "Crystal Palace vs Arsenal (2022-08-05)",
+    "Fulham vs Liverpool (2022-08-06)",
+    "Bournemouth vs Aston Villa (2022-08-06)",
+    "Leeds United vs Wolves (2022-08-06)",
+    "Newcastle vs Nottingham (2022-08-06)"
+  ],
+  "examples_no_bet": [
+    "Southampton vs Leeds United (2022-08-13)",
+    "Chelsea vs Leicester (2022-08-27)",
+    "Liverpool vs Bournemouth (2022-08-27)",
+    "Manchester City vs Crystal Palace (2022-08-27)",
+    "Arsenal vs Fulham (2022-08-27)"
+  ],
+  "edge_threshold": 0.02,
+  "decision_cfg": {
+    "edge_warning_pp": 10.0,
+    "edge_extreme_pp": 20.0,
+    "min_bookmakers": 3,
+    "min_edge_pp": 3.0,
+    "best_prob_only": true,
+    "strong_score": 0.7,
+    "good_score": 0.55,
+    "lean_score": 0.4,
+    "no_clear_max_score": 0.35,
+    "weights": {
+      "probability_quality": 0.3,
+      "calibration_reliability": 0.2,
+      "model_agreement": 0.15,
+      "market_value": 0.15,
+      "data_quality": 0.1,
+      "odds_quality": 0.05,
+      "historical_reliability": 0.05
+    }
+  },
+  "delta_roi_pp": -2.6,
+  "delta_roi_1x2_pp": 0.29,
+  "note": "One chronological walk-forward pass, identical probabilities/odds for all rules. OLD = best-prob 1X2 pick with margin-free edge >= threshold (2%). NEW = Decision Score engine, bets only on STRONG/GOOD decisions (1X2 + totals O/U 2.5). NEW-1X2-only isolates the 1X2 universe for apples-to-apples. Calibration treated as validated for the rule comparison; bookmaker count neutral (3); similar-signal neutral (0.5).",
+  "dataset": "local file cache/football/epl_fixtures_2022_2026.json"
+}

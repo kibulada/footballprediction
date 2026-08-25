@@ -1,0 +1,468 @@
+{
+  "per_league": {
+    "LaLiga": {
+      "n_matches": 1520,
+      "rest_days": {
+        "0.0": {
+          "ensemble": {
+            "n": 1520,
+            "log_loss": 0.9975,
+            "log_loss_ci": 0.0218,
+            "brier": 0.5947,
+            "ece": 0.0119,
+            "hit_rate": 0.523,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1504,
+            "log_loss": 1.0578,
+            "brier": 0.6345,
+            "ece": 0.0272,
+            "hit_rate": 0.4707,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0206,
+            "2023-2024": 0.9832,
+            "2024-2025": 0.9885,
+            "2025-2026": 0.9976
+          }
+        },
+        "0.01": {
+          "ensemble": {
+            "n": 1520,
+            "log_loss": 0.9977,
+            "log_loss_ci": 0.0218,
+            "brier": 0.5949,
+            "ece": 0.0113,
+            "hit_rate": 0.5237,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1504,
+            "log_loss": 1.0584,
+            "brier": 0.635,
+            "ece": 0.0274,
+            "hit_rate": 0.4714,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0208,
+            "2023-2024": 0.9829,
+            "2024-2025": 0.989,
+            "2025-2026": 0.9979
+          }
+        },
+        "0.03": {
+          "ensemble": {
+            "n": 1520,
+            "log_loss": 0.9978,
+            "log_loss_ci": 0.0217,
+            "brier": 0.595,
+            "ece": 0.0099,
+            "hit_rate": 0.5237,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1504,
+            "log_loss": 1.0594,
+            "brier": 0.6358,
+            "ece": 0.0329,
+            "hit_rate": 0.4727,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.021,
+            "2023-2024": 0.9827,
+            "2024-2025": 0.9895,
+            "2025-2026": 0.9981
+          }
+        },
+        "0.05": {
+          "ensemble": {
+            "n": 1520,
+            "log_loss": 0.9978,
+            "log_loss_ci": 0.0217,
+            "brier": 0.5951,
+            "ece": 0.0113,
+            "hit_rate": 0.5243,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1504,
+            "log_loss": 1.0596,
+            "brier": 0.636,
+            "ece": 0.0317,
+            "hit_rate": 0.4707,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.021,
+            "2023-2024": 0.9826,
+            "2024-2025": 0.9895,
+            "2025-2026": 0.9982
+          }
+        },
+        "0.1": {
+          "ensemble": {
+            "n": 1520,
+            "log_loss": 0.9978,
+            "log_loss_ci": 0.0217,
+            "brier": 0.5951,
+            "ece": 0.0117,
+            "hit_rate": 0.525,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1504,
+            "log_loss": 1.0599,
+            "brier": 0.6363,
+            "ece": 0.0322,
+            "hit_rate": 0.4701,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0211,
+            "2023-2024": 0.9824,
+            "2024-2025": 0.9896,
+            "2025-2026": 0.9982
+          }
+        }
+      }
+    },
+    "Bundesliga": {
+      "n_matches": 1231,
+      "rest_days": {
+        "0.0": {
+          "ensemble": {
+            "n": 1231,
+            "log_loss": 1.0036,
+            "log_loss_ci": 0.0248,
+            "brier": 0.6,
+            "ece": 0.0167,
+            "hit_rate": 0.5053,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1214,
+            "log_loss": 1.0445,
+            "brier": 0.6264,
+            "ece": 0.0219,
+            "hit_rate": 0.4843,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0276,
+            "2023-2024": 0.9796,
+            "2024-2025": 1.0336,
+            "2025-2026": 0.9733
+          }
+        },
+        "0.01": {
+          "ensemble": {
+            "n": 1231,
+            "log_loss": 1.0038,
+            "log_loss_ci": 0.0249,
+            "brier": 0.6001,
+            "ece": 0.016,
+            "hit_rate": 0.5053,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1214,
+            "log_loss": 1.0453,
+            "brier": 0.627,
+            "ece": 0.0244,
+            "hit_rate": 0.4835,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.028,
+            "2023-2024": 0.9801,
+            "2024-2025": 1.0335,
+            "2025-2026": 0.9736
+          }
+        },
+        "0.03": {
+          "ensemble": {
+            "n": 1231,
+            "log_loss": 1.004,
+            "log_loss_ci": 0.0249,
+            "brier": 0.6003,
+            "ece": 0.0162,
+            "hit_rate": 0.5061,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1214,
+            "log_loss": 1.046,
+            "brier": 0.6276,
+            "ece": 0.0256,
+            "hit_rate": 0.4835,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0286,
+            "2023-2024": 0.9799,
+            "2024-2025": 1.0338,
+            "2025-2026": 0.9736
+          }
+        },
+        "0.05": {
+          "ensemble": {
+            "n": 1231,
+            "log_loss": 1.0042,
+            "log_loss_ci": 0.0249,
+            "brier": 0.6004,
+            "ece": 0.0175,
+            "hit_rate": 0.5053,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1214,
+            "log_loss": 1.0468,
+            "brier": 0.6281,
+            "ece": 0.0258,
+            "hit_rate": 0.4827,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0292,
+            "2023-2024": 0.9798,
+            "2024-2025": 1.0341,
+            "2025-2026": 0.9737
+          }
+        },
+        "0.1": {
+          "ensemble": {
+            "n": 1231,
+            "log_loss": 1.0046,
+            "log_loss_ci": 0.0249,
+            "brier": 0.6006,
+            "ece": 0.0174,
+            "hit_rate": 0.502,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1214,
+            "log_loss": 1.0483,
+            "brier": 0.6292,
+            "ece": 0.0267,
+            "hit_rate": 0.4819,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0301,
+            "2023-2024": 0.9799,
+            "2024-2025": 1.0345,
+            "2025-2026": 0.9737
+          }
+        }
+      }
+    },
+    "Serie A": {
+      "n_matches": 1521,
+      "rest_days": {
+        "0.0": {
+          "ensemble": {
+            "n": 1521,
+            "log_loss": 1.0033,
+            "log_loss_ci": 0.0224,
+            "brier": 0.6003,
+            "ece": 0.0104,
+            "hit_rate": 0.5187,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1504,
+            "log_loss": 1.0428,
+            "brier": 0.6246,
+            "ece": 0.0176,
+            "hit_rate": 0.4827,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0198,
+            "2023-2024": 0.9992,
+            "2024-2025": 0.9855,
+            "2025-2026": 1.0088
+          }
+        },
+        "0.01": {
+          "ensemble": {
+            "n": 1521,
+            "log_loss": 1.0034,
+            "log_loss_ci": 0.0224,
+            "brier": 0.6004,
+            "ece": 0.0122,
+            "hit_rate": 0.5194,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1504,
+            "log_loss": 1.0431,
+            "brier": 0.6247,
+            "ece": 0.014,
+            "hit_rate": 0.4834,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0198,
+            "2023-2024": 0.9992,
+            "2024-2025": 0.9861,
+            "2025-2026": 1.0085
+          }
+        },
+        "0.03": {
+          "ensemble": {
+            "n": 1521,
+            "log_loss": 1.0033,
+            "log_loss_ci": 0.0224,
+            "brier": 0.6003,
+            "ece": 0.0132,
+            "hit_rate": 0.5194,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1504,
+            "log_loss": 1.043,
+            "brier": 0.6247,
+            "ece": 0.0156,
+            "hit_rate": 0.482,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0198,
+            "2023-2024": 0.9989,
+            "2024-2025": 0.9863,
+            "2025-2026": 1.0081
+          }
+        },
+        "0.05": {
+          "ensemble": {
+            "n": 1521,
+            "log_loss": 1.0032,
+            "log_loss_ci": 0.0224,
+            "brier": 0.6003,
+            "ece": 0.0151,
+            "hit_rate": 0.5181,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1504,
+            "log_loss": 1.043,
+            "brier": 0.6246,
+            "ece": 0.016,
+            "hit_rate": 0.4834,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0197,
+            "2023-2024": 0.9988,
+            "2024-2025": 0.9865,
+            "2025-2026": 1.0078
+          }
+        },
+        "0.1": {
+          "ensemble": {
+            "n": 1521,
+            "log_loss": 1.0031,
+            "log_loss_ci": 0.0224,
+            "brier": 0.6002,
+            "ece": 0.0159,
+            "hit_rate": 0.5181,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1504,
+            "log_loss": 1.0431,
+            "brier": 0.6247,
+            "ece": 0.017,
+            "hit_rate": 0.4894,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0195,
+            "2023-2024": 0.9991,
+            "2024-2025": 0.9864,
+            "2025-2026": 1.0076
+          }
+        }
+      }
+    }
+  },
+  "conclusion": "REST DAYS: no league improves beyond CI (3/3 retain k=0) -> RETAIN k=0 | OPP-ADJ FORM: no league improves beyond CI (3/3 retain baseline)",
+  "dataset_note": "FBref local cache (soccerdata read_schedule); no historical odds (ROI not reported)",
+  "leagues_requested": [
+    "LaLiga",
+    "Bundesliga",
+    "Serie A",
+    "Ligue 1"
+  ],
+  "missing_leagues": [
+    [
+      "Ligue 1",
+      "RuntimeError: FBref returned no fixtures (network blocked or league/season invalid). Use --fixtures with a local JSON file instead."
+    ]
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "match_id": "Belgian Pro League||cid:t:belgian-pro-league:club-brugge-kv||cid:t:belgian-pro-league:cercle-brugge-ksv||2026-08-23",
+  "home": "Club Brugge KV",
+  "away": "Cercle Brugge KSV",
+  "league": "Belgian Pro League",
+  "kickoff": "2026-08-23T16:30:00.000Z",
+  "snapshot_ts_analyzed": "2026-08-23T16:10:12+00:00",
+  "snapshot_source": "cache/football/predictions.jsonl line 2731",
+  "features_from_snapshot": {
+    "attack_home_gf_avg": 2.0,
+    "defense_home_ga_avg": 1.2,
+    "attack_away_gf_avg": 1.8,
+    "defense_away_ga_avg": 2.6,
+    "form_home_newest_first": "W-W-D-L-L",
+    "form_away_newest_first": "D-D-D-L-L",
+    "lambda_samples": 5,
+    "elo_home": 2088.0,
+    "elo_away": 1621.0,
+    "elo_seeded": true,
+    "completeness": 1.0
+  },
+  "config_models_poisson": {
+    "source": "config/football.json lines 128-139",
+    "base_home_goals": 1.45,
+    "base_away_goals": 1.25,
+    "dc_rho": 0.0,
+    "shrinkage_samples": 5,
+    "time_decay_xi": 0.8,
+    "xg_weight": 0.65,
+    "min_samples": 2,
+    "lineup_weight": 0.0,
+    "rest_days_weight": 0.0
+  },
+  "form_source_determination": {
+    "conclusion": "nowgoal_analysis (fallback tier)",
+    "evidence_chain": [
+      "sources[] in snapshot contains 'nowgoal_analysis'; the only producers of that label are nowgoal.py _parse_analysis form/h2h dicts (nowgoal.py:1835,1847)",
+      "h2h source is separately 'flashscore_h2h' (cache/football/h2h_flashscore_h2h_rgTHIK74_IXnm9vwh.json has wins=4 draws=1 losses=0), so 'nowgoal_analysis' in sources can only come from home_form/away_form source labels consumed at analyse.py:2413-2414",
+      "no team_form_flashscore_Belgian Pro League_{rgTHIK74,IXnm9vwh}_5.json cache file exists; agents/football/cache.py set() always persists on success (cache.py:41-51) and files are never deleted on expiry (cache.py:20-39), so flashscore form did not succeed in this run",
+      "no 'livescore'/'thesportsdb'/'football_data' label in snapshot sources -> alternative form tiers returned nothing",
+      "analyse.py:1869-1880 F1 fallback replaced thin/missing forms with ng_analysis forms when deeper"
+    ],
+    "friendly_filter_state": "P3-2 active: is_friendly_competition rows dropped before aggregates (flashscore.py:1659, nowgoal.py _is_excluded_competition at analysis parse); no friendly contamination evidence in this run's window (5 competitive samples each side)"
+  }
+}

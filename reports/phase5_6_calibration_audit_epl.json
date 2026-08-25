@@ -1,0 +1,533 @@
+{
+  "mode": "single",
+  "dataset": "epl_fixtures_2022_2026.json",
+  "fit_seasons": [
+    "2022-2023",
+    "2023-2024",
+    "2024-2025"
+  ],
+  "eval_seasons": [
+    "2025-2026"
+  ],
+  "model": "ensemble",
+  "pooled_metrics": {
+    "n": 4560,
+    "brier": 0.1967,
+    "log_loss": 0.5785,
+    "ece": 0.011
+  },
+  "pooled_buckets": {
+    "buckets": [
+      {
+        "bucket": "[0.00,0.50)",
+        "n": 3756,
+        "predicted": 0.2745,
+        "actual": 0.2756,
+        "gap": -0.0011,
+        "wilson_ci": [
+          0.2615,
+          0.2901
+        ],
+        "brier": 0.1892,
+        "log_loss": 0.5621,
+        "ec_contrib": 4.1327,
+        "sum_pred": 1030.867272,
+        "sum_out": 1035.0
+      },
+      {
+        "bucket": "[0.50,0.55)",
+        "n": 243,
+        "predicted": 0.5227,
+        "actual": 0.5432,
+        "gap": -0.0205,
+        "wilson_ci": [
+          0.4804,
+          0.6047
+        ],
+        "brier": 0.2461,
+        "log_loss": 0.6853,
+        "ec_contrib": 4.9742,
+        "sum_pred": 127.025837,
+        "sum_out": 132.0
+      },
+      {
+        "bucket": "[0.55,0.60)",
+        "n": 177,
+        "predicted": 0.5733,
+        "actual": 0.5311,
+        "gap": 0.0422,
+        "wilson_ci": [
+          0.4577,
+          0.6032
+        ],
+        "brier": 0.2487,
+        "log_loss": 0.6904,
+        "ec_contrib": 7.4725,
+        "sum_pred": 101.472522,
+        "sum_out": 94.0
+      },
+      {
+        "bucket": "[0.60,0.65)",
+        "n": 153,
+        "predicted": 0.6249,
+        "actual": 0.6471,
+        "gap": -0.0222,
+        "wilson_ci": [
+          0.5686,
+          0.7183
+        ],
+        "brier": 0.2288,
+        "log_loss": 0.6502,
+        "ec_contrib": 3.3919,
+        "sum_pred": 95.608114,
+        "sum_out": 99.0
+      },
+      {
+        "bucket": "[0.65,0.70)",
+        "n": 113,
+        "predicted": 0.6728,
+        "actual": 0.6106,
+        "gap": 0.0622,
+        "wilson_ci": [
+          0.5185,
+          0.6955
+        ],
+        "brier": 0.2398,
+        "log_loss": 0.673,
+        "ec_contrib": 7.0296,
+        "sum_pred": 76.029571,
+        "sum_out": 69.0
+      },
+      {
+        "bucket": "[0.70,0.75)",
+        "n": 63,
+        "predicted": 0.727,
+        "actual": 0.7302,
+        "gap": -0.0031,
+        "wilson_ci": [
+          0.6097,
+          0.8242
+        ],
+        "brier": 0.1992,
+        "log_loss": 0.5887,
+        "ec_contrib": 0.1977,
+        "sum_pred": 45.802332,
+        "sum_out": 46.0
+      },
+      {
+        "bucket": "[0.75,0.80)",
+        "n": 37,
+        "predicted": 0.7697,
+        "actual": 0.7568,
+        "gap": 0.0129,
+        "wilson_ci": [
+          0.5988,
+          0.8664
+        ],
+        "brier": 0.1821,
+        "log_loss": 0.5493,
+        "ec_contrib": 0.4777,
+        "sum_pred": 28.477655,
+        "sum_out": 28.0
+      },
+      {
+        "bucket": "[0.80,0.90)",
+        "n": 18,
+        "predicted": 0.8176,
+        "actual": 0.9444,
+        "gap": -0.1269,
+        "wilson_ci": [
+          0.7424,
+          0.9901
+        ],
+        "brier": 0.0671,
+        "log_loss": 0.2796,
+        "ec_contrib": 2.2833,
+        "sum_pred": 14.716696,
+        "sum_out": 17.0
+      },
+      {
+        "bucket": "[0.90,1.00]",
+        "n": 0,
+        "predicted": null,
+        "actual": null,
+        "gap": null,
+        "wilson_ci": null,
+        "brier": null,
+        "log_loss": null,
+        "ec_contrib": 0.0,
+        "sum_pred": 0.0,
+        "sum_out": 0.0
+      }
+    ],
+    "ece": 0.0066
+  },
+  "oos": {
+    "fit_seasons": [
+      "2022-2023",
+      "2023-2024",
+      "2024-2025"
+    ],
+    "eval_seasons": [
+      "2025-2026"
+    ],
+    "fit_samples": 3420,
+    "eval_samples": 1140,
+    "fit_a": 0.0483,
+    "fit_b": 1.0756,
+    "raw": {
+      "n": 1140,
+      "brier": 0.2048,
+      "log_loss": 0.5969,
+      "ece": 0.0291
+    },
+    "calibrated": {
+      "n": 1140,
+      "brier": 0.2054,
+      "log_loss": 0.5984,
+      "ece": 0.0349
+    },
+    "improves_ece": false,
+    "improves_brier": false,
+    "improves_log_loss": false,
+    "raw_eval_buckets": {
+      "buckets": [
+        {
+          "bucket": "[0.00,0.50)",
+          "n": 933,
+          "predicted": 0.2726,
+          "actual": 0.284,
+          "gap": -0.0114,
+          "wilson_ci": [
+            0.256,
+            0.3138
+          ],
+          "brier": 0.1965,
+          "log_loss": 0.5791,
+          "ec_contrib": 10.6334,
+          "sum_pred": 254.36662,
+          "sum_out": 265.0
+        },
+        {
+          "bucket": "[0.50,0.55)",
+          "n": 58,
+          "predicted": 0.5237,
+          "actual": 0.4828,
+          "gap": 0.0409,
+          "wilson_ci": [
+            0.3593,
+            0.6084
+          ],
+          "brier": 0.2522,
+          "log_loss": 0.6975,
+          "ec_contrib": 2.3719,
+          "sum_pred": 30.371906,
+          "sum_out": 28.0
+        },
+        {
+          "bucket": "[0.55,0.60)",
+          "n": 51,
+          "predicted": 0.5746,
+          "actual": 0.451,
+          "gap": 0.1236,
+          "wilson_ci": [
+            0.3227,
+            0.5862
+          ],
+          "brier": 0.2621,
+          "log_loss": 0.7175,
+          "ec_contrib": 6.3043,
+          "sum_pred": 29.30429,
+          "sum_out": 23.0
+        },
+        {
+          "bucket": "[0.60,0.65)",
+          "n": 37,
+          "predicted": 0.6239,
+          "actual": 0.6216,
+          "gap": 0.0022,
+          "wilson_ci": [
+            0.461,
+            0.7594
+          ],
+          "brier": 0.2364,
+          "log_loss": 0.6659,
+          "ec_contrib": 0.083,
+          "sum_pred": 23.082985,
+          "sum_out": 23.0
+        },
+        {
+          "bucket": "[0.65,0.70)",
+          "n": 38,
+          "predicted": 0.6702,
+          "actual": 0.6579,
+          "gap": 0.0123,
+          "wilson_ci": [
+            0.4989,
+            0.7879
+          ],
+          "brier": 0.2254,
+          "log_loss": 0.6432,
+          "ec_contrib": 0.4686,
+          "sum_pred": 25.468598,
+          "sum_out": 25.0
+        },
+        {
+          "bucket": "[0.70,0.75)",
+          "n": 10,
+          "predicted": 0.7297,
+          "actual": 0.6,
+          "gap": 0.1297,
+          "wilson_ci": [
+            0.3127,
+            0.8318
+          ],
+          "brier": 0.2619,
+          "log_loss": 0.7255,
+          "ec_contrib": 1.2974,
+          "sum_pred": 7.29739,
+          "sum_out": 6.0
+        },
+        {
+          "bucket": "[0.75,0.80)",
+          "n": 10,
+          "predicted": 0.7668,
+          "actual": 0.7,
+          "gap": 0.0668,
+          "wilson_ci": [
+            0.3968,
+            0.8922
+          ],
+          "brier": 0.2122,
+          "log_loss": 0.6166,
+          "ec_contrib": 0.6675,
+          "sum_pred": 7.667525,
+          "sum_out": 7.0
+        },
+        {
+          "bucket": "[0.80,0.90)",
+          "n": 3,
+          "predicted": 0.8136,
+          "actual": 1.0,
+          "gap": -0.1864,
+          "wilson_ci": [
+            0.4385,
+            1.0
+          ],
+          "brier": 0.0348,
+          "log_loss": 0.2064,
+          "ec_contrib": 0.5593,
+          "sum_pred": 2.440687,
+          "sum_out": 3.0
+        },
+        {
+          "bucket": "[0.90,1.00]",
+          "n": 0,
+          "predicted": null,
+          "actual": null,
+          "gap": null,
+          "wilson_ci": null,
+          "brier": null,
+          "log_loss": null,
+          "ec_contrib": 0.0,
+          "sum_pred": 0.0,
+          "sum_out": 0.0
+        }
+      ],
+      "ece": 0.0196
+    },
+    "calibrated_eval_buckets": {
+      "buckets": [
+        {
+          "bucket": "[0.00,0.50)",
+          "n": 922,
+          "predicted": 0.2657,
+          "actual": 0.2809,
+          "gap": -0.0152,
+          "wilson_ci": [
+            0.2529,
+            0.3108
+          ],
+          "brier": 0.1961,
+          "log_loss": 0.5786,
+          "ec_contrib": 13.9843,
+          "sum_pred": 245.015711,
+          "sum_out": 259.0
+        },
+        {
+          "bucket": "[0.50,0.55)",
+          "n": 53,
+          "predicted": 0.5251,
+          "actual": 0.5094,
+          "gap": 0.0156,
+          "wilson_ci": [
+            0.3788,
+            0.6388
+          ],
+          "brier": 0.2515,
+          "log_loss": 0.6961,
+          "ec_contrib": 0.8281,
+          "sum_pred": 27.828052,
+          "sum_out": 27.0
+        },
+        {
+          "bucket": "[0.55,0.60)",
+          "n": 49,
+          "predicted": 0.5742,
+          "actual": 0.4286,
+          "gap": 0.1457,
+          "wilson_ci": [
+            0.3002,
+            0.5673
+          ],
+          "brier": 0.2659,
+          "log_loss": 0.7253,
+          "ec_contrib": 7.1369,
+          "sum_pred": 28.136929,
+          "sum_out": 21.0
+        },
+        {
+          "bucket": "[0.60,0.65)",
+          "n": 42,
+          "predicted": 0.6242,
+          "actual": 0.5952,
+          "gap": 0.0289,
+          "wilson_ci": [
+            0.4449,
+            0.7296
+          ],
+          "brier": 0.2393,
+          "log_loss": 0.6714,
+          "ec_contrib": 1.2148,
+          "sum_pred": 26.214823,
+          "sum_out": 25.0
+        },
+        {
+          "bucket": "[0.65,0.70)",
+          "n": 36,
+          "predicted": 0.6738,
+          "actual": 0.5833,
+          "gap": 0.0905,
+          "wilson_ci": [
+            0.422,
+            0.7286
+          ],
+          "brier": 0.2514,
+          "log_loss": 0.6974,
+          "ec_contrib": 3.2564,
+          "sum_pred": 24.256436,
+          "sum_out": 21.0
+        },
+        {
+          "bucket": "[0.70,0.75)",
+          "n": 20,
+          "predicted": 0.7156,
+          "actual": 0.75,
+          "gap": -0.0344,
+          "wilson_ci": [
+            0.5313,
+            0.8881
+          ],
+          "brier": 0.1899,
+          "log_loss": 0.568,
+          "ec_contrib": 0.6887,
+          "sum_pred": 14.311254,
+          "sum_out": 15.0
+        },
+        {
+          "bucket": "[0.75,0.80)",
+          "n": 12,
+          "predicted": 0.7761,
+          "actual": 0.5833,
+          "gap": 0.1928,
+          "wilson_ci": [
+            0.3195,
+            0.8067
+          ],
+          "brier": 0.2757,
+          "log_loss": 0.7585,
+          "ec_contrib": 2.3133,
+          "sum_pred": 9.313328,
+          "sum_out": 7.0
+        },
+        {
+          "bucket": "[0.80,0.90)",
+          "n": 6,
+          "predicted": 0.8228,
+          "actual": 0.8333,
+          "gap": -0.0106,
+          "wilson_ci": [
+            0.4365,
+            0.9699
+          ],
+          "brier": 0.1342,
+          "log_loss": 0.4344,
+          "ec_contrib": 0.0633,
+          "sum_pred": 4.936691,
+          "sum_out": 5.0
+        },
+        {
+          "bucket": "[0.90,1.00]",
+          "n": 0,
+          "predicted": null,
+          "actual": null,
+          "gap": null,
+          "wilson_ci": null,
+          "brier": null,
+          "log_loss": null,
+          "ec_contrib": 0.0,
+          "sum_pred": 0.0,
+          "sum_out": 0.0
+        }
+      ],
+      "ece": 0.0259
+    }
+  },
+  "aggregate_metrics": {
+    "baseline": {
+      "log_loss": 1.0971,
+      "brier": 0.6495,
+      "ece": 0.0196,
+      "hit_rate": 0.4441
+    },
+    "elo": {
+      "log_loss": 0.9914,
+      "brier": 0.5921,
+      "ece": 0.0205,
+      "hit_rate": 0.523
+    },
+    "poisson": {
+      "log_loss": 1.0341,
+      "brier": 0.6213,
+      "ece": 0.0157,
+      "hit_rate": 0.4917
+    },
+    "dc": {
+      "log_loss": 1.0363,
+      "brier": 0.6223,
+      "ece": 0.0174,
+      "hit_rate": 0.489
+    },
+    "ensemble": {
+      "log_loss": 0.9886,
+      "brier": 0.5901,
+      "ece": 0.011,
+      "hit_rate": 0.5309
+    }
+  },
+  "production_calibrator": {
+    "path": "D:\\Hermes-Football\\cache\\football\\calibration.json",
+    "params": {
+      "a": 0.0081,
+      "b": 1.0127
+    },
+    "samples": 4560,
+    "on_eval_metrics": {
+      "n": 1140,
+      "brier": 0.2049,
+      "log_loss": 0.5971,
+      "ece": 0.0273
+    },
+    "note": "fitted in-sample on the full EPL history (a,b above); evaluated here on the OOS eval season"
+  }
+}

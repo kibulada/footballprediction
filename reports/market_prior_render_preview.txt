@@ -1,0 +1,27 @@
+**GKS Katowice vs Hapoel Tel Aviv** • Conference League Qualification
+📅 kickoff: 06:00 WIB • besok
+📊 form: belum ada match musim ini
+🔁 H2H: belum ada rekor head‑to‑head
+💰 odds 1X2: 2.10 / 3.40 / 3.60 (4 bookie)
+   BTTS No: 2.10 @ BM A
+   BTTS Yes: 1.72 @ BM A
+   Over 2.5: 1.85 @ BM A
+   Under 2.5: 1.95 @ BM A
+
+📊 **Data Quality** 🔴 MINIM (1/5 tersedia)
+   ✅ 💰 odds bookmaker
+   ❌ 📊 form 2 tim
+   ❌ ⚽ attack/defense (GF/GA)
+   ❌ 🥅 xG
+   ❌ 🔁 H2H
+   ⚠️ xG, H2H tidak tersedia (keduanya absen → confidence max MEDIUM)
+
+🏆 **FINAL DECISION** (engine independen Elo+Poisson+kalibrasi, bukan cermin odds)
+   **📊 MARKET PRIOR**
+   🎯 most likely 1X2 (market): **Home Win** 45.4% • Home 45.4% / Draw 28.1% / Away 26.5%
+   🎯 total (market): **Over 2.5** — Over 51.3% / Under 48.7%
+   🎯 BTTS (market): **BTTS Yes** — Yes 55.0% / No 45.0%
+   Data model independen tidak cukup (tanpa form/history/Elo seed memadai). Prediksi 1X2/O-U/BTTS mengikuti probabilitas market (margin-free) — ini BUKAN klaim edge: karena prediksi = market, edge = 0 dan EV setelah margin bandar negatif. Saran taruhan: NO BET.
+   🚫 saran taruhan: **NO BET** (prediksi = market → tanpa edge)
+
+⚠️ Disclaimer: prediksi berbasis odds konsensus + model Poisson. xG riil (kalau ada) override odds-derived λ. Bukan jaminan hasil.

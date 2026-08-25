@@ -1,0 +1,133 @@
+{
+  "per_league": {
+    "Bundesliga": {
+      "n_matches": 1231,
+      "rest_days": {
+        "0.0": {
+          "ensemble": {
+            "n": 1231,
+            "log_loss": 1.0036,
+            "log_loss_ci": 0.0248,
+            "brier": 0.6,
+            "ece": 0.0167,
+            "hit_rate": 0.5053,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1214,
+            "log_loss": 1.0445,
+            "brier": 0.6264,
+            "ece": 0.0219,
+            "hit_rate": 0.4843,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0276,
+            "2023-2024": 0.9796,
+            "2024-2025": 1.0336,
+            "2025-2026": 0.9733
+          }
+        },
+        "0.1": {
+          "ensemble": {
+            "n": 1231,
+            "log_loss": 1.0046,
+            "log_loss_ci": 0.0249,
+            "brier": 0.6006,
+            "ece": 0.0174,
+            "hit_rate": 0.502,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1214,
+            "log_loss": 1.0483,
+            "brier": 0.6292,
+            "ece": 0.0267,
+            "hit_rate": 0.4819,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0301,
+            "2023-2024": 0.9799,
+            "2024-2025": 1.0345,
+            "2025-2026": 0.9737
+          }
+        }
+      },
+      "opp_adj": {
+        "baseline": {
+          "ensemble": {
+            "n": 1231,
+            "log_loss": 1.0036,
+            "log_loss_ci": 0.0248,
+            "brier": 0.6,
+            "ece": 0.0167,
+            "hit_rate": 0.5053,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1214,
+            "log_loss": 1.0445,
+            "brier": 0.6264,
+            "ece": 0.0219,
+            "hit_rate": 0.4843,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0276,
+            "2023-2024": 0.9796,
+            "2024-2025": 1.0336,
+            "2025-2026": 0.9733
+          }
+        },
+        "opp_adj_form": {
+          "ensemble": {
+            "n": 1231,
+            "log_loss": 1.0035,
+            "log_loss_ci": 0.0248,
+            "brier": 0.5999,
+            "ece": 0.0172,
+            "hit_rate": 0.5061,
+            "roi": null,
+            "bets": 0,
+            "max_drawdown": null,
+            "max_losing_streak": 0
+          },
+          "dc": {
+            "n": 1214,
+            "log_loss": 1.0443,
+            "brier": 0.6263,
+            "ece": 0.0232,
+            "hit_rate": 0.4843,
+            "roi": null,
+            "bets": 0
+          },
+          "per_season_ensemble_ll": {
+            "2022-2023": 1.0277,
+            "2023-2024": 0.9794,
+            "2024-2025": 1.0336,
+            "2025-2026": 0.9733
+          }
+        }
+      }
+    }
+  },
+  "conclusion": "REST DAYS: no league improves beyond CI (1/1 retain k=0) -> RETAIN k=0 | OPP-ADJ FORM: no league improves beyond CI (1/1 retain baseline)",
+  "dataset_note": "FBref local cache (soccerdata read_schedule); no historical odds (ROI not reported)",
+  "leagues_requested": [
+    "Bundesliga"
+  ],
+  "missing_leagues": []
+}

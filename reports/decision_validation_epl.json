@@ -1,0 +1,100 @@
+{
+  "n_odds_matches": 1520,
+  "old_rule": {
+    "bets": 623,
+    "hits": 257,
+    "hit_rate": 0.4125,
+    "roi": -0.0191,
+    "net_stake": -11.92
+  },
+  "new_rule": {
+    "bets": 1060,
+    "hits": 325,
+    "hit_rate": 0.3066,
+    "roi": -0.0882,
+    "net_stake": -93.47
+  },
+  "new_rule_1x2_only": {
+    "bets": 1060,
+    "hits": 325,
+    "hit_rate": 0.3066,
+    "roi": -0.0882,
+    "net_stake": -93.47
+  },
+  "by_decision_type": {
+    "STRONG": {
+      "bets": 28,
+      "hits": 16,
+      "hit_rate": 0.5714,
+      "roi": 0.0307,
+      "net_stake": 0.86
+    },
+    "GOOD": {
+      "bets": 820,
+      "hits": 233,
+      "hit_rate": 0.2841,
+      "roi": -0.1285,
+      "net_stake": -105.36
+    },
+    "LEAN": {
+      "bets": 212,
+      "hits": 76,
+      "hit_rate": 0.3585,
+      "roi": 0.052,
+      "net_stake": 11.03
+    },
+    "NO CLEAR DECISION": {
+      "bets": 0,
+      "hits": 0,
+      "hit_rate": null,
+      "roi": null,
+      "net_stake": 0.0
+    },
+    "NO BET": {
+      "bets": 0,
+      "hits": 0,
+      "hit_rate": null,
+      "roi": null,
+      "net_stake": 0.0
+    }
+  },
+  "n_no_decision": 460,
+  "examples_no_clear": [
+    "Crystal Palace vs Arsenal (2022-08-05)",
+    "Fulham vs Liverpool (2022-08-06)",
+    "Bournemouth vs Aston Villa (2022-08-06)",
+    "Leeds United vs Wolves (2022-08-06)",
+    "Newcastle vs Nottingham (2022-08-06)"
+  ],
+  "examples_no_bet": [
+    "Southampton vs Leeds United (2022-08-13)",
+    "Brighton vs Leeds United (2022-08-27)",
+    "Wolves vs Newcastle (2022-08-28)",
+    "Arsenal vs Aston Villa (2022-08-31)",
+    "Nottingham vs Bournemouth (2022-09-03)"
+  ],
+  "edge_threshold": 0.02,
+  "decision_cfg": {
+    "edge_warning_pp": 10.0,
+    "edge_extreme_pp": 20.0,
+    "min_bookmakers": 3,
+    "min_edge_pp": 2.0,
+    "strong_score": 0.7,
+    "good_score": 0.55,
+    "lean_score": 0.4,
+    "no_clear_max_score": 0.35,
+    "weights": {
+      "probability_quality": 0.3,
+      "calibration_reliability": 0.2,
+      "model_agreement": 0.15,
+      "market_value": 0.15,
+      "data_quality": 0.1,
+      "odds_quality": 0.05,
+      "historical_reliability": 0.05
+    }
+  },
+  "delta_roi_pp": -6.91,
+  "delta_roi_1x2_pp": -6.91,
+  "note": "One chronological walk-forward pass, identical probabilities/odds for all rules. OLD = best-prob 1X2 pick with margin-free edge >= threshold (2%). NEW = Decision Score engine, bets only on STRONG/GOOD decisions (1X2 + totals O/U 2.5). NEW-1X2-only isolates the 1X2 universe for apples-to-apples. Calibration treated as validated for the rule comparison; bookmaker count neutral (3); similar-signal neutral (0.5).",
+  "dataset": "local file cache/football/epl_fixtures_2022_2026.json"
+}
