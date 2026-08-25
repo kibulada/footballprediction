@@ -1609,7 +1609,7 @@ def _best_pick_block(se: dict[str, Any], *, include_internal: bool = True) -> li
 
 
 def _best_pick_block_with_lean(payload: dict[str, Any], se: dict[str, Any], *, include_internal: bool = True) -> list[str]:
-    """Wrapper yang menambah MARKET LEAN saat NO BET (Poin A)."""
+    """Wrapper yang menambah MARKET LEAN SELALU (Opsi A 2026-08-26)."""
     base = _best_pick_block(se, include_internal=include_internal)
     lean = _market_lean_block(payload, se)
     if lean:
@@ -1618,15 +1618,13 @@ def _best_pick_block_with_lean(payload: dict[str, Any], se: dict[str, Any], *, i
 
 
 def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]:
-    """Poin A (2026-08-24): MARKET LEAN info-only saat BEST PICK = NO BET.
+    """Poin A (2026-08-24) → Opsi A (2026-08-26): MARKET LEAN info-only SELALU tampil.
 
-    Saat semua kandidat veto (deviasi >8pp, lambda rusak, dll) card tetap
-    harus kasih tahu arah pasar — bukan sebagai pick bettable, cuma
-    transparansi. Contoh Bologna: model Over 57% vs market Under 57% →
-    lean Under 2.5 @1.63. Pure display, tidak mengubah decision/best_pick.
+    Awalnya hanya saat BEST PICK = NO BET (transparansi saat veto). Opsi A:
+    lean tetap muncul walau BEST PICK ada value, plus tag selaras/berlawanan
+    vs BEST PICK. Pure display, tidak mengubah decision/best_pick.
+    Contoh Bologna: model Over 57% vs market Under 57% → lean Under 2.5 @1.63.
     """
-    if (se or {}).get("decision") == "BEST PICK":
-        return []
     totals = (payload.get("odds") or {}).get("totals") or {}
     consensus = (payload.get("odds") or {}).get("consensus") or {}
     # Need at least one market with price
@@ -1637,6 +1635,10 @@ def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]
     if not has_totals and not has_1x2:
         return []
     lines: list[str] = ["", "📊 MARKET LEAN (info-only, bukan BEST PICK):"]
+    # Tag selaras/berlawanan vs BEST PICK (pure display)
+    bp = (se or {}).get("best_pick") or {}
+    bp_sel = str(bp.get("selection") or "")
+    bp_market = bp.get("market")
     # Totals lean: odds terkecil = favorit pasar
     if has_totals:
         try:
@@ -1649,7 +1651,13 @@ def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]
                 ia, ib = 1.0 / o, 1.0 / u
                 tot = ia + ib
                 imp = (ib / tot * 100) if lean_label.startswith("Under") else (ia / tot * 100)
-                lines.append(f"• {lean_label} @ {lean_odds:.2f} — market {imp:.0f}% dominan")
+                tag = ""
+                if bp_sel:
+                    if lean_label == bp_sel:
+                        tag = " ✅ selaras dengan BEST PICK"
+                    elif bp_market == "Total" and bp_sel in ("Over 2.5", "Under 2.5"):
+                        tag = " ⚠️ berlawanan arah (model vs pasar)"
+                lines.append(f"• {lean_label} @ {lean_odds:.2f} — market {imp:.0f}% dominan{tag}")
         except Exception:
             pass
     # AH lean: favorit = odds terkecil pada line consensus
@@ -1665,7 +1673,13 @@ def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]
             else:
                 lean_ah = f"Home {line:+.2f}"
                 lean_odds = h
-            lines.append(f"• AH: {lean_ah} @ {lean_odds:.2f} (market favorit AH)")
+            tag = ""
+            if bp_sel:
+                if lean_ah == bp_sel:
+                    tag = " ✅ selaras dengan BEST PICK"
+                elif bp_market == "Asian Handicap" and bp_sel:
+                    tag = " ⚠️ berlawanan arah (model vs pasar)"
+            lines.append(f"• AH: {lean_ah} @ {lean_odds:.2f} (market favorit AH){tag}")
         except Exception:
             pass
     # 1X2 lean: odds terkecil
@@ -1673,7 +1687,13 @@ def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]
         try:
             side = min(consensus, key=lambda k: float(consensus[k]))
             label = {"home": "Home Win", "draw": "Draw", "away": "Away Win"}.get(side, side)
-            lines.append(f"• 1X2: {label} @ {float(consensus[side]):.2f} (market favorit)")
+            tag = ""
+            if bp_sel:
+                if label == bp_sel:
+                    tag = " ✅ selaras dengan BEST PICK"
+                elif bp_market == "1X2" and bp_sel in ("Home Win", "Draw", "Away Win"):
+                    tag = " ⚠️ berlawanan arah (model vs pasar)"
+            lines.append(f"• 1X2: {label} @ {float(consensus[side]):.2f} (market favorit){tag}")
         except Exception:
             pass
     # BTTS lean if available
@@ -1686,7 +1706,13 @@ def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]
             y, n = float(by["odds"]), float(bn["odds"])
             lean = "BTTS No" if n < y else "BTTS Yes"
             lean_odds = n if n < y else y
-            lines.append(f"• {lean} @ {lean_odds:.2f} (market favorit BTTS)")
+            tag = ""
+            if bp_sel:
+                if lean == bp_sel:
+                    tag = " ✅ selaras dengan BEST PICK"
+                elif bp_market == "BTTS" and bp_sel in ("BTTS Yes", "BTTS No"):
+                    tag = " ⚠️ berlawanan arah (model vs pasar)"
+            lines.append(f"• {lean} @ {lean_odds:.2f} (market favorit BTTS){tag}")
         except Exception:
             pass
     lines.append("⚠️ Lean = arah pasar saja, tanpa edge model — bukan rekomendasi bet.")

@@ -78,7 +78,8 @@ def _summary_best_pick_value(se: dict[str, Any], match_data: dict[str, Any] | No
     Phase 5.4: uncalibrated leagues show explicit skip recommendation.
     Keputusan 2026-08-23: semua-kandidat-diveto -> rank #1 tetap tampil
     dengan label HIGH RISK (see ``format._display_best_pick``).
-    Poin A (2026-08-24): NO BET → tambah MARKET LEAN info-only.
+    Opsi A (2026-08-26): MARKET LEAN selalu tampil (BEST PICK ada pun tetap),
+    plus tag selaras/berlawanan vs BEST PICK.
     """
     bp, risk_reason = _display_best_pick(se)
     if bp is None:
@@ -107,6 +108,11 @@ def _summary_best_pick_value(se: dict[str, Any], match_data: dict[str, Any] | No
     )
     if risk_reason:
         out = f"{_high_risk_line(risk_reason)}\n{out}"
+    # Opsi A: lean selalu tampil walau BEST PICK ada (keduanya)
+    if match_data is not None:
+        lean = _market_lean_block(match_data, se)
+        if lean:
+            out += "\n\n" + "\n".join(l for l in lean if l)
     return out
 
 
@@ -137,7 +143,7 @@ def build_expanded_embed(match_data: dict[str, Any]) -> discord.Embed:
     else:
         signals_txt = "No actionable signal."
     embed.add_field(name="📊 SIGNALS", value=signals_txt, inline=False)
-    # Poin A: NO BET → include MARKET LEAN (sama kayak format.py)
+    # Opsi A (2026-08-26): lean selalu tampil (BEST PICK ada pun tetap) — sama kayak format.py
     best_lines = _best_pick_block(se)
     lean = _market_lean_block(match_data, se)
     if lean:
