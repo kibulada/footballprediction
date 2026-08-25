@@ -1,0 +1,27 @@
+{
+  "league": "liga-profesional",
+  "samples": 5330,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4338,
+    "draw": 0.2996,
+    "away_win": 0.2666,
+    "over25": 0.4,
+    "avg_goals": 2.27
+  },
+  "calibrators": {
+    "over25": {
+      "a": -0.485,
+      "b": 0.7
+    },
+    "under25": {
+      "a": 0.485,
+      "b": 0.7
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

@@ -1,0 +1,29 @@
+{
+  "league": "copa-libertadores",
+  "samples": 134,
+  "source": "football-data.org",
+  "calibration_type": "goal_distribution",
+  "actual_rates": {
+    "home_win": 0.4701,
+    "draw": 0.2612,
+    "away_win": 0.2687,
+    "over25": 0.3806,
+    "btts": 0.4776
+  },
+  "calibrators": {
+    "over25": {
+      "a": -0.485,
+      "b": 0.7
+    },
+    "under25": {
+      "a": 0.485,
+      "b": 0.7
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.025,
+  "note": "Estimated from goal distribution, not odds-based calibration"
+}

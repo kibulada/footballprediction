@@ -1,0 +1,107 @@
+{
+ "edges": [
+  0.0,
+  0.5,
+  0.55,
+  0.6,
+  0.65,
+  0.7,
+  0.75,
+  0.8,
+  0.9,
+  1.0
+ ],
+ "buckets": [
+  {
+   "lo": 0.0,
+   "hi": 0.5,
+   "n": 14425,
+   "predicted": 0.2775,
+   "actual": 0.279,
+   "gap": -0.0014
+  },
+  {
+   "lo": 0.5,
+   "hi": 0.55,
+   "n": 898,
+   "predicted": 0.5236,
+   "actual": 0.5312,
+   "gap": -0.0076
+  },
+  {
+   "lo": 0.55,
+   "hi": 0.6,
+   "n": 665,
+   "predicted": 0.5741,
+   "actual": 0.5263,
+   "gap": 0.0478
+  },
+  {
+   "lo": 0.6,
+   "hi": 0.65,
+   "n": 572,
+   "predicted": 0.625,
+   "actual": 0.6171,
+   "gap": 0.0078
+  },
+  {
+   "lo": 0.65,
+   "hi": 0.7,
+   "n": 411,
+   "predicted": 0.6738,
+   "actual": 0.6886,
+   "gap": -0.0148
+  },
+  {
+   "lo": 0.7,
+   "hi": 0.75,
+   "n": 252,
+   "predicted": 0.7249,
+   "actual": 0.7302,
+   "gap": -0.0053
+  },
+  {
+   "lo": 0.75,
+   "hi": 0.8,
+   "n": 121,
+   "predicted": 0.7704,
+   "actual": 0.7851,
+   "gap": -0.0147
+  },
+  {
+   "lo": 0.8,
+   "hi": 0.9,
+   "n": 32,
+   "predicted": 0.8188,
+   "actual": 0.8125,
+   "gap": 0.0063
+  },
+  {
+   "lo": 0.9,
+   "hi": 1.0,
+   "n": 0,
+   "predicted": null,
+   "actual": null,
+   "gap": null
+  }
+ ],
+ "pooled_n": 17376,
+ "pooled_ece": 0.0042,
+ "leagues": [
+  "EPL",
+  "LaLiga",
+  "Bundesliga",
+  "Serie A"
+ ],
+ "fit_seasons": [
+  "2022-2023",
+  "2023-2024",
+  "2024-2025"
+ ],
+ "eval_seasons": [
+  "2025-2026"
+ ],
+ "model": "ensemble",
+ "source": "reports/phase5_6_calibration_audit.json pooled_buckets (cross-league walk-forward)",
+ "regenerated_at": "2026-08-12T19:47:00"
+}

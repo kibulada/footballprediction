@@ -1,0 +1,27 @@
+{
+  "league": "liga-profesional-argentina",
+  "samples": 30,
+  "source": "the-odds-api",
+  "actual_rates": {
+    "home_prob": 0.4261,
+    "draw_prob": 0.3023,
+    "away_prob": 0.2716,
+    "over25_prob": 0.4078
+  },
+  "calibrators": {
+    "over25": {
+      "a": -0.485,
+      "b": 0.7
+    },
+    "under25": {
+      "a": 0.485,
+      "b": 0.7
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.03,
+  "note": "Estimated from odds implied probabilities"
+}

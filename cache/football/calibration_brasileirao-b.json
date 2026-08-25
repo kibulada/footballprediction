@@ -1,0 +1,27 @@
+{
+  "league": "brasileirao-b",
+  "samples": 17,
+  "source": "the-odds-api",
+  "actual_rates": {
+    "home_prob": 0.4699,
+    "draw_prob": 0.2829,
+    "away_prob": 0.2471,
+    "over25_prob": 0.4849
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.03,
+  "note": "Estimated from odds implied probabilities"
+}

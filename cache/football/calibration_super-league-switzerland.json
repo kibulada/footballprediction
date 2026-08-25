@@ -1,0 +1,27 @@
+{
+  "league": "super-league-switzerland",
+  "samples": 4,
+  "source": "the-odds-api",
+  "actual_rates": {
+    "home_prob": 0.4917,
+    "draw_prob": 0.2235,
+    "away_prob": 0.2848,
+    "over25_prob": 0.6814
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.2,
+      "b": 0.9
+    },
+    "under25": {
+      "a": -0.2,
+      "b": 0.9
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.03,
+  "note": "Estimated from odds implied probabilities"
+}

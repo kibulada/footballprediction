@@ -1,0 +1,27 @@
+{
+  "league": "k-league-1",
+  "samples": 9,
+  "source": "the-odds-api",
+  "actual_rates": {
+    "home_prob": 0.3348,
+    "draw_prob": 0.283,
+    "away_prob": 0.3822,
+    "over25_prob": 0.5059
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.03,
+  "note": "Estimated from odds implied probabilities"
+}

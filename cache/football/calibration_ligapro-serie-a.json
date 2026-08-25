@@ -1,0 +1,17 @@
+{
+  "a": 0.0,
+  "b": 1.0,
+  "samples": 2826,
+  "ece": 0.05,
+  "home_win_pct": 46.3,
+  "draw_pct": 27.3,
+  "away_win_pct": 26.4,
+  "over_2_5_pct": 47.3,
+  "under_2_5_pct": 52.7,
+  "btts_pct": 51.7,
+  "avg_home_odd": null,
+  "avg_draw_odd": null,
+  "avg_away_odd": null,
+  "source": "eatpizzanot/soccer-dataset (HuggingFace)",
+  "date_range": "2012-02-04 01:00:00 to 2026-07-04 00:00:00"
+}

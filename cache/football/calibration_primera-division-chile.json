@@ -1,0 +1,27 @@
+{
+  "league": "primera-division-chile",
+  "samples": 9,
+  "source": "the-odds-api",
+  "actual_rates": {
+    "home_prob": 0.4614,
+    "draw_prob": 0.2646,
+    "away_prob": 0.274,
+    "over25_prob": 0.5426
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.03,
+  "note": "Estimated from odds implied probabilities"
+}

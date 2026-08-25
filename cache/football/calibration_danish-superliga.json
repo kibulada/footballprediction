@@ -1,0 +1,27 @@
+{
+  "league": "danish-superliga",
+  "samples": 2634,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4294,
+    "draw": 0.2623,
+    "away_win": 0.3083,
+    "over25": 0.5285,
+    "avg_goals": 2.76
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

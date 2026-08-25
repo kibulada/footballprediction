@@ -1,0 +1,27 @@
+{
+  "league": "nations-league",
+  "samples": 12,
+  "source": "the-odds-api",
+  "actual_rates": {
+    "home_prob": 0.4227,
+    "draw_prob": 0.2544,
+    "away_prob": 0.3229,
+    "over25_prob": 0.5865
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.2,
+      "b": 0.9
+    },
+    "under25": {
+      "a": -0.2,
+      "b": 0.9
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.03,
+  "note": "Estimated from odds implied probabilities"
+}

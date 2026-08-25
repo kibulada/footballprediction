@@ -1,0 +1,27 @@
+{
+  "league": "primeira-liga",
+  "samples": 6626,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4531,
+    "draw": 0.2519,
+    "away_win": 0.295,
+    "over25": 0.462,
+    "avg_goals": 2.52
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

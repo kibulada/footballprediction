@@ -1,0 +1,27 @@
+{
+  "league": "veikkausliiga",
+  "samples": 2354,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4401,
+    "draw": 0.2562,
+    "away_win": 0.3037,
+    "over25": 0.4796,
+    "avg_goals": 2.59
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

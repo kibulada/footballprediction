@@ -1,0 +1,27 @@
+{
+  "league": "bundesliga-austria",
+  "samples": 4,
+  "source": "the-odds-api",
+  "actual_rates": {
+    "home_prob": 0.5487,
+    "draw_prob": 0.2403,
+    "away_prob": 0.2109,
+    "over25_prob": 0.558
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.2,
+      "b": 0.9
+    },
+    "under25": {
+      "a": -0.2,
+      "b": 0.9
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.03,
+  "note": "Estimated from odds implied probabilities"
+}

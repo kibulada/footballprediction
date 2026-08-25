@@ -1,0 +1,27 @@
+{
+  "league": "russian-premier-league",
+  "samples": 3008,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4402,
+    "draw": 0.256,
+    "away_win": 0.3039,
+    "over25": 0.4634,
+    "avg_goals": 2.51
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

@@ -1,0 +1,27 @@
+{
+  "league": "championship",
+  "samples": 13606,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4378,
+    "draw": 0.2724,
+    "away_win": 0.2898,
+    "over25": 0.4752,
+    "avg_goals": 2.56
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

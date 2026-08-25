@@ -1,0 +1,27 @@
+{
+  "league": "brasileir\u00e3o-s\u00e9rie-a",
+  "samples": 4850,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4854,
+    "draw": 0.2685,
+    "away_win": 0.246,
+    "over25": 0.4295,
+    "avg_goals": 2.37
+  },
+  "calibrators": {
+    "over25": {
+      "a": -0.485,
+      "b": 0.7
+    },
+    "under25": {
+      "a": 0.485,
+      "b": 0.7
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

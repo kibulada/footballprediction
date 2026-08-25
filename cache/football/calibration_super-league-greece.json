@@ -1,0 +1,27 @@
+{
+  "league": "super-league-greece",
+  "samples": 4128,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.477,
+    "draw": 0.2558,
+    "away_win": 0.2667,
+    "over25": 0.4188,
+    "avg_goals": 2.31
+  },
+  "calibrators": {
+    "over25": {
+      "a": -0.485,
+      "b": 0.7
+    },
+    "under25": {
+      "a": 0.485,
+      "b": 0.7
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

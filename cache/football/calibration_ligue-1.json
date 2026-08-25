@@ -1,0 +1,27 @@
+{
+  "league": "ligue-1",
+  "samples": 8756,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4503,
+    "draw": 0.2781,
+    "away_win": 0.2716,
+    "over25": 0.4525,
+    "avg_goals": 2.49
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

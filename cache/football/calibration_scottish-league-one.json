@@ -1,0 +1,27 @@
+{
+  "league": "scottish-league-one",
+  "samples": 4092,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4311,
+    "draw": 0.2265,
+    "away_win": 0.3424,
+    "over25": 0.567,
+    "avg_goals": 2.96
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.2,
+      "b": 0.9
+    },
+    "under25": {
+      "a": -0.2,
+      "b": 0.9
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

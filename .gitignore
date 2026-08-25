@@ -9,6 +9,10 @@
 cache/**
 !cache/**/
 !cache/**/.gitkeep
+# keep calibration + elo for VPS deploy (whitelist, rest of cache stays ignored)
+!cache/football/calibration.json
+!cache/football/calibration_*.json
+!cache/football/elo.json
 
 # large binaries / logs anywhere
 *.parquet

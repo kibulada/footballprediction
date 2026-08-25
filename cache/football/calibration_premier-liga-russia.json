@@ -1,0 +1,27 @@
+{
+  "league": "premier-liga-russia",
+  "samples": 8,
+  "source": "the-odds-api",
+  "actual_rates": {
+    "home_prob": 0.4127,
+    "draw_prob": 0.2734,
+    "away_prob": 0.3139,
+    "over25_prob": 0.5199
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.03,
+  "note": "Estimated from odds implied probabilities"
+}

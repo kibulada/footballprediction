@@ -1,0 +1,27 @@
+{
+  "league": "league-of-ireland",
+  "samples": 2367,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4322,
+    "draw": 0.24,
+    "away_win": 0.3278,
+    "over25": 0.4791,
+    "avg_goals": 2.58
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

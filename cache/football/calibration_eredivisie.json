@@ -1,0 +1,27 @@
+{
+  "league": "eredivisie",
+  "samples": 7288,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4712,
+    "draw": 0.2333,
+    "away_win": 0.2956,
+    "over25": 0.5827,
+    "avg_goals": 3.06
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.2,
+      "b": 0.9
+    },
+    "under25": {
+      "a": -0.2,
+      "b": 0.9
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

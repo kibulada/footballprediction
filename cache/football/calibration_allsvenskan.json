@@ -1,0 +1,27 @@
+{
+  "league": "allsvenskan",
+  "samples": 3110,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4379,
+    "draw": 0.2524,
+    "away_win": 0.3096,
+    "over25": 0.5408,
+    "avg_goals": 2.8
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

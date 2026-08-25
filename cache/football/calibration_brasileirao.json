@@ -1,0 +1,27 @@
+{
+  "league": "brasileirao",
+  "samples": 225,
+  "source": "football-data.org",
+  "actual_rates": {
+    "home_win": 0.4533,
+    "draw": 0.2978,
+    "away_win": 0.2489,
+    "over25": 0.4889,
+    "btts": 0.5778
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

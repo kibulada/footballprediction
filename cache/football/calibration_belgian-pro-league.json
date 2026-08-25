@@ -1,0 +1,27 @@
+{
+  "league": "belgian-pro-league",
+  "samples": 6559,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4629,
+    "draw": 0.2487,
+    "away_win": 0.2885,
+    "over25": 0.5385,
+    "avg_goals": 2.84
+  },
+  "calibrators": {
+    "over25": {
+      "a": 0.0,
+      "b": 1.0
+    },
+    "under25": {
+      "a": -0.0,
+      "b": 1.0
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}

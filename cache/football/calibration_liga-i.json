@@ -1,0 +1,27 @@
+{
+  "league": "liga-i",
+  "samples": 3640,
+  "source": "pjc-codes/football-data",
+  "actual_rates": {
+    "home_win": 0.4272,
+    "draw": 0.2777,
+    "away_win": 0.2951,
+    "over25": 0.4365,
+    "avg_goals": 2.41
+  },
+  "calibrators": {
+    "over25": {
+      "a": -0.485,
+      "b": 0.7
+    },
+    "under25": {
+      "a": 0.485,
+      "b": 0.7
+    },
+    "1x2": {
+      "a": 0.0,
+      "b": 1.0
+    }
+  },
+  "ece": 0.02
+}
