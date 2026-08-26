@@ -481,5 +481,25 @@
       "emperor cup japan",
       "jepang emperor cup"
     ]
+  },
+  "EFL Cup": {
+    "odds_api_key": "soccer_england_efl_cup",
+    "display": "EFL Cup",
+    "country": "England",
+    "football_data_code": null,
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "efl cup",
+      "league cup",
+      "carabao cup",
+      "carling cup",
+      "capital one cup",
+      "english league cup",
+      "league cup england",
+      "carabao",
+      "efl carabao cup"
+    ]
   }
 }

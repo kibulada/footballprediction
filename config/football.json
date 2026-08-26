@@ -20,7 +20,8 @@
     "Serie B",
     "Segunda",
     "Liga 1",
-    "Japan Emperor's Cup"
+    "Japan Emperor's Cup",
+    "EFL Cup"
   ],
   "rate_limit_seconds": 1.1,
   "identity_firewall": {
