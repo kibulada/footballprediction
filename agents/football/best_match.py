@@ -789,6 +789,28 @@ async def find_best_goal_matches(
                     )
                     break
 
+            # Fase A: NowGoal market fallback untuk cup/ liga odds_api_key null
+            # atau TheOddsAPI kosong. Tanpa ini Japan Emperor's Cup dkk
+            # selalu error "no form/odds" karena form tim cup tipis.
+            if not totals.get("Over 2.5") and nowgoal is not None:
+                try:
+                    if _time.monotonic() - t0 <= 55.0:
+                        ng_payload = await nowgoal.match_odds(home, away, today)
+                        if ng_payload:
+                            ng_totals = extract_market_totals(ng_payload)
+                            if ng_totals.get("Over 2.5"):
+                                totals = ng_totals
+                                bk_count = len(
+                                    extract_h2h_entries(
+                                        ng_payload,
+                                        ng_payload.get("home_team") or "",
+                                        ng_payload.get("away_team") or "",
+                                    )
+                                )
+                                logger.info("bestgoalmatch: nowgoal odds fallback %s vs %s", home, away)
+                except Exception as exc:  # noqa: BLE001
+                    logger.warning("bestgoalmatch: nowgoal odds fallback failed %s vs %s: %s", home, away, exc)
+
             pending.append({
                 "league_key": league_key,
                 "display": display,
