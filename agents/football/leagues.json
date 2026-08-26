@@ -459,5 +459,27 @@
       "ofc",
       "liga champions oceania"
     ]
+  },
+  "Japan Emperor's Cup": {
+    "odds_api_key": null,
+    "display": "Japan Emperor's Cup",
+    "country": "Japan",
+    "football_data_code": null,
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "japan emperor cup",
+      "japan emperor's cup",
+      "japan emperors cup",
+      "japan emperors's cup",
+      "emperor cup",
+      "emperor's cup",
+      "emperors cup",
+      "emperors's cup",
+      "japan cup",
+      "emperor cup japan",
+      "jepang emperor cup"
+    ]
   }
 }

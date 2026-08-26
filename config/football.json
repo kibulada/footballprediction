@@ -19,7 +19,8 @@
     "Ligue 2",
     "Serie B",
     "Segunda",
-    "Liga 1"
+    "Liga 1",
+    "Japan Emperor's Cup"
   ],
   "rate_limit_seconds": 1.1,
   "identity_firewall": {
