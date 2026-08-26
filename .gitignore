@@ -45,5 +45,12 @@ venv/
 *.old_params
 *.old_*
 
+# oddspapi rolling pool (50 keys)
+apikeys.txt
+apikeys
+oddspapi_keys.txt
+cache/football/oddspapi_pool_state.json
+cache/football/oddspapi_keys.txt
+
 # claude local settings (personal)
 .claude/settings.local.json

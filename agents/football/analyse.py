@@ -3606,6 +3606,7 @@ async def find_specific_match(
                 getattr(oddspapi, "quota_exhausted", False)
             ),
             "oddspapi_remaining": getattr(oddspapi, "last_remaining", None),
+            "oddspapi_pool": getattr(oddspapi, "pool_status", None),
             "nowgoal_used": nowgoal_source,
         },
     }

@@ -28,8 +28,12 @@ the caller simply proceeds without odds.
 from __future__ import annotations
 
 import asyncio
+import json
 import logging
+import os
+import time
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -38,6 +42,41 @@ logger = logging.getLogger(__name__)
 
 BASE_URL = "https://api.oddspapi.io/v4"
 USER_AGENT = "hermes-football/1.0 (local-advisory)"
+
+
+def _parse_keys(raw: str | list[str] | None) -> list[str]:
+    """Split comma/whitespace/semicolon separated keys into a deduped list."""
+    if raw is None:
+        return []
+    if isinstance(raw, list):
+        out: list[str] = []
+        for k in raw:
+            s = str(k).strip()
+            if s:
+                # allow comma inside list elements too
+                if "," in s or ";" in s or "\n" in s:
+                    out.extend(_parse_keys(s))
+                else:
+                    out.append(s)
+        # dedupe preserve order
+        seen: set[str] = set()
+        uniq: list[str] = []
+        for x in out:
+            if x not in seen:
+                seen.add(x)
+                uniq.append(x)
+        return uniq
+    import re
+
+    parts = re.split(r"[,\s;]+", str(raw).strip())
+    seen = set()
+    uniq = []
+    for p in parts:
+        s = p.strip()
+        if s and s not in seen:
+            seen.add(s)
+            uniq.append(s)
+    return uniq
 
 SOCCER_SPORT_ID = 10
 
@@ -91,11 +130,37 @@ _AH_FULLTIME_MARKETS: dict[str, float] = {
 class OddspapiClient:
     def __init__(
         self,
-        api_key: str,
+        api_key: str | list[str] | None = None,
         throttle_seconds: float = 2.5,
         timeout: float = 20.0,
+        *,
+        api_keys: list[str] | None = None,
+        state_path: str | os.PathLike[str] | None = None,
     ) -> None:
-        self._key = api_key
+        # ---- pool init (rolling keys 2026-08-26) --------------------------
+        # Accept: single str, comma/whitespace-separated str, list[str], or
+        # both api_key + api_keys. Backwards compat: OddspapiClient("k") still
+        # works as single-key pool.
+        raw_keys: list[str] = []
+        if api_key is not None:
+            raw_keys.extend(_parse_keys(api_key))
+        if api_keys is not None:
+            raw_keys.extend(_parse_keys(api_keys))
+        if not raw_keys:
+            raise ValueError("OddspapiClient needs at least one apiKey")
+        # dedupe preserve order
+        seen: set[str] = set()
+        self._keys: list[str] = []
+        for k in raw_keys:
+            if k not in seen:
+                seen.add(k)
+                self._keys.append(k)
+        self._current: int = 0
+        self._exhausted: dict[int, float] = {}  # index -> expiry epoch
+        self._state_path: Path | None = Path(state_path) if state_path else None
+        self._load_state()
+        # legacy alias: self._key returns current key (property below)
+        # but keep instance attr for direct writes via setter
         self._throttle = throttle_seconds
         self._timeout = timeout
         # The /fixtures feed is fetched per date window; one analysis batch
@@ -107,50 +172,207 @@ class OddspapiClient:
         # Quota status (2026-08-22): surfaced on the Discord card so a silent
         # 429 no longer looks like "odds are just missing". Stays exhausted
         # until one request succeeds again (free-tier windows reset hourly).
+        # Rolling pool: True only when ALL keys exhausted.
         self.quota_exhausted = False
         self.last_remaining: int | None = None
+        if len(self._keys) > 1:
+            logger.info("oddspapi pool: %d keys, active #%d", len(self._keys), self._current + 1)
+
+    # ---- pool helpers -------------------------------------------------
+
+    @property
+    def _key(self) -> str:  # noqa: D401 -- backward compat alias
+        return self._keys[self._current] if self._keys else ""
+
+    @_key.setter
+    def _key(self, value: str) -> None:
+        # Allow legacy direct assignment to override current key
+        if value and value not in self._keys:
+            self._keys[self._current] = value
+        elif value:
+            # switch to that key if it exists in pool
+            try:
+                self._current = self._keys.index(value)
+            except ValueError:
+                self._keys[self._current] = value
+
+    @property
+    def total_keys(self) -> int:
+        return len(self._keys)
+
+    @property
+    def active_key_index(self) -> int:
+        return self._current
+
+    @property
+    def pool_status(self) -> dict[str, Any]:
+        return {
+            "total": len(self._keys),
+            "active_index": self._current,
+            "active_preview": self._mask(self._keys[self._current]) if self._keys else None,
+            "exhausted_count": sum(1 for e in self._exhausted.values() if e > time.time()),
+            "quota_exhausted": self.quota_exhausted,
+            "last_remaining": self.last_remaining,
+        }
+
+    @staticmethod
+    def _mask(key: str) -> str:
+        if len(key) <= 8:
+            return "***"
+        return f"{key[:4]}...{key[-4:]}"
+
+    def _load_state(self) -> None:
+        if not self._state_path or not self._state_path.exists():
+            return
+        try:
+            data = json.loads(self._state_path.read_text(encoding="utf-8"))
+            idx = int(data.get("current_index", 0))
+            if 0 <= idx < len(self._keys):
+                self._current = idx
+            # load exhausted expiries, drop expired ones
+            now = time.time()
+            raw_ex = data.get("exhausted") or {}
+            for k, v in raw_ex.items():
+                try:
+                    ki = int(k)
+                    exp = float(v)
+                    if 0 <= ki < len(self._keys) and exp > now:
+                        self._exhausted[ki] = exp
+                except (TypeError, ValueError):
+                    continue
+            # if current is exhausted, advance to next available
+            if self._current in self._exhausted and self._exhausted[self._current] > now:
+                self._rotate(silent=True)
+        except Exception as exc:  # noqa: BLE001 -- state is best-effort
+            logger.debug("oddspapi pool state load failed: %s", exc)
+
+    def _save_state(self) -> None:
+        if not self._state_path:
+            return
+        try:
+            self._state_path.parent.mkdir(parents=True, exist_ok=True)
+            payload = {
+                "current_index": self._current,
+                "exhausted": {str(k): v for k, v in self._exhausted.items()},
+                "updated": datetime.now(timezone.utc).isoformat(),
+            }
+            self._state_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("oddspapi pool state save failed: %s", exc)
+
+    def _is_exhausted(self, idx: int) -> bool:
+        exp = self._exhausted.get(idx)
+        if exp is None:
+            return False
+        if exp <= time.time():
+            self._exhausted.pop(idx, None)
+            return False
+        return True
+
+    def _all_exhausted(self) -> bool:
+        now = time.time()
+        # purge expired
+        for k in list(self._exhausted.keys()):
+            if self._exhausted[k] <= now:
+                self._exhausted.pop(k)
+        return len([i for i in range(len(self._keys)) if self._is_exhausted(i)]) >= len(self._keys)
+
+    def _mark_exhausted(self, idx: int, ttl: float = 3600.0) -> None:
+        self._exhausted[idx] = time.time() + ttl
+        self._save_state()
+
+    def _rotate(self, silent: bool = False) -> int:
+        """Advance to next non-exhausted key; returns new index."""
+        if len(self._keys) <= 1:
+            return self._current
+        start = self._current
+        for _ in range(len(self._keys)):
+            self._current = (self._current + 1) % len(self._keys)
+            if not self._is_exhausted(self._current):
+                break
+        else:
+            # all exhausted -- stay on next slot anyway
+            self._current = (start + 1) % len(self._keys)
+        if not silent:
+            logger.warning(
+                "oddspapi rolling: [%d/%d] %s -> [%d/%d] %s",
+                start + 1, len(self._keys), self._mask(self._keys[start]),
+                self._current + 1, len(self._keys), self._mask(self._keys[self._current]),
+            )
+            self._save_state()
+        return self._current
+
+    def _available_keys(self) -> int:
+        return sum(1 for i in range(len(self._keys)) if not self._is_exhausted(i))
 
     # ---- low-level HTTP -------------------------------------------------
 
     async def _get(self, path: str, params: dict[str, Any]) -> dict[str, Any] | None:
         url = f"{BASE_URL}{path}"
-        try:
-            async with httpx.AsyncClient(timeout=self._timeout) as client:
-                resp = await client.get(
-                    url,
-                    params={**params, "apiKey": self._key},
-                    headers={"User-Agent": USER_AGENT},
+        max_attempts = len(self._keys) if self._keys else 1
+        attempts = 0
+        while attempts < max_attempts:
+            cur_key = self._keys[self._current] if self._keys else ""
+            cur_preview = self._mask(cur_key)
+            try:
+                async with httpx.AsyncClient(timeout=self._timeout) as client:
+                    resp = await client.get(
+                        url,
+                        params={**params, "apiKey": cur_key},
+                        headers={"User-Agent": USER_AGENT},
+                    )
+            except httpx.HTTPError as exc:
+                logger.warning("oddspapi network error (%s): %s", path, exc)
+                return None
+            if resp.status_code == 401:
+                logger.warning(
+                    "oddspapi 401 invalid key [%d/%d] %s on %s",
+                    self._current + 1, len(self._keys), cur_preview, path,
                 )
-        except httpx.HTTPError as exc:
-            logger.warning("oddspapi network error (%s): %s", path, exc)
-            return None
-        if resp.status_code == 401:
-            logger.warning("oddspapi 401: apiKey invalid")
-            return None
-        if resp.status_code == 429:
-            logger.warning("oddspapi 429 rate limit on %s", path)
-            self.quota_exhausted = True
-            # Give the shared quota a moment before the caller retries with
-            # another name spelling; without this the second attempt would
-            # be rejected before even starting.
+                # Invalid key -> ban 24 jam (bukan selamanya, biar bisa di-fix)
+                self._mark_exhausted(self._current, ttl=86400.0)
+                if self._all_exhausted():
+                    logger.warning("oddspapi pool exhausted: semua %d key invalid/habis", len(self._keys))
+                    self.quota_exhausted = True
+                    await asyncio.sleep(self._throttle)
+                    return None
+                self._rotate()
+                attempts += 1
+                await asyncio.sleep(0.3)
+                continue
+            if resp.status_code == 429:
+                logger.warning(
+                    "oddspapi 429 quota habis key [%d/%d] %s on %s -> rolling",
+                    self._current + 1, len(self._keys), cur_preview, path,
+                )
+                self._mark_exhausted(self._current, ttl=3600.0)
+                if self._all_exhausted():
+                    logger.warning("oddspapi pool exhausted: semua %d key habis quota (TTL 1 jam)", len(self._keys))
+                    self.quota_exhausted = True
+                    await asyncio.sleep(self._throttle)
+                    return None
+                self._rotate()
+                attempts += 1
+                await asyncio.sleep(0.3)
+                continue
+            if resp.status_code >= 400:
+                logger.warning("oddspapi http %s on %s", resp.status_code, path)
+                return None
             await asyncio.sleep(self._throttle)
-            return None
-        if resp.status_code >= 400:
-            logger.warning("oddspapi http %s on %s", resp.status_code, path)
-            return None
-        await asyncio.sleep(self._throttle)
-        self.quota_exhausted = False
-        for header, value in resp.headers.items():
-            if "remaining" in header.lower():
-                try:
-                    self.last_remaining = int(value)
-                except (TypeError, ValueError):
-                    pass
-                break
-        try:
-            return resp.json()
-        except ValueError:
-            return None
+            self.quota_exhausted = False
+            for header, value in resp.headers.items():
+                if "remaining" in header.lower():
+                    try:
+                        self.last_remaining = int(value)
+                    except (TypeError, ValueError):
+                        pass
+                    break
+            try:
+                return resp.json()
+            except ValueError:
+                return None
+        self.quota_exhausted = True
+        return None
 
     # ---- fixture resolution ----------------------------------------------
 

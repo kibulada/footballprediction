@@ -64,14 +64,104 @@ def _build_nowgoal(cfg: dict[str, Any], proxy_url: str | None) -> Any | None:
     )
 
 
-def _build_oddspapi(cfg: dict[str, Any]) -> Any | None:
-    """OddsPapi client (feature-gated, needs ODDSPAPI_KEY). Shared by the
-    analyse and match-source (livescore/flashscore) modes."""
-    if (cfg.get("feature_flags") or {}).get("enable_oddspapi", True) and os.getenv("ODDSPAPI_KEY"):
-        from .oddspapi import OddspapiClient
+def _collect_oddspapi_keys() -> list[str]:
+    """Kumpulkan semua OddsPapi keys dari env + file (rolling pool).
 
-        return OddspapiClient(os.getenv("ODDSPAPI_KEY"))
-    return None
+    Sumber (digabung, dedup preserve order):
+    1. ODDSPAPI_KEYS (jamak, koma/newline/space)
+    2. ODDSPAPI_KEY  (tunggal ATAU koma-list backward-compat)
+    3. ODDSPAPI_KEY_1 .. _100 / ODDSPAPI_KEYS_1 ..
+    4. File via ODDSPAPI_KEYS_FILE / ODDSPAPI_KEY_FILE
+    5. File default: apikeys.txt, apikeys, oddspapi_keys.txt,
+       cache/football/oddspapi_keys.txt (satu key per baris)
+    """
+    import re
+
+    ROOT_LOCAL = Path(__file__).resolve().parent.parent.parent
+    keys: list[str] = []
+
+    def _add_raw(raw: str | None) -> None:
+        if not raw:
+            return
+        for p in re.split(r"[,\s;]+", raw.strip()):
+            s = p.strip()
+            if s and s not in keys:
+                keys.append(s)
+
+    _add_raw(os.getenv("ODDSPAPI_KEYS"))
+    _add_raw(os.getenv("ODDSPAPI_KEY"))
+    # Numbered env vars (ODDSPAPI_KEY_1 .. 100)
+    for i in range(1, 101):
+        for prefix in ("ODDSPAPI_KEY_", "ODDSPAPI_KEYS_"):
+            v = os.getenv(f"{prefix}{i}")
+            if v:
+                v = v.strip()
+                if v and v not in keys:
+                    keys.append(v)
+
+    # File candidates
+    file_env = os.getenv("ODDSPAPI_KEYS_FILE") or os.getenv("ODDSPAPI_KEY_FILE") or os.getenv("ODDSPAPI_APIKEYS_FILE")
+    candidates: list[Path] = []
+    if file_env:
+        candidates.append(Path(file_env))
+        # also relative to ROOT
+        if not Path(file_env).is_absolute():
+            candidates.append(ROOT_LOCAL / file_env)
+    # default files
+    candidates.extend([
+        ROOT_LOCAL / "apikeys.txt",
+        ROOT_LOCAL / "apikeys",
+        ROOT_LOCAL / "oddspapi_keys.txt",
+        ROOT_LOCAL / "cache" / "football" / "oddspapi_keys.txt",
+        Path("apikeys.txt"),
+    ])
+    seen_files: set[str] = set()
+    for p in candidates:
+        try:
+            key = str(p.resolve()) if p.exists() else str(p)
+            if key in seen_files:
+                continue
+            seen_files.add(key)
+            if p.exists() and p.is_file():
+                txt = p.read_text(encoding="utf-8", errors="ignore")
+                for line in txt.splitlines():
+                    line = line.strip()
+                    if not line or line.startswith("#"):
+                        continue
+                    for part in re.split(r"[,\s;]+", line):
+                        s = part.strip()
+                        if s and s not in keys:
+                            keys.append(s)
+        except Exception:
+            continue
+
+    # dedupe preserve order (already but double-check)
+    seen: set[str] = set()
+    uniq: list[str] = []
+    for k in keys:
+        if k not in seen:
+            seen.add(k)
+            uniq.append(k)
+    return uniq
+
+
+def _build_oddspapi(cfg: dict[str, Any]) -> Any | None:
+    """OddsPapi client (feature-gated, rolling pool). Shared by the
+    analyse and match-source (livescore/flashscore) modes."""
+    if not (cfg.get("feature_flags") or {}).get("enable_oddspapi", True):
+        return None
+    keys = _collect_oddspapi_keys()
+    if not keys:
+        return None
+    from .oddspapi import OddspapiClient
+
+    ROOT_LOCAL = Path(__file__).resolve().parent.parent.parent
+    state_path = ROOT_LOCAL / "cache" / "football" / "oddspapi_pool_state.json"
+    try:
+        return OddspapiClient(keys, state_path=state_path)
+    except Exception as exc:  # noqa: BLE001 -- fail-open
+        logger.warning("oddspapi pool init failed (%s), fallback single key", exc)
+        return OddspapiClient(keys[0])
 
 
 def _silence_root_handlers() -> None:
@@ -620,11 +710,7 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
                 proxy=proxy_url,
                 mirrors=ng_cfg.get("mirrors"),
             )
-        oddspapi = None
-        if (cfg.get("feature_flags") or {}).get("enable_oddspapi", True) and os.getenv("ODDSPAPI_KEY"):
-            from .oddspapi import OddspapiClient
-
-            oddspapi = OddspapiClient(os.getenv("ODDSPAPI_KEY"))
+        oddspapi = _build_oddspapi(cfg)
 
         def _cadence_for(hours: float) -> int | None:
             return cadence_for(hours, schedule)
