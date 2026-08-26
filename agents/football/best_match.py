@@ -667,6 +667,7 @@ async def find_best_goal_matches(
     league_query: str | None = None,
     date: str | None = None,
     nowgoal: Any = None,
+    oddspapi: Any = None,
 ) -> dict[str, Any]:
     """`!bestgoalmatch`: today's fixtures across leagues ranked by expected
     total goals; the top match is the most goal-friendly pick (banjir gol)."""
@@ -810,6 +811,26 @@ async def find_best_goal_matches(
                                 logger.info("bestgoalmatch: nowgoal odds fallback %s vs %s", home, away)
                 except Exception as exc:  # noqa: BLE001
                     logger.warning("bestgoalmatch: nowgoal odds fallback failed %s vs %s: %s", home, away, exc)
+
+            # Fase A2: OddsPapi fallback kalau NowGoal juga kosong
+            if not totals.get("Over 2.5") and oddspapi is not None:
+                try:
+                    if _time.monotonic() - t0 <= 55.0:
+                        op_payload = await oddspapi.match_odds(home, away, kickoff)
+                        if op_payload:
+                            op_totals = extract_market_totals(op_payload)
+                            if op_totals.get("Over 2.5"):
+                                totals = op_totals
+                                bk_count = len(
+                                    extract_h2h_entries(
+                                        op_payload,
+                                        op_payload.get("home_team") or "",
+                                        op_payload.get("away_team") or "",
+                                    )
+                                )
+                                logger.info("bestgoalmatch: oddspapi odds fallback %s vs %s", home, away)
+                except Exception as exc:  # noqa: BLE001
+                    logger.warning("bestgoalmatch: oddspapi odds fallback failed %s vs %s: %s", home, away, exc)
 
             pending.append({
                 "league_key": league_key,

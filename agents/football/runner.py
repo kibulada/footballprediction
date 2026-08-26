@@ -344,6 +344,7 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
             league_query=args.league,
             date=args.date,
             nowgoal=_build_nowgoal(cfg, proxy_url),
+            oddspapi=_build_oddspapi(cfg),
         )
     if args.mode == "compare":
         return await compare_teams(
