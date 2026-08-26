@@ -21,7 +21,10 @@
     "Segunda",
     "Liga 1",
     "Japan Emperor's Cup",
-    "EFL Cup"
+    "EFL Cup",
+    "FA Cup",
+    "Liga Super Malaysia",
+    "K-League"
   ],
   "rate_limit_seconds": 1.1,
   "identity_firewall": {

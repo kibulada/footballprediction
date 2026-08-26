@@ -311,17 +311,23 @@
     ]
   },
   "K-League": {
-    "odds_api_key": "soccer_south_korea_kleague",
-    "display": "K-League",
+    "odds_api_key": "soccer_korea_kleague1",
+    "display": "K League 1",
     "country": "South Korea",
     "football_data_code": null,
-    "sofascore_tournament_id": 141,
-    "provider": "sofascore",
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
     "fallback_provider": "thesportsdb",
     "aliases": [
       "kleague",
+      "k league 1",
+      "kleague 1",
+      "k-league 1",
       "korea",
-      "korean league"
+      "korean league",
+      "k league",
+      "korea league",
+      "south korea kleague"
     ]
   },
   "J1 League": {
@@ -497,9 +503,48 @@
       "carling cup",
       "capital one cup",
       "english league cup",
+      "england league cup",
+      "england efl cup",
       "league cup england",
       "carabao",
       "efl carabao cup"
+    ]
+  },
+  "FA Cup": {
+    "odds_api_key": "soccer_fa_cup",
+    "display": "FA Cup",
+    "country": "England",
+    "football_data_code": null,
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "fa cup",
+      "english fa cup",
+      "england fa cup",
+      "fa cup england",
+      "the fa cup",
+      "piala fa",
+      "piala fa inggris"
+    ]
+  },
+  "Liga Super Malaysia": {
+    "odds_api_key": null,
+    "display": "Liga Super Malaysia",
+    "country": "Malaysia",
+    "football_data_code": null,
+    "sofascore_tournament_id": null,
+    "provider": "flashscore",
+    "fallback_provider": "thesportsdb",
+    "aliases": [
+      "liga super malaysia",
+      "liga super",
+      "malaysia super league",
+      "malaysian super league",
+      "super league malaysia",
+      "liga malaysia",
+      "malaysia league",
+      "liga super malaysian"
     ]
   }
 }
