@@ -311,7 +311,7 @@
     ]
   },
   "K-League": {
-    "odds_api_key": null,
+    "odds_api_key": "soccer_korea_kleague1",
     "display": "K League 1",
     "country": "South Korea",
     "football_data_code": null,
@@ -489,7 +489,7 @@
     ]
   },
   "EFL Cup": {
-    "odds_api_key": null,
+    "odds_api_key": "soccer_england_efl_cup",
     "display": "EFL Cup",
     "country": "England",
     "football_data_code": null,
@@ -511,7 +511,7 @@
     ]
   },
   "FA Cup": {
-    "odds_api_key": null,
+    "odds_api_key": "soccer_fa_cup",
     "display": "FA Cup",
     "country": "England",
     "football_data_code": null,
