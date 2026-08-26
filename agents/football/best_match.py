@@ -671,7 +671,17 @@ async def find_best_goal_matches(
 ) -> dict[str, Any]:
     """`!bestgoalmatch`: today's fixtures across leagues ranked by expected
     total goals; the top match is the most goal-friendly pick (banjir gol)."""
-    today = date or wib_today_iso()
+    # Window like `!best` (today + tomorrow early WIB) — user expectation
+    # "hari ini dan dini hari" (00-06 WIB besok) harus tercakup. Dulu hanya
+    # 1 tanggal WIB sehingga UEL/UECL yang kickoff di UTC 2026-08-27 sore
+    # (WIB 27 malam / 28 dini hari) terlewat. Samakan dengan find_best_matches.
+    if date:
+        dates = [date]
+        today = date
+    else:
+        today = wib_today_iso()
+        tomorrow = (datetime.now(WIB) + timedelta(days=1)).date().isoformat()
+        dates = [today, tomorrow]
     leagues_cfg = _load_leagues()
 
     if league_query:
@@ -686,7 +696,7 @@ async def find_best_goal_matches(
     # Phase 1 collects fixtures/forms/odds; phase 2 (after the loops) computes
     # the ML batch and the goal profiles so the ML O/U model is one call.
     pending: list[dict[str, Any]] = []
-    seen: set[tuple[str, str]] = set()
+    seen: set[tuple[str, str, str]] = set()
     ttl = cfg.get("cache_ttl_seconds") or {}
 
     # Hard time budget: scanning every league's fixtures + per-team form can
@@ -699,7 +709,7 @@ async def find_best_goal_matches(
 
     for league_key in league_keys:
         if _time.monotonic() - t0 > 55.0:
-            logger.warning("bestgoalmatch: time budget hit, using %d matches", len(matches))
+            logger.warning("bestgoalmatch: time budget hit, using %d matches", len(pending))
             break
         meta = leagues_cfg.get(league_key)
         if not meta:
@@ -707,44 +717,57 @@ async def find_best_goal_matches(
         display = meta["display"]
         meta_with_season = {**meta, "season": _season_now(), "_league_key": league_key}
         # P2: provider-aware fixture caches (football-data primary, nowgoal
-        # fallback stored separately).
-        fd_cache_key = f"fixtures_football_data_{league_key}_{today}"
-        ng_cache_key = f"fixtures_nowgoal_{league_key}_{today}"
-        fixtures = cache.get(fd_cache_key, ttl.get("fixtures", 21600)) if cache else None
-        if fixtures is None:
-            try:
-                fixtures = await stats.fetch_fixtures_for_date(meta_with_season, today) or []
-                if fixtures:
-                    if cache:
-                        cache.set(fd_cache_key, fixtures)
-                else:
-                    # NowGoal schedule fallback (same as top/best): when
-                    # football-data has nothing, take the nowgoal schedule once.
-                    if nowgoal is not None:
-                        from .match_finder import _nowgoal_fixtures_for_league
+        # fallback stored separately) — same 2-date window as find_best_matches
+        # sehingga dini hari ter-cover.
+        fixtures: list[dict[str, Any]] = []
+        seen_dates_for_league: set[str] = set()
+        for d in dates:
+            if _time.monotonic() - t0 > 55.0:
+                break
+            fd_cache_key = f"fixtures_football_data_{league_key}_{d}"
+            ng_cache_key = f"fixtures_nowgoal_{league_key}_{d}"
+            day_fixtures = cache.get(fd_cache_key, ttl.get("fixtures", 21600)) if cache else None
+            if day_fixtures is None:
+                try:
+                    day_fixtures = await stats.fetch_fixtures_for_date(meta_with_season, d) or []
+                    if day_fixtures:
+                        if cache:
+                            cache.set(fd_cache_key, day_fixtures)
+                    else:
+                        if nowgoal is not None:
+                            from .match_finder import _nowgoal_fixtures_for_league
 
-                        fixtures = cache.get(ng_cache_key, ttl.get("fixtures", 21600)) if cache else None
-                        if fixtures is None:
-                            fixtures = await _nowgoal_fixtures_for_league(
-                                nowgoal, today, league_key, meta
-                            )
-                            if cache and fixtures:
-                                cache.set(ng_cache_key, fixtures)
-            except Exception as exc:  # noqa: BLE001
-                logger.warning("bestgoalmatch: fixtures failed %s: %s", league_key, exc)
-                continue
+                            day_fixtures = cache.get(ng_cache_key, ttl.get("fixtures", 21600)) if cache else None
+                            if day_fixtures is None:
+                                day_fixtures = await _nowgoal_fixtures_for_league(
+                                    nowgoal, d, league_key, meta
+                                )
+                                if cache and day_fixtures:
+                                    cache.set(ng_cache_key, day_fixtures)
+                            day_fixtures = day_fixtures or []
+                        else:
+                            day_fixtures = []
+                except Exception as exc:  # noqa: BLE001
+                    logger.warning("bestgoalmatch: fixtures failed %s %s: %s", league_key, d, exc)
+                    day_fixtures = []
+                    continue
+            # dedupe per (league, date) already via cache; merge across dates
+            if day_fixtures:
+                # avoid double-adding same date twice if loop re-enters
+                if d not in seen_dates_for_league:
+                    fixtures.extend(day_fixtures)
+                    seen_dates_for_league.add(d)
         if not fixtures:
             continue
 
         # Odds for THIS league (cached per league+date) — needed so the goal
         # profile can fall back to the market Over/Under lines when form data
-        # is missing (new-season matchday 1, football-data rate limit). Only
-        # leagues that actually have fixtures pay for the call, and the 55s
-        # budget caps the total.
+        # is missing. Cukup sekali per league (payload TheOddsAPI mencakup semua
+        # commence_time mendatang); cache key pakai start date agar reuse.
         odds_key = meta.get("odds_api_key")
         odds_payload: list[dict[str, Any]] = []
         if odds_key:
-            odds_cache_key = f"odds_{odds_key}_{today}"
+            odds_cache_key = f"odds_{odds_key}_{dates[0]}"
             odds_payload = cache.get(odds_cache_key, ttl.get("odds", 900)) if cache else None
             if odds_payload is None:
                 try:
@@ -764,7 +787,8 @@ async def find_best_goal_matches(
             away = (fix.get("away") or {}).get("name")
             if not home or not away:
                 continue
-            key = (home, away)
+            kickoff = fix.get("date") or ""
+            key = (home, away, str(kickoff)[:10])
             if key in seen:
                 continue
             seen.add(key)
@@ -796,7 +820,8 @@ async def find_best_goal_matches(
             if not totals.get("Over 2.5") and nowgoal is not None:
                 try:
                     if _time.monotonic() - t0 <= 55.0:
-                        ng_payload = await nowgoal.match_odds(home, away, today)
+                        ng_date = kickoff[:10] if kickoff else None
+                        ng_payload = await nowgoal.match_odds(home, away, ng_date)
                         if ng_payload:
                             ng_totals = extract_market_totals(ng_payload)
                             if ng_totals.get("Over 2.5"):
@@ -891,7 +916,8 @@ async def find_best_goal_matches(
             league_avg[display] = round(exp / n, 2)
 
     if not matches:
-        return {"error": f"Tidak ada match hari ini ({today}) dengan data form atau odds untuk goal profile."}
+        date_label = f"{dates[0]} → {dates[-1]}" if len(dates) > 1 else today
+        return {"error": f"Tidak ada match hari ini ({date_label}) dengan data form atau odds untuk goal profile."}
 
     matches.sort(key=lambda m: m["goal"]["expected_total"], reverse=True)
     top = matches[:10]
@@ -901,7 +927,8 @@ async def find_best_goal_matches(
     league_ranked = sorted(league_avg.items(), key=lambda kv: kv[1], reverse=True)
 
     return {
-        "date": today,
+        "date": dates[0] if len(dates) == 1 else f"{dates[0]} → {dates[-1]}",
+        "date_range": f"{dates[0]} → {dates[-1]}" if len(dates) > 1 else today,
         "generated_at": utc_now_iso(),
         "league_avg": league_ranked,
         "candidates": [
