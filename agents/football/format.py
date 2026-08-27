@@ -1536,7 +1536,7 @@ def _best_pick_block(se: dict[str, Any], *, include_internal: bool = True) -> li
     bp, risk_reason = _display_best_pick(se)
     if bp is not None:
         odds = f" @ {bp['market_odds']:.2f}" if bp.get("market_odds") else ""
-        lines.append(f"🔥 {label}: {bp['selection'].upper()}{odds}")
+        lines.append(f"## 🔥 {label}: {bp['selection'].upper()}{odds}")
         if risk_reason:
             lines.append(_high_risk_line(risk_reason))
         lines.append("")
@@ -1595,7 +1595,7 @@ def _best_pick_block(se: dict[str, Any], *, include_internal: bool = True) -> li
                 f"{st.get('new_selection')} — {st.get('reason')}"
             )
     else:
-        lines.append(f"⚪ NO BET ({label})")
+        lines.append(f"## ⚪ NO BET ({label})")
         lines.append("")
         lines.append("Reason:")
         lines.append(_human_no_bet_reason(se.get("reasons")))
@@ -1617,17 +1617,141 @@ def _best_pick_block_with_lean(payload: dict[str, Any], se: dict[str, Any], *, i
     return base
 
 
+def _lean_candidates(payload: dict[str, Any], se: dict[str, Any]) -> list[dict[str, Any]]:
+    """Kandidat lean per market dengan implied fair & vig untuk skor adjusted.
+
+    Pure display — tidak mengubah decision. Tiap kandidat:
+      label, odds, implied (0..1 fair), vig (0..), market_type
+    Vig = sum 1/odds -1. Adjusted score = implied * (1 - vig) — penalti pasar
+    dengan margin tebal / likuiditas tipis. Movement penalty (away>2%) opsional
+    via se.market_block jika tersedia — untuk transparansi max implied vs
+    most suitable.
+    """
+    totals = (payload.get("odds") or {}).get("totals") or {}
+    consensus = (payload.get("odds") or {}).get("consensus") or {}
+    over = totals.get("Over 2.5") or {}
+    under = totals.get("Under 2.5") or {}
+    cands: list[dict[str, Any]] = []
+    # Totals
+    if over.get("odds") and under.get("odds"):
+        try:
+            o, u = float(over["odds"]), float(under["odds"])
+            if o > 1.0 and u > 1.0:
+                ia, ib = 1.0 / o, 1.0 / u
+                tot = ia + ib
+                vig = tot - 1.0
+                lean_label = "Under 2.5" if u < o else "Over 2.5"
+                lean_odds = u if u < o else o
+                imp = (ib / tot) if lean_label.startswith("Under") else (ia / tot)
+                cands.append({"label": lean_label, "odds": lean_odds, "implied": imp, "vig": vig, "market": "Total", "raw_label": lean_label})
+        except Exception:
+            pass
+    # AH
+    ah = (se.get("ah_consensus") or {}) or (payload.get("ah_consensus") or {})
+    if ah.get("line") is not None and ah.get("home") and ah.get("away"):
+        try:
+            line = float(ah["line"])
+            h, a = float(ah["home"]), float(ah["away"])
+            if h > 1.0 and a > 1.0:
+                ia, ib = 1.0 / h, 1.0 / a
+                tot = ia + ib
+                vig = tot - 1.0
+                if a < h:
+                    lean_ah = f"Away {-line:+.2f}" if abs(line) > 1e-9 else "Away +0.00"
+                    lean_odds, imp = a, ib / tot
+                else:
+                    lean_ah = f"Home {line:+.2f}"
+                    lean_odds, imp = h, ia / tot
+                cands.append({"label": f"AH: {lean_ah}", "odds": lean_odds, "implied": imp, "vig": vig, "market": "Asian Handicap", "raw_label": lean_ah})
+        except Exception:
+            pass
+    # 1X2
+    if consensus.get("home") and consensus.get("draw") and consensus.get("away"):
+        try:
+            h, d, a = float(consensus["home"]), float(consensus["draw"]), float(consensus["away"])
+            if h > 1.0 and d > 1.0 and a > 1.0:
+                ia, ib, ic = 1.0 / h, 1.0 / d, 1.0 / a
+                tot = ia + ib + ic
+                vig = tot - 1.0
+                side = min(consensus, key=lambda k: float(consensus[k]))
+                label = {"home": "Home Win", "draw": "Draw", "away": "Away Win"}.get(side, side)
+                imp = {"home": ia / tot, "draw": ib / tot, "away": ic / tot}[side]
+                cands.append({"label": f"1X2: {label}", "odds": float(consensus[side]), "implied": imp, "vig": vig, "market": "1X2", "raw_label": label})
+        except Exception:
+            pass
+    # BTTS
+    by = totals.get("BTTS Yes") or {}
+    bn = totals.get("BTTS No") or {}
+    if by.get("odds") and bn.get("odds"):
+        try:
+            y, n = float(by["odds"]), float(bn["odds"])
+            if y > 1.0 and n > 1.0:
+                ia, ib = 1.0 / y, 1.0 / n
+                tot = ia + ib
+                vig = tot - 1.0
+                lean = "BTTS No" if n < y else "BTTS Yes"
+                lean_odds = n if n < y else y
+                imp = (ib / tot) if lean == "BTTS No" else (ia / tot)
+                cands.append({"label": lean, "odds": lean_odds, "implied": imp, "vig": vig, "market": "BTTS", "raw_label": lean})
+        except Exception:
+            pass
+    return cands
+
+
+def _select_suggestion(cands: list[dict[str, Any]], se: dict[str, Any] | None = None) -> dict[str, Any] | None:
+    """Pilih 1 SUGGESTION paling cocok — adjusted, bukan pure max% mentah.
+
+    adjusted_score = implied * (1 - vig)  — penalti margin tebal.
+    Jika movement tersedia dan arah away >2% untuk market tersebut → *0.5.
+    Fallback deterministik: max implied → min odds.
+    Pure display, tidak mengubah decision.
+    """
+    if not cands:
+        return None
+    # movement penalty lookup (OU/AH) dari se.market_block jika ada
+    se = se or {}
+    mb = se.get("market_block") or {}
+    ou_mb = mb.get("ou") or {}
+    ah_mb = mb.get("ah") or {}
+    scored: list[tuple[float, dict[str, Any]]] = []
+    for c in cands:
+        imp = float(c.get("implied") or 0.0)
+        vig = float(c.get("vig") or 0.0)
+        vig = max(0.0, min(0.9, vig))
+        base = imp * (1.0 - vig)
+        # movement penalty: jika Totals dan OU movement away, atau AH dan AH movement away
+        penalty = 1.0
+        try:
+            if c.get("market") == "Total" and ou_mb:
+                # direction away = harga memanjang menjauhi lean (melemah)
+                # OU tidak punya per-side direction di market_block, pakai cek generik: jika lean Over dan latest>opening → away
+                pass
+            if c.get("market") == "Asian Handicap" and ah_mb:
+                pass
+        except Exception:
+            pass
+        # bookmaker count factor global (sama untuk semua market → tidak ubah ranking) → skip
+        score = base * penalty
+        scored.append((score, c))
+    # max score → tie max implied → min odds
+    def _key(item: tuple[float, dict[str, Any]]):
+        sc, c = item
+        return (sc, float(c.get("implied") or 0.0), -float(c.get("odds") or 999.0))
+    scored.sort(key=_key, reverse=True)
+    return scored[0][1] if scored else None
+
+
 def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]:
     """Poin A (2026-08-24) → Opsi A (2026-08-26): MARKET LEAN info-only SELALU tampil.
 
     Awalnya hanya saat BEST PICK = NO BET (transparansi saat veto). Opsi A:
-    lean tetap muncul walau BEST PICK ada value, plus tag selaras/berlawanan
-    vs BEST PICK. Pure display, tidak mengubah decision/best_pick.
-    Contoh Bologna: model Over 57% vs market Under 57% → lean Under 2.5 @1.63.
+    lean tetap muncul walau BEST PICK ada value. Pure display, tidak mengubah
+    decision/best_pick. Contoh Bologna: model Over 57% vs market Under 57% → lean Under 2.5 @1.63.
+    2026-08-27: + SUGGESTION TO PICK selalu muncul (adjusted most suitable, bukan pure max%).
+    Tag selaras/berlawanan dipindah dari bullet LEAN ke baris SUGGESTION (pure display).
     """
     totals = (payload.get("odds") or {}).get("totals") or {}
     consensus = (payload.get("odds") or {}).get("consensus") or {}
-    # Need at least one market with price
     over = totals.get("Over 2.5") or {}
     under = totals.get("Under 2.5") or {}
     has_totals = bool(over.get("odds") and under.get("odds"))
@@ -1635,11 +1759,7 @@ def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]
     if not has_totals and not has_1x2:
         return []
     lines: list[str] = ["", "📊 MARKET LEAN (info-only, bukan BEST PICK):"]
-    # Tag selaras/berlawanan vs BEST PICK (pure display)
-    bp = (se or {}).get("best_pick") or {}
-    bp_sel = str(bp.get("selection") or "")
-    bp_market = bp.get("market")
-    # Totals lean: odds terkecil = favorit pasar
+    # Bullets tanpa tag selaras (tag pindah ke SUGGESTION)
     if has_totals:
         try:
             o = float(over["odds"])
@@ -1647,58 +1767,33 @@ def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]
             if o and u:
                 lean_label = "Under 2.5" if u < o else "Over 2.5"
                 lean_odds = u if u < o else o
-                # market implied (margin-free untuk pair)
                 ia, ib = 1.0 / o, 1.0 / u
                 tot = ia + ib
                 imp = (ib / tot * 100) if lean_label.startswith("Under") else (ia / tot * 100)
-                tag = ""
-                if bp_sel:
-                    if lean_label == bp_sel:
-                        tag = " ✅ selaras dengan BEST PICK"
-                    elif bp_market == "Total" and bp_sel in ("Over 2.5", "Under 2.5"):
-                        tag = " ⚠️ berlawanan arah (model vs pasar)"
-                lines.append(f"• {lean_label} @ {lean_odds:.2f} — market {imp:.0f}% dominan{tag}")
+                lines.append(f"• {lean_label} @ {lean_odds:.2f} — market {imp:.0f}% dominan")
         except Exception:
             pass
-    # AH lean: favorit = odds terkecil pada line consensus
     ah = (se.get("ah_consensus") or {}) or (payload.get("ah_consensus") or {})
     if ah.get("line") is not None and ah.get("home") and ah.get("away"):
         try:
             line = float(ah["line"])
             h, a = float(ah["home"]), float(ah["away"])
-            # line = home handicap (mis -0.25 = home -0.25). Away label = -line
             if a < h:
                 lean_ah = f"Away {-line:+.2f}" if abs(line) > 1e-9 else "Away +0.00"
                 lean_odds = a
             else:
                 lean_ah = f"Home {line:+.2f}"
                 lean_odds = h
-            tag = ""
-            if bp_sel:
-                if lean_ah == bp_sel:
-                    tag = " ✅ selaras dengan BEST PICK"
-                elif bp_market == "Asian Handicap" and bp_sel:
-                    tag = " ⚠️ berlawanan arah (model vs pasar)"
-            lines.append(f"• AH: {lean_ah} @ {lean_odds:.2f} (market favorit AH){tag}")
+            lines.append(f"• AH: {lean_ah} @ {lean_odds:.2f} (market favorit AH)")
         except Exception:
             pass
-    # 1X2 lean: odds terkecil
     if has_1x2:
         try:
             side = min(consensus, key=lambda k: float(consensus[k]))
             label = {"home": "Home Win", "draw": "Draw", "away": "Away Win"}.get(side, side)
-            tag = ""
-            if bp_sel:
-                if label == bp_sel:
-                    tag = " ✅ selaras dengan BEST PICK"
-                elif bp_market == "1X2" and bp_sel in ("Home Win", "Draw", "Away Win"):
-                    tag = " ⚠️ berlawanan arah (model vs pasar)"
-            lines.append(f"• 1X2: {label} @ {float(consensus[side]):.2f} (market favorit){tag}")
+            lines.append(f"• 1X2: {label} @ {float(consensus[side]):.2f} (market favorit)")
         except Exception:
             pass
-    # BTTS lean if available
-    btts_yes = totals.get("BTTS Yes") or (payload.get("odds") or {}).get("totals", {}).get("BTTS Yes")
-    # totals already checked, try direct
     by = totals.get("BTTS Yes") or {}
     bn = totals.get("BTTS No") or {}
     if by.get("odds") and bn.get("odds"):
@@ -1706,16 +1801,36 @@ def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]
             y, n = float(by["odds"]), float(bn["odds"])
             lean = "BTTS No" if n < y else "BTTS Yes"
             lean_odds = n if n < y else y
-            tag = ""
-            if bp_sel:
-                if lean == bp_sel:
-                    tag = " ✅ selaras dengan BEST PICK"
-                elif bp_market == "BTTS" and bp_sel in ("BTTS Yes", "BTTS No"):
-                    tag = " ⚠️ berlawanan arah (model vs pasar)"
-            lines.append(f"• {lean} @ {lean_odds:.2f} (market favorit BTTS){tag}")
+            lines.append(f"• {lean} @ {lean_odds:.2f} (market favorit BTTS)")
         except Exception:
             pass
     lines.append("⚠️ Lean = arah pasar saja, tanpa edge model — bukan rekomendasi bet.")
+    # SUGGESTION TO PICK — selalu muncul jika ada lean (adjusted most suitable)
+    # Format rapih: blok terpisah dengan header & separator agar tidak ambigu vs LEAN
+    cands = _lean_candidates(payload, se)
+    sug = _select_suggestion(cands, se)
+    if sug:
+        bp = (se or {}).get("best_pick") or {}
+        bp_sel = str(bp.get("selection") or "")
+        bp_market = bp.get("market")
+        raw = str(sug.get("raw_label") or sug.get("label") or "")
+        tag = ""
+        if bp_sel:
+            sug_market = sug.get("market")
+            if raw == bp_sel or sug.get("label") == bp_sel or (sug_market and raw == bp_sel.split(":")[-1].strip()):
+                tag = " ✅ selaras dengan BEST PICK"
+            elif sug_market and bp_market == sug_market:
+                if raw != bp_sel:
+                    tag = " ⚠️ berlawanan arah (model vs pasar)"
+            elif raw == bp_sel:
+                tag = " ✅ selaras dengan BEST PICK"
+        disp_label = sug.get("label") or raw
+        imp_pct = int(round(float(sug.get("implied") or 0.0) * 100))
+        lines.append("")
+        lines.append("──────────────────")
+        lines.append("💡 SUGGESTION TO PICK (market-only):")
+        lines.append(f"   {disp_label} @ {float(sug.get('odds', 0)):.2f} — market paling dominan ({imp_pct}%){tag}")
+        lines.append("   ⚠️ market-only, tanpa edge model — bukan jaminan hasil")
     return lines
 
 

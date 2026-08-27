@@ -83,11 +83,11 @@ def _summary_best_pick_value(se: dict[str, Any], match_data: dict[str, Any] | No
     """
     bp, risk_reason = _display_best_pick(se)
     if bp is None:
-        base = "⚪ NO BET"
+        # 20% lebih besar: heading ## untuk NO BET agar standalone menonjol
+        base = "## ⚪ NO BET"
         if match_data is not None:
             lean = _market_lean_block(match_data, se)
             if lean:
-                # lean[0] is "" -> skip, join dengan newline
                 base += "\n\n" + "\n".join(l for l in lean if l)
         return base
     icon = _SIGNAL_CONF_ICONS.get(bp.get("confidence"), "🟢")
@@ -97,12 +97,12 @@ def _summary_best_pick_value(se: dict[str, Any], match_data: dict[str, Any] | No
     if se.get("edge_invalid"):
         why.append("Edge benchmark stale — edge: n/a")
     short = why[0] if why else "No single evidence group clearly dominant."
-    # Phase 5.4: uncalibrated league warning
     _warn = ""
     if se.get("display_label") == "TOP SIGNAL":
         _warn = "\n⚠️ **LIGA TIDAK TERKALIBRASI — REKOMENDASI: SKIP**"
+    # 20% lebih besar: baris BEST PICK pakai heading markdown ## (≈20% up)
     out = (
-        f"{icon} {bp['selection'].upper()}{odds}\n"
+        f"## {icon} {bp['selection'].upper()}{odds}\n"
         f"Score: {score}/100 • Confidence: {bp.get('confidence')}\n"
         f"{short}{_warn}"
     )
