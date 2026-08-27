@@ -1536,7 +1536,7 @@ def _best_pick_block(se: dict[str, Any], *, include_internal: bool = True) -> li
     bp, risk_reason = _display_best_pick(se)
     if bp is not None:
         odds = f" @ {bp['market_odds']:.2f}" if bp.get("market_odds") else ""
-        lines.append(f"## 🔥 {label}: {bp['selection'].upper()}{odds}")
+        lines.append(f"🔥 {label}: {bp['selection'].upper()}{odds}")
         if risk_reason:
             lines.append(_high_risk_line(risk_reason))
         lines.append("")
@@ -1595,7 +1595,7 @@ def _best_pick_block(se: dict[str, Any], *, include_internal: bool = True) -> li
                 f"{st.get('new_selection')} — {st.get('reason')}"
             )
     else:
-        lines.append(f"## ⚪ NO BET ({label})")
+        lines.append(f"⚪ NO BET ({label})")
         lines.append("")
         lines.append("Reason:")
         lines.append(_human_no_bet_reason(se.get("reasons")))
