@@ -286,7 +286,7 @@ def test_summary_best_pick_value_all_vetoed_is_no_bet():
     )
 
     out = _summary_best_pick_value(_all_vetoed_se())
-    assert out == "⚪ NO BET"
+    assert out == "**__⚪ NO BET__**"
 
 
 def test_summary_best_pick_value_normal_path_unchanged():

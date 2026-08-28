@@ -277,15 +277,30 @@ def test_market_signal_renders_sections_and_best_pick():
     assert format_market_signal(_signal_payload())["title"] == "🔬 MATCH SIGNAL"
     assert "Singapore vs Thailand" in body
     assert "📊 SIGNALS" in body
-    assert "🏆 BEST PICK" in body
+    # K5 (2026-08-28): the demo's top signal is LOW (51/100) -> it is shown
+    # as a LEAN, never dressed up as a BEST PICK. A MEDIUM+ pick keeps the
+    # "🏆 BEST PICK" header (see test_market_signal_best_pick_header_for_strong_pick).
+    assert "🏆 LEAN" in body
     assert "📈 MARKET" in body
     assert "⚠️ DISCLAIMER" in body
-    # the engine's strongest signal is surfaced as the best pick
-    assert "🔥 " in body
+    # the engine's strongest signal is surfaced (LEAN icon for a weak pick)
+    assert "📌 " in body
     # no engine internals leak into the primary card
     for banned in ("n_bucket", "λ", "calibration", "FINAL DECISION",
                    "disagreement", "lolos gate", "confluence", "REVIEW_REQUIRED"):
         assert banned not in body
+
+
+def test_market_signal_best_pick_header_for_strong_pick():
+    """K5: a MEDIUM+ pick above medium_score keeps the BEST PICK header."""
+    se = _demo()
+    se["pick_tier"] = "BEST PICK"
+    if se.get("best_pick"):
+        se["best_pick"]["confidence"] = "MEDIUM"
+        se["best_pick"]["score"] = 0.6
+    body = format_market_signal(_signal_payload(se))["body"]
+    assert "🏆 BEST PICK" in body
+    assert "🔥 " in body
 
 
 def test_market_signal_no_bet_when_all_weak():
@@ -318,7 +333,7 @@ def test_market_block_shows_movement():
 
 def test_signal_detail_has_no_debug_internals():
     body = format_signal_detail(_signal_payload())["body"]
-    assert "🏆 BEST PICK" in body
+    assert "🏆 LEAN" in body  # K5: demo top signal is LOW -> LEAN header
     assert "📈 MARKET" in body
     assert "📊 Data quality" in body
     for banned in ("n_bucket", "λ_home", "calibration", "FINAL DECISION",

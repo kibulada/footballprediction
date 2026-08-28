@@ -100,6 +100,9 @@ def _summary_best_pick_value(se: dict[str, Any], match_data: dict[str, Any] | No
     _warn = ""
     if se.get("display_label") == "TOP SIGNAL":
         _warn = "\n⚠️ **LIGA TIDAK TERKALIBRASI — REKOMENDASI: SKIP**"
+    if se.get("pick_tier") == "LEAN":
+        # K5: a LEAN is shown, but never dressed up as a BEST PICK.
+        _warn += "\n📌 **LEAN — pick lemah (score/confidence rendah), bukan BEST PICK**"
     # 20% lebih besar: bold+underline untuk BEST PICK (≈20% visual)
     out = (
         f"**__{icon} {bp['selection'].upper()}{odds}__**\n"

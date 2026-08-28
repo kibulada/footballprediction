@@ -1050,6 +1050,16 @@ def run_prediction_engine(
         # True once both teams exist in the seeded ratings; otherwise the Elo
         # contribution is only the home-advantage prior (honesty labeling).
         "elo_seeded": elo.known(ctx.home, ctx.away),
+        # K1 (post-mortem 2026-08-28): per-side seeding + the ratings the
+        # ensemble actually used. The combined flag cannot tell "one side on
+        # a 1500 prior" (direction still informed by the seeded side) from
+        # "both sides on the prior" (direction is pure home-advantage noise);
+        # the pick gates need that distinction to veto directional markets
+        # only when the model genuinely knows nothing.
+        "elo_home_seeded": elo.resolve(ctx.home) is not None,
+        "elo_away_seeded": elo.resolve(ctx.away) is not None,
+        "elo_home": round(float(elo.rating(ctx.home)), 1),
+        "elo_away": round(float(elo.rating(ctx.away)), 1),
     }
 
     return PredictionResult(

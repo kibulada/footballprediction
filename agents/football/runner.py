@@ -895,24 +895,57 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
             from .prediction_log import best_pick_evaluation
 
             ev = best_pick_evaluation(log_path)
+            _fc_names = {
+                "K1": "tanpa evidensi (Elo prior)", "K2": "entitas/data salah",
+                "K3": "konteks leg-2", "K4": "suggestion dipaksa", "K5": "pick lemah (LEAN)",
+                "K0": "variance pasar",
+            }
+
+            def _fmt_bucket(m: str, b: dict[str, Any]) -> str:
+                roi_txt = f"{b['roi_pct']}%" if b.get("roi_pct") is not None else "n/a"
+                return (
+                    f"**{m}**: {b['n']} pick | win-rate {b['win_rate']:.1%} "
+                    f"| ROI {roi_txt} ({b['wins']}W/{b['pushes']}P/{b['losses']}L)"
+                )
+
             body = [f"🧾 Evaluasi BEST PICK vs hasil ({ev['n']} match)", ""]
             for m, b in sorted(ev["markets"].items()):
-                roi_txt = f"{b['roi_pct']}%" if b.get("roi_pct") is not None else "n/a"
-                body.append(
-                    f"**{m}**: {b['n']} pick | win-rate {b['win_rate']:.1%} "
-                    f"| ROI {roi_txt} "
-                    f"({b['wins']}W/{b['pushes']}P/{b['losses']}L)"
-                )
+                body.append(_fmt_bucket(m, b))
             if not ev["markets"]:
                 body.append("Belum ada BEST PICK tersimpan yang settled.")
+            if ev.get("tiers"):
+                body.append("")
+                body.append("Per tier (K5):")
+                for m, b in sorted(ev["tiers"].items()):
+                    body.append(_fmt_bucket(m, b))
+            if ev.get("failure_classes"):
+                body.append("")
+                body.append("Kelas kegagalan LOSS BEST PICK:")
+                for k, n in sorted(ev["failure_classes"].items()):
+                    body.append(f"• {k} {_fc_names.get(k, '')}: {n}")
+            sug = ev.get("suggestion") or {}
+            if sug.get("n"):
+                body.append("")
+                body.append(f"💡 Evaluasi SUGGESTION TO PICK ({sug['n']} match)")
+                for m, b in sorted(sug["markets"].items()):
+                    body.append(_fmt_bucket(m, b))
+                if sug.get("failure_classes"):
+                    body.append("Kelas kegagalan LOSS SUGGESTION:")
+                    for k, n in sorted(sug["failure_classes"].items()):
+                        body.append(f"• {k} {_fc_names.get(k, '')}: {n}")
             body.append("")
             body.append("Per match:")
             for p in ev["picks"]:
                 roi = f" ROI {p['roi']:+.2f}" if p.get("roi") is not None else ""
+                fc = f" [{p['failure_class']}]" if p.get("failure_class") else ""
                 body.append(
-                    f"• {p['market']} {p['selection']} ({p['confidence']}) "
-                    f"→ {p['result']}{roi}"
+                    f"• [{p.get('tier', 'BEST PICK')}] {p['market']} {p['selection']} "
+                    f"({p['confidence']}) → {p['result']}{roi}{fc}"
                 )
+            for p in sug.get("picks") or []:
+                roi = f" ROI {p['roi']:+.2f}" if p.get("roi") is not None else ""
+                fc = f" [{p['failure_class']}]" if p.get("failure_class") else ""
+                body.append(f"• [SUG] {p['market']} {p['selection']} → {p['result']}{roi}{fc}")
             return {
                 "render": {"title": "🧾 Evaluasi BEST PICK", "body": "\n".join(body)},
                 "raw": ev,

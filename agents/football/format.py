@@ -1475,6 +1475,10 @@ def _pick_label(se: dict[str, Any]) -> str:
     make informed decisions.
     """
     label = se.get("display_label")
+    # K5 (2026-08-28): a pick below medium_score / labelled LOW is a LEAN,
+    # never advertised as BEST PICK (25-27 Aug: LOW picks 8-4, MEDIUM+ 12-2).
+    if se.get("pick_tier") == "LEAN":
+        return "LEAN (pick lemah — bukan BEST PICK)"
     if label == "BEST PICK":
         return "BEST PICK"
     if label == "TOP SIGNAL":
@@ -1536,7 +1540,8 @@ def _best_pick_block(se: dict[str, Any], *, include_internal: bool = True) -> li
     bp, risk_reason = _display_best_pick(se)
     if bp is not None:
         odds = f" @ {bp['market_odds']:.2f}" if bp.get("market_odds") else ""
-        lines.append(f"🔥 {label}: {bp['selection'].upper()}{odds}")
+        _icon = "📌" if label.startswith("LEAN") else "🔥"
+        lines.append(f"{_icon} {label}: {bp['selection'].upper()}{odds}")
         if risk_reason:
             lines.append(_high_risk_line(risk_reason))
         lines.append("")
@@ -1618,127 +1623,32 @@ def _best_pick_block_with_lean(payload: dict[str, Any], se: dict[str, Any], *, i
 
 
 def _lean_candidates(payload: dict[str, Any], se: dict[str, Any]) -> list[dict[str, Any]]:
-    """Kandidat lean per market dengan implied fair & vig untuk skor adjusted.
+    """Kandidat lean per market -- delegasi ke ``market_lean.lean_candidates``
+    (K4 2026-08-28: satu implementasi dipakai render DAN snapshot)."""
+    from .market_lean import lean_candidates
 
-    Pure display — tidak mengubah decision. Tiap kandidat:
-      label, odds, implied (0..1 fair), vig (0..), market_type
-    Vig = sum 1/odds -1. Adjusted score = implied * (1 - vig) — penalti pasar
-    dengan margin tebal / likuiditas tipis. Movement penalty (away>2%) opsional
-    via se.market_block jika tersedia — untuk transparansi max implied vs
-    most suitable.
-    """
-    totals = (payload.get("odds") or {}).get("totals") or {}
-    consensus = (payload.get("odds") or {}).get("consensus") or {}
-    over = totals.get("Over 2.5") or {}
-    under = totals.get("Under 2.5") or {}
-    cands: list[dict[str, Any]] = []
-    # Totals
-    if over.get("odds") and under.get("odds"):
-        try:
-            o, u = float(over["odds"]), float(under["odds"])
-            if o > 1.0 and u > 1.0:
-                ia, ib = 1.0 / o, 1.0 / u
-                tot = ia + ib
-                vig = tot - 1.0
-                lean_label = "Under 2.5" if u < o else "Over 2.5"
-                lean_odds = u if u < o else o
-                imp = (ib / tot) if lean_label.startswith("Under") else (ia / tot)
-                cands.append({"label": lean_label, "odds": lean_odds, "implied": imp, "vig": vig, "market": "Total", "raw_label": lean_label})
-        except Exception:
-            pass
-    # AH
+    odds = payload.get("odds") or {}
     ah = (se.get("ah_consensus") or {}) or (payload.get("ah_consensus") or {})
-    if ah.get("line") is not None and ah.get("home") and ah.get("away"):
-        try:
-            line = float(ah["line"])
-            h, a = float(ah["home"]), float(ah["away"])
-            if h > 1.0 and a > 1.0:
-                ia, ib = 1.0 / h, 1.0 / a
-                tot = ia + ib
-                vig = tot - 1.0
-                if a < h:
-                    lean_ah = f"Away {-line:+.2f}" if abs(line) > 1e-9 else "Away +0.00"
-                    lean_odds, imp = a, ib / tot
-                else:
-                    lean_ah = f"Home {line:+.2f}"
-                    lean_odds, imp = h, ia / tot
-                cands.append({"label": f"AH: {lean_ah}", "odds": lean_odds, "implied": imp, "vig": vig, "market": "Asian Handicap", "raw_label": lean_ah})
-        except Exception:
-            pass
-    # 1X2
-    if consensus.get("home") and consensus.get("draw") and consensus.get("away"):
-        try:
-            h, d, a = float(consensus["home"]), float(consensus["draw"]), float(consensus["away"])
-            if h > 1.0 and d > 1.0 and a > 1.0:
-                ia, ib, ic = 1.0 / h, 1.0 / d, 1.0 / a
-                tot = ia + ib + ic
-                vig = tot - 1.0
-                side = min(consensus, key=lambda k: float(consensus[k]))
-                label = {"home": "Home Win", "draw": "Draw", "away": "Away Win"}.get(side, side)
-                imp = {"home": ia / tot, "draw": ib / tot, "away": ic / tot}[side]
-                cands.append({"label": f"1X2: {label}", "odds": float(consensus[side]), "implied": imp, "vig": vig, "market": "1X2", "raw_label": label})
-        except Exception:
-            pass
-    # BTTS
-    by = totals.get("BTTS Yes") or {}
-    bn = totals.get("BTTS No") or {}
-    if by.get("odds") and bn.get("odds"):
-        try:
-            y, n = float(by["odds"]), float(bn["odds"])
-            if y > 1.0 and n > 1.0:
-                ia, ib = 1.0 / y, 1.0 / n
-                tot = ia + ib
-                vig = tot - 1.0
-                lean = "BTTS No" if n < y else "BTTS Yes"
-                lean_odds = n if n < y else y
-                imp = (ib / tot) if lean == "BTTS No" else (ia / tot)
-                cands.append({"label": lean, "odds": lean_odds, "implied": imp, "vig": vig, "market": "BTTS", "raw_label": lean})
-        except Exception:
-            pass
-    return cands
+    return lean_candidates(odds.get("totals") or {}, odds.get("consensus") or {}, ah)
 
 
 def _select_suggestion(cands: list[dict[str, Any]], se: dict[str, Any] | None = None) -> dict[str, Any] | None:
-    """Pilih 1 SUGGESTION paling cocok — adjusted, bukan pure max% mentah.
+    """Pilih 1 SUGGESTION -- delegasi ke ``market_lean.select_suggestion``.
 
-    adjusted_score = implied * (1 - vig)  — penalti margin tebal.
-    Jika movement tersedia dan arah away >2% untuk market tersebut → *0.5.
-    Fallback deterministik: max implied → min odds.
-    Pure display, tidak mengubah decision.
+    Render-time fallback saja (payload lama tanpa ``se["suggestion"]``);
+    jalur utama memakai hasil yang sudah dihitung analyser dan dipersist.
     """
-    if not cands:
-        return None
-    # movement penalty lookup (OU/AH) dari se.market_block jika ada
+    from .market_lean import select_suggestion
+
     se = se or {}
-    mb = se.get("market_block") or {}
-    ou_mb = mb.get("ou") or {}
-    ah_mb = mb.get("ah") or {}
-    scored: list[tuple[float, dict[str, Any]]] = []
-    for c in cands:
-        imp = float(c.get("implied") or 0.0)
-        vig = float(c.get("vig") or 0.0)
-        vig = max(0.0, min(0.9, vig))
-        base = imp * (1.0 - vig)
-        # movement penalty: jika Totals dan OU movement away, atau AH dan AH movement away
-        penalty = 1.0
-        try:
-            if c.get("market") == "Total" and ou_mb:
-                # direction away = harga memanjang menjauhi lean (melemah)
-                # OU tidak punya per-side direction di market_block, pakai cek generik: jika lean Over dan latest>opening → away
-                pass
-            if c.get("market") == "Asian Handicap" and ah_mb:
-                pass
-        except Exception:
-            pass
-        # bookmaker count factor global (sama untuk semua market → tidak ubah ranking) → skip
-        score = base * penalty
-        scored.append((score, c))
-    # max score → tie max implied → min odds
-    def _key(item: tuple[float, dict[str, Any]]):
-        sc, c = item
-        return (sc, float(c.get("implied") or 0.0), -float(c.get("odds") or 999.0))
-    scored.sort(key=_key, reverse=True)
-    return scored[0][1] if scored else None
+    out = select_suggestion(
+        cands,
+        model_probs=se.get("_model_probs"),
+        features=se.get("_features"),
+        tie_state=se.get("tie_state"),
+        ranking=se.get("ranking"),
+    )
+    return out.get("pick")
 
 
 def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]:
@@ -1807,8 +1717,23 @@ def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]
     lines.append("⚠️ Lean = arah pasar saja, tanpa edge model — bukan rekomendasi bet.")
     # SUGGESTION TO PICK — selalu muncul jika ada lean (adjusted most suitable)
     # Format rapih: blok terpisah dengan header & separator agar tidak ambigu vs LEAN
-    cands = _lean_candidates(payload, se)
-    sug = _select_suggestion(cands, se)
+    _stored = (se or {}).get("suggestion")
+    if isinstance(_stored, dict):
+        sug = _stored.get("pick")
+        _blocked = list(_stored.get("blocked") or [])
+    else:
+        cands = _lean_candidates(payload, se)
+        sug = _select_suggestion(cands, se)
+        _blocked = []
+    if not sug:
+        # K4 (2026-08-28): tidak ada market yang layak -> jujur "—", dengan
+        # alasan per kandidat, bukan memaksa 1 pick 55-60%.
+        lines.append("")
+        lines.append("──────────────────")
+        lines.append("💡 SUGGESTION TO PICK (market-only):")
+        lines.append("   — (tidak ada market yang layak disarankan)")
+        for b in _blocked[:3]:
+            lines.append(f"   • {b.get('label')}: {b.get('reason')}")
     if sug:
         bp = (se or {}).get("best_pick") or {}
         bp_sel = str(bp.get("selection") or "")

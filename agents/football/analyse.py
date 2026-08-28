@@ -2182,6 +2182,22 @@ async def find_specific_match(
         except Exception as exc:  # noqa: BLE001 -- windowing is best-effort
             logger.warning("h2h window filter failed (prediction unaffected): %s", exc)
     logger.info("analyse phases: h2h=%.1fs", _time.monotonic() - _t0)
+    # K3 (2026-08-28): two-legged tie context from the H2H rows -- a finished
+    # meeting between the same clubs with reversed venue <= 10 days ago is
+    # the first leg. Feeds the signal engine (soft penalties), the SUGGESTION
+    # rules and the snapshot (so it can be graded). Never blocks analysis.
+    _tie_state: dict[str, Any] | None = None
+    try:
+        from .tie_state import tie_state_from_h2h
+        _tie_state = tie_state_from_h2h(h2h, home=home_name, away=away_name, kickoff=kickoff)
+        if _tie_state:
+            logger.info(
+                "tie_state: leg-2 %s (%s, agg_margin_home=%+d)",
+                _tie_state.get("state"), _tie_state.get("first_leg"),
+                int(_tie_state.get("agg_margin_home") or 0),
+            )
+    except Exception as exc:  # noqa: BLE001 -- context only
+        logger.warning("tie_state detection failed (prediction unaffected): %s", exc)
     _t0 = _time.monotonic()
 
     # NowGoal rich context (team stats / HT/FT / goal timing / lineups /
@@ -3086,6 +3102,8 @@ async def find_specific_match(
             for _k in ("team_stats", "htft", "goal_timing"):
                 if (nowgoal_context or {}).get(_k):
                     team_context[_k] = nowgoal_context[_k]
+            if _tie_state:
+                team_context["tie_state"] = _tie_state
 
             signal_engine_result = run_signal_engine(
                     model_probs=(prediction or {}).get("model_probs") or {},
@@ -3099,6 +3117,19 @@ async def find_specific_match(
                     # kandidat 1X2 sama sekali sehingga "Away Win" mustahil
                     # keluar. Odds konsensus dipakai untuk implied margin-free.
                     odds_1x2={k: consensus.get(k) for k in ("home", "draw", "away")},
+                    # K2 (2026-08-28): our own form data for the source-
+                    # consistency gate (market 80% favourite vs our
+                    # "bottom-tier" numbers = wrong entity, Copenhagen class).
+                    team_form={
+                        "home": {
+                            "sequence": (home_form or {}).get("sequence"),
+                            "ga_avg": (home_form or {}).get("ga_avg"),
+                        },
+                        "away": {
+                            "sequence": (away_form or {}).get("sequence"),
+                            "ga_avg": (away_form or {}).get("ga_avg"),
+                        },
+                    },
                     ah_rows=_ah_rows,
                     movement_snapshot=_mv_signal,
                     context=team_context or None,
@@ -3175,6 +3206,25 @@ async def find_specific_match(
                     else "BEST PICK"
                 )
                 signal_engine_result["edge_invalid"] = bool(_dec.get("edge_invalid"))
+                # K2 audit: an entity mismatch is logged for alias repair --
+                # the veto alone would silently hide the data bug.
+                if signal_engine_result.get("entity_mismatch"):
+                    try:
+                        import json as _json
+                        _em_dir = ROOT / "reports"
+                        _em_dir.mkdir(parents=True, exist_ok=True)
+                        _em_path = _em_dir / f"entity_mismatch_{_utc_now_iso()[:10]}.jsonl"
+                        with _em_path.open("a", encoding="utf-8") as _fh:
+                            _fh.write(_json.dumps({
+                                "ts": _utc_now_iso(),
+                                "league": display,
+                                "home": home_name,
+                                "away": away_name,
+                                "kickoff": kickoff,
+                                **(signal_engine_result.get("entity_mismatch") or {}),
+                            }, ensure_ascii=False) + "\n")
+                    except Exception as exc:  # noqa: BLE001 -- audit only
+                        logger.warning("entity_mismatch log failed: %s", exc)
                 signal_engine_result["edge_benchmark"] = _dec.get("edge_benchmark")
                 # P1-2: source-confidence gate veto. When the engine ran but
                 # 3+ critical fields were LOW, override the verdict to NO
@@ -3306,6 +3356,9 @@ async def find_specific_match(
             if _se_res.get("decision") == "BEST PICK" and _se_bp:
                 _se_pick_payload = {
                     "decision": "BEST PICK",
+                    # K5 (2026-08-28): BEST PICK vs LEAN tier, so the
+                    # evaluation can report them separately.
+                    "tier": _se_res.get("pick_tier"),
                     "market": _se_bp.get("market"),
                     "selection": _se_bp.get("selection"),
                     "score": _se_bp.get("score"),
@@ -3362,6 +3415,19 @@ async def find_specific_match(
                     _context_data["coaches"] = {
                         side: list(v or []) for side, v in coaches.items()
                     }
+            # K1/K2/K3 audit trail on every snapshot: tie context + which
+            # evidence gates fired, so a settled LOSS can be classified
+            # (``failure_class``) without re-running the engine.
+            _gate_audit = {
+                "elo_scope": (signal_engine_result or {}).get("elo_scope"),
+                "entity_mismatch": (signal_engine_result or {}).get("entity_mismatch"),
+                "pick_tier": (signal_engine_result or {}).get("pick_tier"),
+            }
+            if _tie_state or any(v for v in _gate_audit.values()):
+                _context_data = dict(_context_data or {})
+                if _tie_state:
+                    _context_data["tie_state"] = _tie_state
+                _context_data["gate_audit"] = _gate_audit
             # Model A rule: the stored best_pick is the DISPLAYED signal-engine
             # pick (independent engine = Model B) when one exists -- never the
             # market mirror (reference-only, edge 0 by construction).
@@ -3402,6 +3468,34 @@ async def find_specific_match(
                         )
                 except Exception as exc:
                     logger.warning("identity lock check failed (write proceeds): %s", exc)
+            # K4 (2026-08-28): compute the SUGGESTION here, with the SAME
+            # inputs the card renders, and persist it -- before this the
+            # suggestion was recomputed at render time and never stored, so
+            # its win rate could only be graded by hand.
+            _suggestion: dict[str, Any] | None = None
+            try:
+                from .market_lean import compute_suggestion
+                _sug_cfg = ((cfg.get("models") or {}).get("market_lean") or {}).get("suggestion") or {}
+                _sug = compute_suggestion(
+                    totals=market_totals,
+                    consensus=(consensus if has_odds else None),
+                    ah=(signal_engine_result or {}).get("ah_consensus"),
+                    model_probs=mp,
+                    features=features,
+                    tie_state=_tie_state,
+                    ranking=(signal_engine_result or {}).get("ranking"),
+                    cfg=_sug_cfg,
+                )
+                _suggestion = {
+                    "pick": _sug.get("pick"),
+                    "blocked": _sug.get("blocked"),
+                    "floor": _sug.get("floor"),
+                    "n_candidates": _sug.get("n_candidates"),
+                }
+                if signal_engine_result is not None:
+                    signal_engine_result["suggestion"] = _suggestion
+            except Exception as exc:  # noqa: BLE001 -- display/audit only
+                logger.warning("suggestion compute failed (card falls back to render-time): %s", exc)
             append_snapshot(
                 # Anti-flap P1 (2026-08-23): MARKET PRIOR rows are reference-
                 # only market mirrors (no model). Logging them made same-match
@@ -3462,6 +3556,7 @@ async def find_specific_match(
                 # Fix 2026-08-22: persist the FULL model probability block so
                 # post-hoc evaluation never replays the Poisson matrix again.
                 model_probs=mp or None,
+                suggestion=_suggestion,
                 # Phase 1.3: lineup provenance on every snapshot (auditable
                 # leakage guard -- reject lineups fetched at/after kickoff).
                 lineup_source=(lineups or {}).get("source"),

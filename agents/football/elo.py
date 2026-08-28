@@ -39,6 +39,42 @@ _EXTRA_ALIASES: dict[str, str] = {
     "GA Eagles": "Go Ahead Eagles",
     "Go Ahead": "Go Ahead Eagles",
     "Den Haag": "ADO Den Haag",
+    # K2 (post-mortem 2026-08-28): short LIVE spellings of European-cup
+    # regulars whose seed key shares no significant token ("Lyon" vs
+    # "Olympique Lyonnais") or ties against a reserve key ("Benfica" vs
+    # "SL Benfica" / "SL Benfica B"). Without these the ensemble ran the
+    # 60%-weight Elo on a 1500 prior for AGF v Benfica, Lyon v Fenerbahce.
+    "Lyon": "Olympique Lyonnais",
+    "Olympique Lyon": "Olympique Lyonnais",
+    "Benfica": "SL Benfica",
+    "Hearts": "Heart of Midlothian",
+    "Heart of Midlothian FC": "Heart of Midlothian",
+    "Copenhagen": "FC Kobenhavn",
+    "FC Copenhagen": "FC Kobenhavn",
+    "FC København": "FC Kobenhavn",
+    "Celtic": "Celtic FC",
+    "Rangers": "Rangers FC",
+    "Ajax": "Ajax Amsterdam",
+    "AFC Ajax": "Ajax Amsterdam",
+    "Ferencvaros": "Ferencvarosi TC",
+    "Ferencvárosi TC": "Ferencvarosi TC",
+    "Anderlecht": "RSC Anderlecht",
+    "Thun": "FC Thun",
+    "Brann": "SK Brann",
+    "Hibernian": "Hibernian FC",
+    "Sporting CP": "Sporting Lisbon",
+    "Sporting": "Sporting Lisbon",
+    "PSV": "PSV Eindhoven",
+    "Feyenoord": "Feyenoord Rotterdam",
+}
+
+# K2: tokens that mark a SECOND team of the same club (reserve / B side /
+# youth / women). Kept separate from ``_CLUB_TOKEN_PREFIXES`` because they
+# DO carry identity -- "SL Benfica B" is not "SL Benfica" -- but a query
+# without the marker must prefer the first team when both keys tie.
+_SECOND_TEAM_TOKENS = {
+    "b", "ii", "iii", "reserves", "reserve", "u19", "u21", "u23",
+    "women", "youth", "amateur", "amateurs",
 }
 
 # Club-prefix / suffix tokens that carry no identity ("Arsenal FC" vs "Arsenal").
@@ -60,6 +96,21 @@ def _significant_tokens(name: str) -> list[str]:
     """Lowercased identity tokens, dropping club prefixes and 1-2 char noise."""
     tokens = re.findall(r"[a-z0-9]+", _norm(name))
     return [t for t in tokens if t not in _CLUB_TOKEN_PREFIXES and len(t) >= 3]
+
+
+def _is_second_team(name: str) -> bool:
+    """True when the RAW key names a reserve/B/youth/women side."""
+    raw_tokens = re.findall(r"[a-z0-9]+", _norm(name))
+    return any(t in _SECOND_TEAM_TOKENS for t in raw_tokens)
+
+
+def _expand_synonyms(tokens: list[str]) -> set[str]:
+    out = set(tokens)
+    for t in tokens:
+        alt = _TOKEN_SYNONYMS.get(t)
+        if alt:
+            out.add(alt)
+    return out
 
 
 # Spelling variants that carry the same identity ("Manchester United" vs the
@@ -226,6 +277,7 @@ class EloModel:
         if not tokens:
             return None
         query_tokens = set(tokens)
+        query_expanded = _expand_synonyms(tokens)
         best_score = 0
         candidates: list[str] = []
         for nkey, key in self._norm_index.items():
@@ -237,6 +289,22 @@ class EloModel:
                 candidates.append(key)
         if not candidates:
             return None
+        # K2 (post-mortem 2026-08-28): a SINGLE-token query ("Hearts",
+        # "Union", "Benfica") must not partial-match a seed key that carries
+        # EXTRA identity tokens -- "Hearts" hit "Kelty Hearts" (Scottish
+        # tier-4, rating 1031) and drove Rapid Wien v Hearts to a HIGH Over
+        # 2.5 built on the wrong club. A short live name maps to a longer
+        # seed key only through the alias index (handled above); the fuzzy
+        # pass may only accept keys whose identity tokens are all in the
+        # query. Multi-token queries keep the partial rule ("Royale Union
+        # Saint-Gilloise" -> "Union Saint-Gilloise").
+        if len(tokens) == 1:
+            candidates = [
+                key for key in candidates
+                if set(_significant_tokens(key)) <= query_expanded
+            ]
+            if not candidates:
+                return None
         if len(candidates) == 1:
             return candidates[0]
         # Tie: prefer the candidate whose ENTIRE token set is contained in the
@@ -249,6 +317,13 @@ class EloModel:
         ]
         if len(contained) == 1:
             return contained[0]
+        # K2: "SL Benfica" vs "SL Benfica B" tie on identical significant
+        # tokens ("b" is noise). A query WITHOUT a second-team marker means
+        # the first team; drop the marked keys and accept a unique survivor.
+        if len(contained) > 1 and not _is_second_team(name):
+            firsts = [key for key in contained if not _is_second_team(key)]
+            if len(firsts) == 1:
+                return firsts[0]
         return None
 
     def rating(self, team: str) -> float:

@@ -112,7 +112,12 @@ def resolve_lambda_total_band(
 # same matchday. That is a lookup collision, not a strength assessment; it
 # drove a -28.2pp 1X2 error (model home 16.5% vs market 44.7%; Betis won 1-0).
 DEFAULT_ELO_MIN = 1300.0
-DEFAULT_ELO_MAX = 2100.0
+# 2026-08-28: ceiling raised 2100 -> 2450. The live store legitimately rates
+# the strongest clubs above 2100 (Barcelona 2298, Real Madrid 2243, Arsenal
+# 2361 -- all verified BEST PICK winners 25-27 Aug); the Sociedad incident
+# was a COLLISION (identical value on two clubs), which the collision check
+# below catches independently of the ceiling.
+DEFAULT_ELO_MAX = 2450.0
 DEFAULT_ELO_COLLISION_EPS = 0.01
 
 # --------------------------------------------------------------------------
@@ -458,3 +463,167 @@ def price_gate(
 # winner away; a direction-scoped veto keeps it while still killing the
 # Erzurumspor AH Home +1 (lost 0-4) and the Al Riyadh AH Home +1.75 (lost 0-4).
 DIRECTIONAL_MARKETS = ("Asian Handicap", "1X2")
+
+
+def is_directional_selection(market: str | None, selection: str | None) -> bool:
+    """True for picks that bet on WHICH side is stronger.
+
+    ``Draw`` is a 1X2 selection but carries no direction (it bets on
+    closeness, not on a side), so an unseeded-Elo veto must not touch it --
+    verified 2026-08-27 Internacional v Gremio Draw @3.38 WON on a card where
+    both Elo were the 1500 prior.
+    """
+    if market == "Asian Handicap":
+        return True
+    if market == "1X2":
+        return str(selection or "").strip().lower() != "draw"
+    return False
+
+
+def is_low_scoring_selection(market: str | None, selection: str | None) -> bool:
+    """True for picks that need FEW goals (``Under x.5``, ``BTTS No``)."""
+    sel = str(selection or "").strip().lower()
+    if market == "Total":
+        return sel.startswith("under")
+    if market == "BTTS":
+        return sel in ("no", "btts no")
+    return False
+
+
+# --------------------------------------------------------------------------
+# K1 -- "know when you know nothing": Elo evidence scope
+# --------------------------------------------------------------------------
+# Post-mortem 2026-08-28 (25-27 Aug live): every BEST PICK whose BOTH Elo
+# ratings were the 1500 prior went 3-3 (Al Shabab Home Win, Anyang Away Win,
+# Vietnam Home Win all LOST; the three wins were Under / BTTS / Draw -- none
+# of them a directional bet). Elo carries 60% of the 1X2 ensemble weight, so
+# with two priors the direction is home-advantage noise. Picks with ONE side
+# seeded went 5-1 (the seeded side still informs the direction).
+
+def elo_evidence_scope(model_probs: dict[str, Any] | None) -> tuple[str | None, str | None]:
+    """Return ``(scope, note)`` describing how much of the card Elo can support.
+
+    ``scope`` is ``"all"`` when BOTH sides are on the prior (directional
+    markets must be vetoed, the rest capped), ``"one"`` when exactly one side
+    is on the prior (directional confidence capped), ``None`` when both are
+    seeded. Per-side flags are preferred; when only the legacy combined
+    ``elo_seeded`` flag exists, ``False`` is treated as "one side" (the
+    conservative reading that never fabricates a card-wide veto).
+    """
+    mp = model_probs or {}
+    hs, as_ = mp.get("elo_home_seeded"), mp.get("elo_away_seeded")
+    if hs is None or as_ is None:
+        if mp.get("elo_seeded") is False:
+            return "one", (
+                "Elo salah satu tim belum ter-seed — arah 1X2/AH hanya dari sisi "
+                "yang punya rating; confidence directional dibatasi"
+            )
+        return None, None
+    if not hs and not as_:
+        return "all", (
+            "kedua tim tanpa Elo (prior 1500) — arah 1X2/AH murni noise "
+            "(pola Al Shabab / Anyang / Vietnam 2026-08-25/26: 0-3); "
+            "pick directional diveto, pick non-directional dibatasi LOW"
+        )
+    if not hs or not as_:
+        side = "home" if not hs else "away"
+        return "one", (
+            f"Elo {side} belum ter-seed — arah hanya dari sisi lawan; "
+            "confidence directional dibatasi MEDIUM"
+        )
+    return None, None
+
+
+# --------------------------------------------------------------------------
+# K2 -- source consistency: our team data vs the market's view of the team
+# --------------------------------------------------------------------------
+# Verified 2026-08-27 FC Copenhagen v Inter Turku: market home 1.25 (~80%),
+# our features for "Copenhagen" said form D-L-L-L-L, 5.2 goals conceded per
+# game, lambda 0.81 vs 1.53 (underdog). Those are not FC Kobenhavn's numbers
+# -- the form/xG providers resolved a different entity. The engine emitted
+# BTTS No @1.76 (LOW) on that lambda; FT 4-1. A card whose OWN data
+# contradicts an 80% market favourite this violently is an entity-resolution
+# failure, not a value spot: no market on that card is trustworthy.
+DEFAULT_CONSISTENCY_FAV_IMPLIED = 0.70
+DEFAULT_CONSISTENCY_MAX_WINS = 1
+DEFAULT_CONSISTENCY_MIN_FORM = 4
+DEFAULT_CONSISTENCY_MIN_GA = 3.0
+
+
+def _devig_1x2(odds_1x2: dict[str, Any] | None) -> dict[str, float] | None:
+    o = odds_1x2 or {}
+    try:
+        inv = {k: 1.0 / float(o[k]) for k in ("home", "draw", "away") if o.get(k)}
+    except (TypeError, ValueError, ZeroDivisionError):
+        return None
+    if len(inv) < 2 or any(v <= 0 for v in inv.values()):
+        return None
+    tot = sum(inv.values())
+    return {k: v / tot for k, v in inv.items()}
+
+
+def _form_wins(sequence: str | None) -> tuple[int, int]:
+    """(wins, matches) parsed from a ``W-D-L`` style sequence."""
+    seq = [c for c in str(sequence or "").upper() if c in "WDL"]
+    return seq.count("W"), len(seq)
+
+
+def source_consistency_gate(
+    odds_1x2: dict[str, Any] | None,
+    team_form: dict[str, Any] | None,
+    model_probs: dict[str, Any] | None,
+    *,
+    fav_implied_min: float = DEFAULT_CONSISTENCY_FAV_IMPLIED,
+    max_wins: int = DEFAULT_CONSISTENCY_MAX_WINS,
+    min_form_len: int = DEFAULT_CONSISTENCY_MIN_FORM,
+    min_ga_avg: float = DEFAULT_CONSISTENCY_MIN_GA,
+) -> tuple[bool, list[str], dict[str, Any] | None]:
+    """K2: veto the whole card when our data for the market favourite is
+    bottom-tier while the market prices it as a heavy favourite.
+
+    ``team_form`` = ``{"home": {"sequence", "ga_avg"}, "away": {...}}``.
+    Fires only when BOTH signals agree the entity is wrong: (form has
+    <= ``max_wins`` wins over >= ``min_form_len`` matches AND concedes
+    >= ``min_ga_avg`` per game) AND the lambda matrix also makes the
+    market favourite the underdog. Missing inputs never veto. Returns
+    ``(passed, reasons, detail)`` where ``detail`` describes the mismatch
+    for the entity-resolution log.
+    """
+    fair = _devig_1x2(odds_1x2)
+    if not fair:
+        return True, [], None
+    fav = max(("home", "away"), key=lambda k: fair.get(k, 0.0))
+    fav_p = fair.get(fav, 0.0)
+    if fav_p < fav_implied_min:
+        return True, [], None
+    tf = (team_form or {}).get(fav) or {}
+    wins, n = _form_wins(tf.get("sequence"))
+    try:
+        ga = float(tf.get("ga_avg")) if tf.get("ga_avg") is not None else None
+    except (TypeError, ValueError):
+        ga = None
+    mp = model_probs or {}
+    lh, la = mp.get("lambda_home"), mp.get("lambda_away")
+    lam_says_underdog = False
+    if lh is not None and la is not None:
+        lam_fav = float(lh) if fav == "home" else float(la)
+        lam_other = float(la) if fav == "home" else float(lh)
+        lam_says_underdog = lam_fav < lam_other
+    form_bottom = n >= min_form_len and wins <= max_wins and ga is not None and ga >= min_ga_avg
+    if form_bottom and lam_says_underdog:
+        detail = {
+            "favourite": fav,
+            "market_implied": round(fav_p, 3),
+            "form": tf.get("sequence"),
+            "ga_avg": ga,
+            "lambda_home": lh,
+            "lambda_away": la,
+        }
+        return False, [
+            f"data tim tidak konsisten dengan market: favorit {fav} dihargai "
+            f"{fav_p:.0%} tapi form kita {tf.get('sequence')} ({wins}W/{n}), "
+            f"kebobolan {ga:.1f}/laga, lambda menempatkannya sebagai underdog — "
+            "kemungkinan entitas tim salah (pola Copenhagen 2026-08-27), "
+            "seluruh kartu tidak dapat dipercaya"
+        ], detail
+    return True, [], None

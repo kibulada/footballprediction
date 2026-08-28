@@ -483,7 +483,7 @@ def test_format_analyse_with_prediction_engine():
 
 def test_leagues_count_31():
     leagues = json.loads((ROOT / "agents" / "football" / "leagues.json").read_text(encoding="utf-8"))
-    assert len(leagues) == 31
+    assert len(leagues) == 35
 
 
 def test_all_leagues_have_aliases():

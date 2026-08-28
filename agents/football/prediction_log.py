@@ -287,8 +287,13 @@ def append_snapshot(
     entities: dict[str, Any] | None = None,
     market_totals: dict[str, dict[str, float]] | None = None,
     model_probs: dict[str, Any] | None = None,
+    suggestion: dict[str, Any] | None = None,
 ) -> None:
     """Append one immutable pre-match prediction snapshot.
+
+    ``suggestion`` (K4, 2026-08-28) is the market-only SUGGESTION TO PICK
+    exactly as rendered (``{pick, blocked, floor, n_candidates}``) so it can
+    be settled alongside the BEST PICK.
 
     ``skip`` (Anti-flap P1, 2026-08-23) short-circuits the write: MARKET
     PRIOR reference rows are not logged as decisions (see analyse.py).
@@ -317,6 +322,7 @@ def append_snapshot(
         # Fix 2026-08-22: full model probability block (see docstring) --
         # direct O/U/BTTS audit without lambda replay.
         "model_probs": model_probs or None,
+        "suggestion": suggestion or None,
         "odds_1x2": (
             {k: round(float(v), 4) for k, v in (odds or {}).items()} if odds else None
         ),
@@ -510,29 +516,113 @@ def settle(
     return True
 
 
-def best_pick_evaluation(path: str | Path) -> dict[str, Any]:
-    """Settle every stored signal-engine BEST PICK against its result.
+def _pick_tier(pick: dict[str, Any], medium_score: float = 0.52) -> str:
+    """K5: ``tier`` when stored; otherwise derived from score/confidence."""
+    t = pick.get("tier")
+    if t in ("BEST PICK", "LEAN"):
+        return t
+    try:
+        low = float(pick.get("score") or 0.0) < medium_score
+    except (TypeError, ValueError):
+        low = False
+    return "LEAN" if (low or pick.get("confidence") == "LOW") else "BEST PICK"
+
+
+def classify_failure(
+    snapshot: dict[str, Any],
+    pick: dict[str, Any],
+    result: str,
+    *,
+    kind: str = "best_pick",
+    medium_score: float = 0.52,
+) -> str | None:
+    """Failure class of a LOST pick from the stored snapshot fields.
+
+    Post-mortem 2026-08-28 classes (see the plan): K1 no evidence (both Elo
+    on the prior, directional pick), K2 wrong entity (Elo out of band /
+    source mismatch), K3 context ignored (second-leg tie), K4 forced
+    suggestion (below the dominance floor), K5 weak pick published as BEST
+    PICK (LEAN tier). ``K0`` = none of the above (market variance). Only
+    losses are classified; returns None otherwise.
+    """
+    if result not in ("loss", "half_loss"):
+        return None
+    from .pick_gates import is_directional_selection  # lazy: avoid cycle
+
+    mp = snapshot.get("model_probs") or {}
+    f = snapshot.get("features") or {}
+    ctx = snapshot.get("context_data") or {}
+    audit = ctx.get("gate_audit") or {}
+    market, sel = pick.get("market"), pick.get("selection") or pick.get("raw_label")
+    directional = is_directional_selection(market, sel)
+
+    def _elo(side: str) -> float | None:
+        v = mp.get(f"elo_{side}", f.get(f"elo_{side}"))
+        try:
+            return float(v) if v is not None else None
+        except (TypeError, ValueError):
+            return None
+
+    eh, ea = _elo("home"), _elo("away")
+    if audit.get("entity_mismatch") or any(
+        v is not None and (v < 1300.0 or v > 2450.0) for v in (eh, ea)
+    ):
+        return "K2"
+    hs, as_ = mp.get("elo_home_seeded"), mp.get("elo_away_seeded")
+    if hs is None or as_ is None:
+        both_prior = mp.get("elo_seeded") is False and eh == 1500.0 and ea == 1500.0
+    else:
+        both_prior = (not hs) and (not as_)
+    if both_prior and directional:
+        return "K1"
+    ts = ctx.get("tie_state") or {}
+    if ts:
+        side = pick.get("side") or ("home" if str(sel).startswith("Home") else "away")
+        if ts.get("state") == "decided" and directional and side == ts.get("leader"):
+            return "K3"
+        if ts.get("state") == "balanced" and (
+            (market == "Total" and str(sel).startswith("Over"))
+            or (market == "BTTS" and str(sel).endswith("Yes"))
+        ):
+            return "K3"
+    if kind == "suggestion":
+        try:
+            adj = float(pick.get("adjusted_score"))
+        except (TypeError, ValueError):
+            adj = None
+        if adj is not None and adj < medium_score:
+            return "K4"
+        return "K0"
+    if _pick_tier(pick, medium_score) == "LEAN":
+        return "K5"
+    return "K0"
+
+
+def best_pick_evaluation(path: str | Path, *, medium_score: float = 0.52) -> dict[str, Any]:
+    """Settle every stored signal-engine BEST PICK (and SUGGESTION) against its result.
 
     Each snapshot stores ``signal_engine_pick`` (market, selection, line,
-    side, score, confidence) -- the pick the bot actually displayed. This
-    joins those picks with their settle rows (one per canonical match),
+    side, score, confidence, tier) -- the pick the bot actually displayed --
+    and, since 2026-08-28, ``suggestion`` (the market-only SUGGESTION TO
+    PICK). This joins them with their settle rows (one per canonical match),
     settles each via the production ``settle_signal`` (quarter-line AH
-    semantics included), and aggregates hit-rate / ROI per market. Odds
-    come from the stored pick's ``market_odds`` when present, else from the
-    matching ``signal_engine_ranking`` entry; without odds the pick still
-    counts toward hit-rate but not ROI. Returns
-    {n, n_roi, markets: {market: {n, win_rate, roi_pct, wins, pushes,
-    losses}}, picks: [{match, market, selection, result, odds, roi}]}.
+    semantics included) and aggregates hit-rate / ROI per market, per tier
+    (BEST PICK vs LEAN) and for the suggestion. Every LOSS is tagged with a
+    ``failure_class`` (K1..K5 / K0) so the next fix targets the class that
+    is actually losing. Odds come from the stored pick's ``market_odds`` when
+    present, else from the matching ``signal_engine_ranking`` entry; without
+    odds the pick still counts toward hit-rate but not ROI.
     """
     from .signal_engine import settle_signal  # lazy: avoid import cycle
+    from .market_lean import suggestion_for_settlement
 
     rows = _read_lines(Path(path))
     settlements = {r["match_id"]: r for r in rows if r.get("event") == "settle"}
 
-    # One pick per canonical match (newest snapshot with a stored pick wins).
+    # One snapshot per canonical match (newest with a stored pick OR suggestion).
     newest: dict[tuple[str, str, str, str], dict[str, Any]] = {}
     for s in (r for r in rows if r.get("event") == "snapshot"
-              and r.get("signal_engine_pick")):
+              and (r.get("signal_engine_pick") or (r.get("suggestion") or {}).get("pick"))):
         if settlements.get(s["match_id"]) is None:
             continue
         key = _match_dedupe_key(s)
@@ -560,61 +650,124 @@ def best_pick_evaluation(path: str | Path) -> dict[str, Any]:
                     return None
         return None
 
-    markets: dict[str, dict[str, Any]] = {}
-    picks: list[dict[str, Any]] = []
-    for s in newest.values():
-        st = settlements[s["match_id"]]
-        pick = s.get("signal_engine_pick") or {}
-        settled = settle_signal(
-            pick, int(st.get("home_goals") or 0), int(st.get("away_goals") or 0)
-        )
-        market = pick.get("market") or "?"
-        b = markets.setdefault(market, {
-            "n": 0, "wins": 0, "pushes": 0, "losses": 0,
-            "ret": 0.0, "staked": 0.0,
+    def _bucket(store: dict[str, dict[str, Any]], key: str) -> dict[str, Any]:
+        return store.setdefault(key, {
+            "n": 0, "wins": 0, "pushes": 0, "losses": 0, "ret": 0.0, "staked": 0.0,
         })
+
+    def _tally(b: dict[str, Any], res: str, stake_return: float, odds: float | None) -> float | None:
         b["n"] += 1
-        res = settled["result"]
-        if res == "win":
+        if res in ("win", "half_win"):
             b["wins"] += 1
         elif res == "push":
             b["pushes"] += 1
         else:
             b["losses"] += 1
-        odds = _pick_odds(s)
-        pick_row = {
-            "match": s.get("match_id"),
-            "league": s.get("league"),
-            "market": market,
-            "selection": pick.get("selection"),
-            "confidence": pick.get("confidence"),
-            "score": pick.get("score"),
-            "result": res,
-            "odds": odds,
-        }
         if odds and odds > 1.0:
             b["staked"] += 1.0
-            b["ret"] += float(settled["stake_return"]) * odds
-            pick_row["roi"] = round((float(settled["stake_return"]) * odds - 1.0), 4)
-        picks.append(pick_row)
+            b["ret"] += stake_return * odds
+            return round(stake_return * odds - 1.0, 4)
+        return None
 
-    out_markets: dict[str, dict[str, Any]] = {}
-    for m, b in markets.items():
-        denom = b["n"]
-        out_markets[m] = {
-            "n": denom,
-            "win_rate": round((b["wins"] + 0.5 * b["pushes"]) / denom, 4) if denom else None,
-            "wins": b["wins"],
-            "pushes": b["pushes"],
-            "losses": b["losses"],
-            "roi_pct": (
-                round((b["ret"] - b["staked"]) / b["staked"] * 100.0, 2)
-                if b["staked"] > 0 else None
-            ),
-            "n_roi": int(b["staked"]),
-        }
-    return {"n": len(newest), "markets": out_markets, "picks": picks}
+    def _finish(store: dict[str, dict[str, Any]]) -> dict[str, dict[str, Any]]:
+        out: dict[str, dict[str, Any]] = {}
+        for m, b in store.items():
+            denom = b["n"]
+            out[m] = {
+                "n": denom,
+                "win_rate": round((b["wins"] + 0.5 * b["pushes"]) / denom, 4) if denom else None,
+                "wins": b["wins"],
+                "pushes": b["pushes"],
+                "losses": b["losses"],
+                "roi_pct": (
+                    round((b["ret"] - b["staked"]) / b["staked"] * 100.0, 2)
+                    if b["staked"] > 0 else None
+                ),
+                "n_roi": int(b["staked"]),
+            }
+        return out
 
+    markets: dict[str, dict[str, Any]] = {}
+    tiers: dict[str, dict[str, Any]] = {}
+    sug_markets: dict[str, dict[str, Any]] = {}
+    failure_classes: dict[str, int] = {}
+    sug_failure_classes: dict[str, int] = {}
+    picks: list[dict[str, Any]] = []
+    sug_picks: list[dict[str, Any]] = []
+    n_bp = 0
+    for s in newest.values():
+        st = settlements[s["match_id"]]
+        hg, ag = int(st.get("home_goals") or 0), int(st.get("away_goals") or 0)
+        pick = s.get("signal_engine_pick") or {}
+        if pick:
+            n_bp += 1
+            settled = settle_signal(pick, hg, ag)
+            res = settled["result"]
+            market = pick.get("market") or "?"
+            tier = _pick_tier(pick, medium_score)
+            odds = _pick_odds(s)
+            roi = _tally(_bucket(markets, market), res, float(settled["stake_return"]), odds)
+            _tally(_bucket(tiers, tier), res, float(settled["stake_return"]), odds)
+            fclass = classify_failure(s, pick, res, kind="best_pick", medium_score=medium_score)
+            if fclass:
+                failure_classes[fclass] = failure_classes.get(fclass, 0) + 1
+            pick_row = {
+                "match": s.get("match_id"),
+                "league": s.get("league"),
+                "market": market,
+                "selection": pick.get("selection"),
+                "confidence": pick.get("confidence"),
+                "score": pick.get("score"),
+                "tier": tier,
+                "result": res,
+                "odds": odds,
+                "failure_class": fclass,
+            }
+            if roi is not None:
+                pick_row["roi"] = roi
+            picks.append(pick_row)
+        sug = ((s.get("suggestion") or {}).get("pick")) or None
+        if sug:
+            sig = suggestion_for_settlement(sug)
+            settled = settle_signal(sig, hg, ag) if sig else {"result": "n/a", "stake_return": 0.0}
+            res = settled["result"]
+            if res != "n/a":
+                try:
+                    s_odds = float(sug.get("odds") or 0.0)
+                except (TypeError, ValueError):
+                    s_odds = 0.0
+                roi = _tally(_bucket(sug_markets, sug.get("market") or "?"), res,
+                             float(settled["stake_return"]), s_odds if s_odds > 1.0 else None)
+                fclass = classify_failure(s, sug, res, kind="suggestion", medium_score=medium_score)
+                if fclass:
+                    sug_failure_classes[fclass] = sug_failure_classes.get(fclass, 0) + 1
+                row = {
+                    "match": s.get("match_id"),
+                    "league": s.get("league"),
+                    "market": sug.get("market"),
+                    "selection": sug.get("raw_label") or sug.get("label"),
+                    "adjusted_score": sug.get("adjusted_score"),
+                    "result": res,
+                    "odds": s_odds if s_odds > 1.0 else None,
+                    "failure_class": fclass,
+                }
+                if roi is not None:
+                    row["roi"] = roi
+                sug_picks.append(row)
+
+    return {
+        "n": n_bp,
+        "markets": _finish(markets),
+        "tiers": _finish(tiers),
+        "picks": picks,
+        "failure_classes": failure_classes,
+        "suggestion": {
+            "n": len(sug_picks),
+            "markets": _finish(sug_markets),
+            "picks": sug_picks,
+            "failure_classes": sug_failure_classes,
+        },
+    }
 
 def dedupe_settles(path: str | Path) -> dict[str, Any]:
     """Rewrite the log keeping ONE settle row per canonical match.

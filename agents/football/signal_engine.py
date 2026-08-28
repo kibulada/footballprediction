@@ -37,16 +37,25 @@ from .models import MAX_GOALS, poisson_matrix
 from .steam_detector import analyze_market_intelligence
 from .clv_tracker import log_clv_entry, clv_gate
 from .pick_gates import (
+    DEFAULT_ELO_COLLISION_EPS,
+    DEFAULT_ELO_MAX,
+    DEFAULT_ELO_MIN,
     DEFAULT_MAX_DEV_PP,
     DIRECTIONAL_MARKETS,
     agreement_gate,
     band_source,
+    elo_evidence_scope,
+    elo_integrity_gate,
+    is_directional_selection,
+    is_low_scoring_selection,
     lambda_1x2_gate,
     lambda_total_gate,
     market_implied_total,
     price_gate,
     resolve_lambda_total_band,
+    source_consistency_gate,
 )
+from .tie_state import tie_state_note
 
 # --------------------------------------------------------------------------
 # Configurable defaults (mirrored in config/football.json -> models.signal_engine)
@@ -780,6 +789,10 @@ class Signal:
     # always reports what the evidence scored; ``vetoed`` decides eligibility.
     vetoed: bool = False
     veto_reasons: list[str] = field(default_factory=list)
+    # K1 (2026-08-28): a gate may CAP the label without vetoing (one Elo side
+    # on the prior -> directional picks never advertise HIGH). Applied in
+    # ``rank_and_pick`` after the coverage floor.
+    confidence_cap: str | None = None
 
 
 def _build_matrix(model_probs: dict[str, Any]) -> list[list[float]] | None:
@@ -889,6 +902,16 @@ def _coverage_floor(
     if completeness < downgrade and confidence in ("VERY HIGH", "HIGH"):
         return "MEDIUM"
     return confidence
+
+
+_CONF_ORDER = ("NO SIGNAL", "LOW", "MEDIUM", "HIGH", "VERY HIGH")
+
+
+def _cap_confidence(label: str, cap: str | None) -> str:
+    """Never let ``label`` exceed ``cap`` (order NO SIGNAL < LOW < MEDIUM < HIGH < VERY HIGH)."""
+    if not cap or label not in _CONF_ORDER or cap not in _CONF_ORDER:
+        return label
+    return label if _CONF_ORDER.index(label) <= _CONF_ORDER.index(cap) else cap
 
 
 def _movement_available(mv: dict[str, Any] | None) -> bool:
@@ -1382,6 +1405,49 @@ def score_signals(
 
 
 
+# K3 (post-mortem 2026-08-28): second-leg context as SOFT penalties.
+# Decided tie (aggregate margin >= 2): the leading side rotates / sits back,
+# so picks that need the LEADER to win 90' are discounted (27 Aug: favourite
+# failed to win 90' in 4 of 8 decided ties). Balanced tie (margin <= 1):
+# cagey 90 minutes, so Over / BTTS Yes are discounted (Jablonec 1-0, Inter
+# Escaldes 0-0, Rapid 1-1, Maccabi 1-1, Hapoel 0-1). Multipliers are mild on
+# purpose -- measured via ``failure_class`` before any of this becomes a veto.
+TIE_STATE_PENALTIES: dict[str, float] = {
+    "decided_leader_directional": 0.85,
+    "balanced_high_scoring": 0.92,
+}
+
+
+def _apply_tie_state_adjustments(
+    signals: list[Signal],
+    tie_state: dict[str, Any] | None,
+    cfg: dict[str, Any] | None = None,
+) -> None:
+    if not signals or not tie_state:
+        return
+    pen = dict(TIE_STATE_PENALTIES)
+    pen.update({k: float(v) for k, v in (cfg or {}).items() if v is not None})
+    note = tie_state_note(tie_state)
+    state = tie_state.get("state")
+    leader = tie_state.get("leader")
+    for s in signals:
+        factor = 1.0
+        if state == "decided" and leader and is_directional_selection(s.market, s.selection):
+            side = s.side or ("home" if str(s.selection).startswith("Home") else "away")
+            if side == leader:
+                factor = pen["decided_leader_directional"]
+        elif state == "balanced" and (
+            (s.market == "Total" and str(s.selection).startswith("Over"))
+            or (s.market == "BTTS" and str(s.selection).endswith("Yes"))
+        ):
+            factor = pen["balanced_high_scoring"]
+        if factor != 1.0:
+            s.score = round(s.score * factor, 3)
+            s.internal_notes.append(f"{note} (score x{factor:.2f})")
+        elif note and note not in s.internal_notes:
+            s.internal_notes.append(note)
+
+
 def _apply_post_scoring_adjustments(
     signals: list[Signal],
     model_probs: dict[str, Any],
@@ -1552,6 +1618,7 @@ def rank_and_pick(
             min_confluence, conflict_pp, confidence_thresholds,
         )
         s.confidence = _coverage_floor(completeness, s.confidence, _cov_cfg)
+        s.confidence = _cap_confidence(s.confidence, getattr(s, "confidence_cap", None))
         # 2026-08-22: a gated candidate keeps its SCORE (so the card can show
         # what the evidence was worth) but must never advertise a confidence --
         # "Score: 62/100 / Confidence: HIGH" next to a rejected pick is exactly
@@ -2242,8 +2309,13 @@ def run_signal_engine(
     league_name: str | None = None,
     x2_market_dev_pp: float | None = None,
     odds_1x2: dict[str, Any] | None = None,
+    team_form: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Build, score, rank signals and return the Best Pick (JSON-safe).
+
+    ``team_form`` (K2, 2026-08-28) = ``{"home": {"sequence", "ga_avg"},
+    "away": {...}}`` -- our own form data for the source-consistency gate.
+    ``context["tie_state"]`` (K3) carries the two-legged tie context.
 
     ``cfg`` = ``models.signal_engine`` (weights + thresholds). Deterministic:
     no I/O, no randomness. Returns a dict ready for the Discord formatter and
@@ -2311,6 +2383,10 @@ def run_signal_engine(
     # Post-scoring adjustments: match-level properties (direction, decisive,
     # high-scoring) applied AFTER per-signal scoring.
     _apply_post_scoring_adjustments(signals, model_probs, league_calibrated=league_calibrated)
+    _tie_state = (context or {}).get("tie_state") if isinstance(context, dict) else None
+    _apply_tie_state_adjustments(
+        signals, _tie_state, (cfg.get("tie_state_penalties") if isinstance(cfg, dict) else None),
+    )
     # ------------------------------------------------------------------
     # BEST PICK hard gates -- post-mortem 2026-08-22.
     # Evidence: reports/bestpick_postmortem_2026-08-22.md
@@ -2397,6 +2473,69 @@ def run_signal_engine(
                 s.veto_reasons.append(_reason_g4)
             _gate_reasons.append(_reason_g4)
 
+    # K2 (card-level, 2026-08-28): our own team data must not contradict the
+    # market's view of a heavy favourite. Verified FC Copenhagen v Inter Turku
+    # 2026-08-27: market 80% home, our form D-L-L-L-L / 5.2 conceded per game
+    # / lambda underdog -> the entity behind "Copenhagen" was wrong; BTTS No
+    # emitted on that lambda lost 4-1. Nothing on such a card is trustworthy.
+    _entity_mismatch: dict[str, Any] | None = None
+    if bool(_pg_cfg.get("source_consistency", True)):
+        _ok_k2, _rs_k2, _k2_detail = source_consistency_gate(
+            odds_1x2, team_form, model_probs,
+            fav_implied_min=float(_pg_cfg.get("consistency_fav_implied", 0.70)),
+            max_wins=int(_pg_cfg.get("consistency_max_wins", 1)),
+            min_form_len=int(_pg_cfg.get("consistency_min_form", 4)),
+            min_ga_avg=float(_pg_cfg.get("consistency_min_ga", 3.0)),
+        )
+        if not _ok_k2:
+            _entity_mismatch = _k2_detail
+            for s in signals:
+                s.vetoed = True
+                s.veto_reasons.append(_rs_k2[0])
+            _gate_reasons.append(_rs_k2[0])
+
+    # G5 (2026-08-28, finally WIRED -- the gate existed since 2026-08-22 but
+    # had no call site). Two parts:
+    #   range/collision (card-level): a rating outside [elo_min, elo_max] or
+    #     identical on both sides is a lookup failure, not a strength
+    #     estimate (Rapid Wien 1291 v "Hearts" 1031 = Kelty Hearts, 2026-08-26
+    #     HIGH Over 2.5, FT 1-1);
+    #   evidence scope: BOTH sides on the 1500 prior -> directional picks
+    #     (Home/Away Win, AH) are vetoed and the rest capped LOW; ONE side on
+    #     the prior -> directional picks capped MEDIUM. Draw / Totals / BTTS
+    #     do not depend on which side is stronger and stay eligible.
+    _elo_scope: str | None = None
+    _elo_note: str | None = None
+    if bool(_pg_cfg.get("elo_integrity", False)):
+        _ok_g5, _rs_g5 = elo_integrity_gate(
+            model_probs,
+            lo=float(_pg_cfg.get("elo_min", DEFAULT_ELO_MIN)),
+            hi=float(_pg_cfg.get("elo_max", DEFAULT_ELO_MAX)),
+            require_seeded=False,
+            collision_eps=float(_pg_cfg.get("elo_collision_eps", DEFAULT_ELO_COLLISION_EPS)),
+        )
+        if not _ok_g5:
+            _reason_g5 = "; ".join(_rs_g5)
+            for s in signals:
+                s.vetoed = True
+                s.veto_reasons.append(_reason_g5)
+            _gate_reasons.append(_reason_g5)
+        _elo_scope, _elo_note = elo_evidence_scope(model_probs)
+        if _elo_scope == "all":
+            for s in signals:
+                if is_directional_selection(s.market, s.selection):
+                    _veto(s, _elo_note or "kedua tim tanpa Elo — pick directional diveto")
+                else:
+                    s.confidence_cap = "LOW"
+                    if _elo_note and _elo_note not in s.internal_notes:
+                        s.internal_notes.append(_elo_note)
+        elif _elo_scope == "one":
+            for s in signals:
+                if is_directional_selection(s.market, s.selection):
+                    s.confidence_cap = "MEDIUM"
+                    if _elo_note and _elo_note not in s.internal_notes:
+                        s.internal_notes.append(_elo_note)
+
     # G2 (per candidate, ALL markets): agreement with the margin-free price.
     if bool(_pg_cfg.get("agreement", True)):
         _max_dev = float(_pg_cfg.get("max_dev_pp", DEFAULT_MAX_DEV_PP))
@@ -2421,15 +2560,27 @@ def run_signal_engine(
     # evidence: on Erzurumspor 2026-08-21 the (c) rule leaves AH Away +0.25
     # standing, and that would have WON (FT 0-4). Measure on the full log
     # before enabling. Kept wired so enabling is a config flip, not a patch.
-    if bool(_pg_cfg.get("lambda_1x2_consistency", False)):
+    _g3_directional = bool(_pg_cfg.get("lambda_1x2_consistency", False))
+    # G3-low (2026-08-28, default ON): the same contradiction ALSO corrupts
+    # picks that need FEW goals. When the ensemble says one side is the
+    # favourite but the lambda matrix has that side scoring LESS, the
+    # favourite's goals are understated -> P(Under) / P(BTTS No) inflated.
+    # Verified Copenhagen v Inter Turku 2026-08-27 (1X2 home 64%, lambda
+    # 0.81 v 1.53 -> BTTS No @1.76, FT 4-1). Over / BTTS Yes are untouched:
+    # Arsenal v Coventry and LASK v Celtic won Over 2.5 with the same
+    # contradiction present.
+    _g3_low = bool(_pg_cfg.get("lambda_1x2_low_scoring", True))
+    if _g3_directional or _g3_low:
         _ok_g3, _rs_g3 = lambda_1x2_gate(
             model_probs,
             favourite_prob=float(_pg_cfg.get("lambda_1x2_favourite_prob", 0.60)),
         )
         if not _ok_g3:
             for s in signals:
-                if s.market in DIRECTIONAL_MARKETS:
+                if _g3_directional and s.market in DIRECTIONAL_MARKETS:
                     _veto(s, _rs_g3[0])
+                elif _g3_low and is_low_scoring_selection(s.market, s.selection):
+                    _veto(s, _rs_g3[0] + " — pick minim gol ikut korup (gol favorit understated)")
 
     # Loser-guard remnants that G2 does NOT subsume, kept because each is
     # independently evidence-backed:
@@ -2508,6 +2659,11 @@ def run_signal_engine(
                         f"(< {MIN_EVIDENCE_FORM_MATCHES} match) — confidence dibatasi"
                     ),
                 }
+    if _elo_scope == "all" and evidence_floor is None:
+        # K1: both sides on the prior. Directional candidates are already
+        # vetoed above; whatever survives (Draw / Totals / BTTS) must never
+        # advertise more than LOW -- reuse the evidence-floor cap path.
+        evidence_floor = {"veto": False, "note": _elo_note or "kedua tim tanpa Elo — confidence dibatasi"}
     result = rank_and_pick(
         signals,
         best_pick_margin=best_pick_margin,
@@ -2558,6 +2714,25 @@ def run_signal_engine(
     # Over/Under + BTTS opening prices in the analyse payload; the AH opening
     # is only available here, so expose it JSON-safe.
     result["ah_consensus"] = ah_consensus(ah_rows)
+    # K5 (2026-08-28): tier the label instead of vetoing. A pick below
+    # ``medium_score`` or labelled LOW is a LEAN, not a BEST PICK -- 25-27 Aug
+    # LOW picks went 8-4 while MEDIUM+ went 12-2; printing both as
+    # "BEST PICK" hid that difference from the reader and from the stats.
+    _medium_score = float(cfg.get("medium_score", MEDIUM_SCORE))
+    if result["best_pick"] is not None:
+        _bp_obj = result["best_pick"]
+        result["pick_tier"] = (
+            "LEAN"
+            if (float(_bp_obj.score) < _medium_score or _bp_obj.confidence == "LOW")
+            else "BEST PICK"
+        )
+    else:
+        result["pick_tier"] = None
+    result["tier_threshold"] = _medium_score
+    # K1/K2/K3 audit trail (persisted with the snapshot via the analyser).
+    result["elo_scope"] = _elo_scope
+    result["entity_mismatch"] = _entity_mismatch
+    result["tie_state"] = _tie_state
     if result["best_pick"] is not None:
         bp = result["best_pick"]
         result["best_pick"] = {

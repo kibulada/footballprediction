@@ -146,8 +146,19 @@ def test_lambda_1x2_missing_lambdas_passes():
 # --------------------------------------------------------------------------
 
 def test_elo_vetoes_out_of_range_sociedad():
-    ok, rs = elo_integrity_gate({"elo_seeded": True, "elo_home": 2036.0, "elo_away": 2361.0})
+    """Sociedad 2361 was a lookup COLLISION, not a legit rating. 2026-08-28:
+    the ceiling moved to 2450 because Barcelona 2298 / Real Madrid 2243 /
+    Arsenal 2361 are real ratings in the live store (all BEST PICK winners);
+    the incident band is kept reproducible via an explicit ``hi``."""
+    ok, rs = elo_integrity_gate(
+        {"elo_seeded": True, "elo_home": 2036.0, "elo_away": 2361.0}, hi=2100.0,
+    )
     assert not ok and any("2361" in r for r in rs)
+    # Default band now accepts the verified real ratings...
+    assert elo_integrity_gate({"elo_seeded": True, "elo_home": 2298.0, "elo_away": 1958.0})[0]
+    # ...but still rejects the impossible (Kelty Hearts 1031 on a UECL card).
+    ok, rs = elo_integrity_gate({"elo_seeded": True, "elo_home": 1291.0, "elo_away": 1031.0})
+    assert not ok and any("1031" in r for r in rs)
 
 
 def test_elo_vetoes_identical_rating_collision():

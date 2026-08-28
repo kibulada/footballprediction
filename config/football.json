@@ -304,6 +304,17 @@
       "require_movement_agreement": false,
       "time_decay_tau": 6.0
     },
+    "market_lean": {
+      "suggestion": {
+        "dominance_floor": 0.60,
+        "conflict_pp": 8.0,
+        "min_form_len": 3,
+        "require_direction_evidence": true,
+        "decided_tie_no_directional": true,
+        "under_requires_model_agreement": true,
+        "_note": "K4 2026-08-28: SUGGESTION TO PICK may be '—'. dominance_floor 0.60 == pick_gates.lambda_1x2_favourite_prob, the engine's own 'clear favourite' bar, applied to implied*(1-vig) (Under @1.60 = 0.54 is NOT dominant; 1.35 fav = 0.67 is); conflict_pp == signal_engine.conflict_pp (model must not contradict the selection by more). require_direction_evidence: both Elo on prior + no xG -> no 1X2/AH suggestion. decided_tie_no_directional: agg margin >= 2 -> no 1X2/AH. Stored on every snapshot as `suggestion` and graded by `runner settle --best-pick`."
+      }
+    },
     "signal_engine": {
       "model_version": "v2",
       "allow_negative_edge_pp": -3.0,
@@ -324,10 +335,17 @@
         "lambda_1x2_favourite_prob": 0.6,
         "entity_integrity": true,
         "entity_veto_asymmetric": true,
-        "elo_integrity": false,
+        "elo_integrity": true,
         "elo_require_seeded": true,
         "elo_min": 1300.0,
-        "elo_max": 2100.0,
+        "elo_max": 2450.0,
+        "lambda_1x2_low_scoring": true,
+        "source_consistency": true,
+        "consistency_fav_implied": 0.70,
+        "consistency_max_wins": 1,
+        "consistency_min_form": 4,
+        "consistency_min_ga": 3.0,
+        "_note_2026_08_28": "Post-mortem 25-27 Aug (plan coba-hari-ini-statistik). elo_integrity WIRED for the first time (was dead code): range/collision card-level + evidence scope (both Elo on prior -> directional veto, non-directional cap LOW; one side -> directional cap MEDIUM). elo_max 2100->2450 because Barcelona 2298 / Real Madrid 2243 / Arsenal 2361 are real ratings (all verified winners). lambda_1x2_low_scoring: the G3 contradiction also vetoes Under/BTTS No (Copenhagen 2026-08-27). source_consistency: market >=70% favourite whose OWN form is <=1W/4+ with >=3.0 conceded/game AND lambda underdog -> wrong entity -> card-wide NO BET + reports/entity_mismatch_*.jsonl.",
         "_note": "Post-mortem 2026-08-22 (reports/bestpick_postmortem_2026-08-22.md). agreement (G2) replaces disagreement_gate.max_total_dev_pp: symmetric, all markets. lambda_1x2_consistency (G3) and elo_integrity (G5) default OFF -- both are stricter than the evidence supports and elo_require_seeded would veto every unseeded-Elo league; measure with a replay over the full log before enabling. entity_integrity (G6) needs home/away threaded into run_signal_engine before it does anything. lambda_total_band_by_league (2026-08-22): league-aware G4 band -- Eredivisie averages ~3.2 goals/game so its ceiling is 4.0 (still below the SV Ried broken-lambda case at 4.09)."
       },
       "disagreement_gate": {
@@ -367,6 +385,11 @@
       "coverage_floor": {
         "downgrade_below": 0.4,
         "low_below": 0.25
+      },
+      "tie_state_penalties": {
+        "decided_leader_directional": 0.85,
+        "balanced_high_scoring": 0.92,
+        "_note": "K3 2026-08-28: soft score multipliers from context_data.tie_state (leg-2 detected from H2H). Decided tie (agg margin >= 2): picks needing the LEADER to win 90' x0.85. Balanced tie: Over / BTTS Yes x0.92. Measured via failure_class K3 before becoming a veto."
       },
       "stability": {
         "enabled": true,
