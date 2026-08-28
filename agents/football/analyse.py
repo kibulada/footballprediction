@@ -156,6 +156,7 @@ def _norm_team_name(name: str) -> str:
     s = unicodedata.normalize("NFD", s)
     s = "".join(c for c in s if not unicodedata.combining(c))
     s = re.sub(r"[^a-z0-9 ]", " ", s)
+    s = re.sub(r"\bmunchen\b", "munich", s)
     return " ".join(s.split())
 
 
