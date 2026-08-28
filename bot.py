@@ -46,7 +46,13 @@ client = discord.Client(intents=intents)
 
 
 def _runner_path() -> str:
-    return str(ROOT / ".venv" / "Scripts" / "python.exe")
+    # Cross-platform: Windows .venv\Scripts\python.exe, Linux .venv/bin/python
+    if sys.platform == "win32":
+        return str(ROOT / ".venv" / "Scripts" / "python.exe")
+    p = ROOT / ".venv" / "bin" / "python"
+    if p.exists():
+        return str(p)
+    return sys.executable
 
 
 def _cleanup_browser_zombies() -> None:
