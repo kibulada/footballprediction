@@ -465,5 +465,91 @@
     "birmingham city": "Birmingham City FC",
     "wrexham": "Wrexham AFC",
     "wrexham afc": "Wrexham AFC"
+  },
+  "Scottish Premiership": {
+    "CEL": "Celtic FC",
+    "RAN": "Rangers FC",
+    "HEA": "Heart of Midlothian",
+    "HIB": "Hibernian FC",
+    "ABE": "Aberdeen FC",
+    "DUN": "Dundee United FC",
+    "ST MIREN": "St Mirren FC",
+    "MOTHERWELL": "Motherwell FC",
+    "CELTIC": "Celtic FC",
+    "RANGERS": "Rangers FC"
+  },
+  "Super Lig": {
+    "GAL": "Galatasaray SK",
+    "FEN": "Fenerbahçe SK",
+    "BES": "Beşiktaş JK",
+    "TRA": "Trabzonspor",
+    "BAS": "İstanbul Başakşehir",
+    "GALATASARAY": "Galatasaray SK",
+    "FENERBAHCE": "Fenerbahçe SK",
+    "BESIKTAS": "Beşiktaş JK"
+  },
+  "Belgian Pro League": {
+    "BRU": "Club Brugge KV",
+    "GNK": "KRC Genk",
+    "AND": "RSC Anderlecht",
+    "GNT": "KAA Gent",
+    "STA": "Standard Liège",
+    "ANT": "Royal Antwerp FC",
+    "CLUB BRUGGE": "Club Brugge KV",
+    "GENK": "KRC Genk"
+  },
+  "Ligue 2": {
+    "AUX": "AJ Auxerre",
+    "LOR": "FC Lorient",
+    "MET": "FC Metz",
+    "AJA": "AJ Auxerre",
+    "AUXERRE": "AJ Auxerre",
+    "LORIENT": "FC Lorient"
+  },
+  "Serie B": {
+    "PAL": "Palermo FC",
+    "PAR": "Parma Calcio 1913",
+    "SASS": "US Sassuolo Calcio",
+    "PISA": "Pisa SC",
+    "SPE": "Spezia Calcio",
+    "PALERMO": "Palermo FC"
+  },
+  "Eerste Divisie": {
+    "ADO": "ADO Den Haag",
+    "WIL": "Willem II",
+    "GRA": "De Graafschap",
+    "TEL": "Telstar 1963",
+    "EXC": "Excelsior Rotterdam",
+    "ADO DEN HAAG": "ADO Den Haag"
+  },
+  "EFL Cup": {
+    "ARS": "Arsenal FC",
+    "MCI": "Manchester City FC",
+    "LIV": "Liverpool FC",
+    "CHE": "Chelsea FC",
+    "MUN": "Manchester United FC",
+    "NEW": "Newcastle United FC"
+  },
+  "FA Cup": {
+    "ARS": "Arsenal FC",
+    "MCI": "Manchester City FC",
+    "LIV": "Liverpool FC",
+    "CHE": "Chelsea FC",
+    "MUN": "Manchester United FC",
+    "TOT": "Tottenham Hotspur FC"
+  },
+  "Liga Super Malaysia": {
+    "JDT": "Johor Darul Ta'zim",
+    "SEL": "Selangor FC",
+    "KED": "Kedah Darul Aman FC",
+    "JOHOR": "Johor Darul Ta'zim",
+    "SELANGOR": "Selangor FC"
+  },
+  "Japan Emperor's Cup": {
+    "REDS": "Urawa Red Diamonds",
+    "KASHIMA": "Kashima Antlers",
+    "YOKOHAMA": "Yokohama F. Marinos",
+    "VISSEL": "Vissel Kobe",
+    "GAMBA": "Gamba Osaka"
   }
 }

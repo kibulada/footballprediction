@@ -66,6 +66,19 @@ LEAGUE_PATHS: dict[str, str] = {
     "K-League": "/football/south-korea/k-league-1",
     "J1 League": "/football/japan/j1-league",
     "Liga 1": "/football/indonesia/super-league",
+    "Eerste Divisie": "/football/netherlands/eerste-divisie",
+    "Japan Emperor's Cup": "/football/japan/emperor-cup",
+    "EFL Cup": "/football/england/efl-cup",
+    "FA Cup": "/football/england/fa-cup",
+    "Liga Super Malaysia": "/football/malaysia/super-league",
+    "UEFA Super Cup": "/football/europe/uefa-super-cup",
+    "Community Shield": "/football/england/community-shield",
+    "Friendly International": "/football/world/friendly-international",
+    "Copa Libertadores": "/football/south-america/copa-libertadores",
+    "Copa Sudamericana": "/football/south-america/copa-sudamericana",
+    "Leagues Cup": "/football/north-america/leagues-cup",
+    "CONCACAF Central American Cup": "/football/north-central-america/concacaf-central-american-cup",
+    "OFC Champions League": "/football/oceania/ofc-champions-league",
 }
 
 _TRANSLIT = {
