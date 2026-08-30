@@ -73,6 +73,33 @@ _EXTRA_ALIASES: dict[str, str] = {
     "FC Internazionale Milano": "Inter Milan",
     "Borussia Mönchengladbach": "Bor. Mönchengladbach",
     "Excelsior Rotterdam": "SBV Excelsior",
+    # Paris/Nice 2025-26 - Ligue 1: seed keys are full "OGC Nice" / "Paris FC",
+    # but live feeds use short "Nice" / "Paris FC". Single-token "Nice" would be
+    # vetoed by the K2 single-token guard (ogc+nice not <= nice) -> 1500 prior.
+    "Nice": "OGC Nice",
+    "OGC Nice": "OGC Nice",
+    # Serie A 2025-26 - seed keys carry generic suffixes (Calcio/CFC/SSc) or
+    # founding years (1907/1913) or double identity (Inter+Milan, Lazio+Roma,
+    # Hellas+Verona). Single-token LIVE names ("Cagliari","Inter","Genoa",...)
+    # vetoed by K2 guard before 2026-08-31 fix -> 1500 prior for both sides
+    # (Cagliari v Inter, Lazio v Genoa). Explicit alias restores 1-token hit.
+    "Cagliari": "Cagliari Calcio",
+    "Inter": "Inter Milan",
+    "Internazionale": "Inter Milan",
+    "Genoa": "Genoa CFC",
+    "Lazio": "Lazio Roma",
+    "Napoli": "SSC Napoli",
+    "Verona": "Hellas Verona",
+    "Hellas Verona": "Hellas Verona",
+    "Fiorentina": "ACF Fiorentina",
+    "Parma": "Parma Calcio 1913",
+    "Como": "Como 1907",
+    "Sassuolo": "Sassuolo Calcio",
+    "Udinese": "Udinese Calcio",
+    "Frosinone": "Frosinone Calcio",
+    # Ligue 1 single-token short that slipped through K2 (Brest/Angers SCO)
+    "Brest": "Stade Brestois 29",
+    "Angers": "Angers SCO",
 }
 
 # K2: tokens that mark a SECOND team of the same club (reserve / B side /
@@ -89,6 +116,7 @@ _CLUB_TOKEN_PREFIXES = {
     "fc", "cf", "ac", "sc", "afc", "fk", "nk", "cd", "pfc", "ifk",
     "rc", "ca", "ec", "cr", "se", "ud", "as", "bsc", "tsg", "sb",
     "kc", "sk", "de", "sv", "ss", "1.",
+    "calcio",
 }
 
 

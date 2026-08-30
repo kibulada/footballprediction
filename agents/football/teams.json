@@ -139,6 +139,7 @@
     "LYO": "Olympique Lyonnais",
     "LIL": "Lille OSC",
     "NIC": "OGC Nice",
+    "NICE": "OGC Nice",
     "REN": "Stade Rennais FC 1901",
     "STR": "RC Strasbourg Alsace",
     "NAN": "FC Nantes",
@@ -153,7 +154,9 @@
     "LOR": "FC Lorient",
     "AJA": "AJ Auxerre",
     "DIJ": "Dijon FCO",
-    "PARIS": "Paris Saint-Germain FC"
+    "PARIS": "Paris Saint-Germain FC",
+    "PFC": "Paris FC",
+    "PARIS FC": "Paris FC"
   },
   "Primeira Liga": {
     "POR": "FC Porto",
