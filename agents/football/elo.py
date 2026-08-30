@@ -261,23 +261,33 @@ class EloModel:
             for league in teams.values()
             for alias, canonical in league.items()
         ]
+        # Build alias_index by picking the MOST SPECIFIC seed for each canon
+        # (previous setdefault kept first in file order -> Juventus FC -> YF Zurich
+        # and RCD Espanyol -> FC Barcelona). Now choose minimal extra tokens.
+        best: dict[str, tuple[str, int, int]] = {}  # canon_norm -> (seed_key, extra, -games)
         for seed_key in self.ratings:
             seed_norm = _norm(seed_key)
             seed_tokens = set(_significant_tokens(seed_key))
+            seed_games = int(self.games.get(seed_key, 0))
             for alias_norm, canon_norm, canon_tokens in entries:
+                matched = False
+                extra = 10**9
                 if alias_norm == seed_norm:
-                    # INTER -> FC Internazionale Milano  (seed "Inter")
-                    self._alias_index.setdefault(canon_norm, seed_key)
+                    matched = True
+                    extra = -1  # exact alias -> best possible
+                elif canon_tokens and canon_tokens <= seed_tokens:
+                    matched = True
+                    extra = len(seed_tokens - canon_tokens)
+                elif seed_tokens and seed_tokens <= canon_tokens:
+                    matched = True
+                    extra = len(canon_tokens - seed_tokens)
+                if not matched:
                     continue
-                if canon_tokens and canon_tokens <= seed_tokens:
-                    # Arsenal FC -> Arsenal, Celtic FC -> Celtic FC
-                    self._alias_index.setdefault(canon_norm, seed_key)
-                    continue
-                if seed_tokens and seed_tokens <= canon_tokens:
-                    # Newcastle -> Newcastle United FC (reverse direction):
-                    # the seeded short name is a strict part of the canonical
-                    # provider name, so the full live spelling maps back.
-                    self._alias_index.setdefault(canon_norm, seed_key)
+                # keep most specific (smallest extra), tie -> most games
+                cur = best.get(canon_norm)
+                if cur is None or extra < cur[1] or (extra == cur[1] and seed_games > -cur[2]):
+                    best[canon_norm] = (seed_key, extra, -seed_games)
+        self._alias_index = {k: v[0] for k, v in best.items()}
         # Built-in abbreviated-spelling aliases -> seed keys that exist.
         for raw, seed_key in _EXTRA_ALIASES.items():
             if seed_key in self.ratings:
