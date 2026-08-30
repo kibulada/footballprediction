@@ -107,6 +107,9 @@ _EXTRA_ALIASES: dict[str, str] = {
     "Bilbao": "Athletic Club",
     "Celta Vigo": "RC Celta",
     "Celta": "RC Celta",
+    "Espanyol": "Espanyol Barcelona",
+    "RCD Espanyol": "Espanyol Barcelona",
+    "Barca": "FC Barcelona",
 }
 
 # K2: tokens that mark a SECOND team of the same club (reserve / B side /
