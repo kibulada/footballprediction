@@ -100,6 +100,13 @@ _EXTRA_ALIASES: dict[str, str] = {
     # Ligue 1 single-token short that slipped through K2 (Brest/Angers SCO)
     "Brest": "Stade Brestois 29",
     "Angers": "Angers SCO",
+    # LaLiga - Athletic Bilbao short forms (provider "Athletic Club", user "Athletic Bilbao"/"Ath Bilbao")
+    # seed "Athletic Club" 1958: query ["athletic","bilbao"] ambigu 10*Athletic* -> None without alias
+    "Athletic Bilbao": "Athletic Club",
+    "Ath Bilbao": "Athletic Club",
+    "Bilbao": "Athletic Club",
+    "Celta Vigo": "RC Celta",
+    "Celta": "RC Celta",
 }
 
 # K2: tokens that mark a SECOND team of the same club (reserve / B side /
