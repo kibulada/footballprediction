@@ -70,6 +70,9 @@ _EXTRA_ALIASES: dict[str, str] = {
     "Stuttgart": "VfB Stuttgart",
     "Bayern Munich": "Bayern München",
     "FC Bayern Munich": "Bayern München",
+    "FC Internazionale Milano": "Inter Milan",
+    "Borussia Mönchengladbach": "Bor. Mönchengladbach",
+    "Excelsior Rotterdam": "SBV Excelsior",
 }
 
 # K2: tokens that mark a SECOND team of the same club (reserve / B side /
