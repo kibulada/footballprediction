@@ -2535,6 +2535,21 @@ def run_signal_engine(
                     s.confidence_cap = "MEDIUM"
                     if _elo_note and _elo_note not in s.internal_notes:
                         s.internal_notes.append(_elo_note)
+        # Market-elo fallback for 0% leagues: market provides direction, don't veto completely
+        if model_probs.get("market_elo_fallback") and _elo_scope == "all":
+            for s in signals:
+                if is_directional_selection(s.market, s.selection):
+                    # undo the veto from elo_scope, keep as cap MEDIUM (LEAN)
+                    if _elo_note and _elo_note in s.veto_reasons:
+                        s.vetoed = any(r != _elo_note for r in s.veto_reasons)
+                        s.veto_reasons = [r for r in s.veto_reasons if r != _elo_note]
+                    s.confidence_cap = "MEDIUM"
+                    if _elo_note and _elo_note not in s.internal_notes:
+                        s.internal_notes.append(_elo_note + " (market fallback → cap MEDIUM)")
+                else:
+                    s.confidence_cap = "LOW"
+            _elo_scope = "one"
+            _gate_reasons = [r for r in _gate_reasons if r != _elo_note]
 
     # G2 (per candidate, ALL markets): agreement with the margin-free price.
     if bool(_pg_cfg.get("agreement", True)):

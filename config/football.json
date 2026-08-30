@@ -10,6 +10,7 @@
     "UECL",
     "Primeira Liga",
     "Eredivisie",
+    "Eerste Divisie",
     "Saudi Pro League",
     "MLS",
     "Scottish Premiership",
@@ -328,6 +329,9 @@
         "lambda_total_max": 3.6,
         "lambda_total_band_by_league": {
           "eredivisie": {
+            "max": 4.0
+          },
+          "eerste divisie": {
             "max": 4.0
           }
         },

@@ -10,6 +10,7 @@ All returned probabilities are renormalized so 1X2 sums to exactly 1.0.
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -976,6 +977,52 @@ def run_prediction_engine(
         totals = {"over_1.5": o15, "over_2.5": o25, "over_3.5": o35, "btts_yes": btts}
         lam_src = "elo"
 
+    # Market-elo fallback for 0% Elo leagues (K-League/Liga1/J1/Saudi/MLS/A-League):
+    # elofootball has 0 coverage there, so 1500 prior would make every directional
+    # pick a coin flip (K1 veto). Use market devig as temporary Elo proxy, but
+    # keep it capped to LEAN (never HIGH) — honest prior replacement, not value.
+    market_elo_fallback = False
+    _fallback_elo_home = None
+    _fallback_elo_away = None
+    _FALLBACK_LEAGUES = {
+        "k-league", "k league 1", "kleague", "liga 1", "liga1", "indonesia",
+        "j1 league", "j1", "saudi pro league", "saudi", "mls", "a-league", "aleague",
+        "liga super malaysia", "malaysia",
+    }
+    _is_fallback_league = ctx.league and str(ctx.league).strip().lower() in _FALLBACK_LEAGUES
+    # also check normalized without hyphen/space
+    _league_norm = re.sub(r"[^a-z0-9]", "", str(ctx.league or "").lower())
+    if _league_norm in {"kleague", "k league1", "liga1", "j1league", "saudiproleague", "mls", "aleague", "ligasupermalaysia"}:
+        _is_fallback_league = True
+    if _is_fallback_league and ctx.has_odds and not elo.known(ctx.home, ctx.away):
+        try:
+            _imp = _normalize_implied(ctx.consensus_odds)
+            if _imp:
+                _p_home = float(_imp.get("home", 0.5))
+                _p_away = float(_imp.get("away", 0.5))
+                _p_home = max(0.05, min(0.90, _p_home))
+                _p_away = max(0.05, min(0.90, _p_away))
+                # use home vs away directly (ignore draw) for Elo diff
+                _ratio = _p_home / max(0.01, _p_away)
+                _ratio = max(0.18, min(5.67, _ratio))  # clamp 15% vs 85% extremes
+                _d = 400.0 * math.log10(_ratio)
+                # also set Elo ratings to avoid collision veto (both 1500 identical)
+                # keep games 0 but make ratings differ by market diff
+                _fallback_elo_home = 1500.0 + _d / 2.0
+                _fallback_elo_away = 1500.0 - _d / 2.0
+                # split diff around 1500, keep total goals same
+                _total = float(lh + la) if (lh and la) else 2.7
+                _share = 1.0 / (1.0 + 10.0 ** (-_d / 400.0))
+                lh = max(0.3, min(3.5, _total * _share))
+                la = max(0.3, min(3.5, _total * (1.0 - _share)))
+                # recompute totals from market-split lambda
+                _, o15, o25, o35, btts = probs_from_matrix(poisson_matrix(lh, la, poisson.rho if pm is not None else 0.0))
+                totals = {"over_1.5": o15, "over_2.5": o25, "over_3.5": o35, "btts_yes": btts}
+                lam_src = (lam_src + "+mktelo") if pm is not None else "mktelo"
+                market_elo_fallback = True
+        except Exception:
+            pass
+
     # Market comparison uses margin-free implied probabilities so model and
     # market are on the same scale (edge is honest).
     norm_implied = _normalize_implied(ctx.consensus_odds) if ctx.has_odds else None
@@ -1058,8 +1105,9 @@ def run_prediction_engine(
         # only when the model genuinely knows nothing.
         "elo_home_seeded": elo.resolve(ctx.home) is not None,
         "elo_away_seeded": elo.resolve(ctx.away) is not None,
-        "elo_home": round(float(elo.rating(ctx.home)), 1),
-        "elo_away": round(float(elo.rating(ctx.away)), 1),
+        "elo_home": round(float(_fallback_elo_home if _fallback_elo_home is not None else elo.rating(ctx.home)), 1),
+        "elo_away": round(float(_fallback_elo_away if _fallback_elo_away is not None else elo.rating(ctx.away)), 1),
+        "market_elo_fallback": market_elo_fallback,
     }
 
     return PredictionResult(
