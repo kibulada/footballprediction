@@ -344,6 +344,7 @@
         "elo_min": 1300.0,
         "elo_max": 2450.0,
         "lambda_1x2_low_scoring": true,
+        "require_model_favorite_1x2": true,
         "source_consistency": true,
         "consistency_fav_implied": 0.70,
         "consistency_max_wins": 1,

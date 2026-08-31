@@ -2561,6 +2561,21 @@ def run_signal_engine(
             if not _ok_g2:
                 _veto(s, _rs_g2[0])
 
+    # G10 (2026-08-31): 1X2 must be model favorite. A 1X2 underdog (e.g. Away 30% vs Home 44% favorite) has no model edge even if edge 0 vs market - picking it is pure market mirroring. Verified Monaco 2-0, Leeds 1-1, Pisa 2-1.
+    if bool(_pg_cfg.get("require_model_favorite_1x2", True)):
+        _p1x2 = (model_probs or {}).get("1x2") or {}
+        if _p1x2 and all(k in _p1x2 for k in ("home", "draw", "away")):
+            _max_side = max(("home", "draw", "away"), key=lambda k: float(_p1x2.get(k, 0.0) or 0.0))
+            _max_val = float(_p1x2.get(_max_side, 0.0) or 0.0)
+            _side_map = {"Home Win": "home", "Draw": "draw", "Away Win": "away"}
+            for s in signals:
+                if s.market == "1X2":
+                    _side = _side_map.get(str(s.selection) or "")
+                    if _side and _side != _max_side:
+                        _veto(s, f"1X2 {s.selection} bukan favorit model ({_max_side} { _max_val:.0%} vs {s.model_prob:.0%}) - cegah pick underdog cuma karena mirip pasar (pola Monaco 2026-08-30)")
+                    elif s.model_prob is not None and float(s.model_prob) < 0.35:
+                        _veto(s, f"1X2 {s.selection} prob model {float(s.model_prob):.0%} <35% terlalu rendah untuk BEST PICK")
+
     # G7 (per candidate): a pick without a tradeable price is not a pick.
     # Verified: Braga v Austria Wien Women 2026-08-20 shipped market_odds null.
     if bool(_pg_cfg.get("require_price", True)):
