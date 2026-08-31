@@ -314,7 +314,7 @@
         "require_direction_evidence": true,
         "decided_tie_no_directional": true,
         "under_requires_model_agreement": true,
-        "_note": "K4 2026-08-30: dominance_floor 0.60 (2-way) / 0.55 (1X2 3-way) - 1X2 Home 2.20=42% sudah kuat; conflict_pp 5.0 (was 8.0) + adjusted_score = dominance*(0.5+0.5*(1-|edge|/conflict)) so SUG ranks by dominance that agrees with model, not pure dominance. SUGGESTION may be '—'." 
+        "_note": "K4 2026-08-31: dominance_floor 0.60 (2-way) / dominance_floor_1x2 0.55 (1X2 3-way, 1.60+ favourite passes); floor diuji ke dominance MURNI implied*(1-vig). conflict_pp 5.0 (was 8.0) = block saat model < pasar-5pp. adjusted_score = dominance*(1-|model-market|/8pp) hanya untuk SORT, bukan floor. SUGGESTION may be '-'. Stored on every snapshot as `suggestion` and graded by `runner settle --best-pick`."
       }
     },
     "signal_engine": {

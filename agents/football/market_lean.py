@@ -230,21 +230,25 @@ def select_suggestion(
         raw = str(cand.get("raw_label") or "")
         imp = float(cand.get("implied") or 0.0)
         vig = max(0.0, min(0.9, float(cand.get("vig") or 0.0)))
-        # Dominance floor is per-market: 1X2 55% (3-way), others 60% (2-way)
+        # Dominance floor is per-market: 1X2 55% (3-way), others 60% (2-way).
+        # The floor is tested against PURE dominance (implied*(1-vig)) --
+        # never against the agreement-weighted score below.
         _floor = float(c.get("dominance_floor_1x2", 0.55)) if market == "1X2" else floor
-        base_adjusted = imp * (1.0 - vig)
-        # Model agreement factor: 1 at edge 0, 0 at edge >= conflict (5pp for SUG)
-        mprob_tmp = model_prob_for(cand, model_probs, ranking)
-        if mprob_tmp is not None:
-            _edge = abs(float(mprob_tmp) - imp)
-            _factor = max(0.0, 1.0 - _edge / conflict) if conflict > 0 else 0.0
-            adjusted = base_adjusted * (0.5 + 0.5 * _factor)  # 0.5 floor so dominant market not zeroed, but agreement still ranks higher
+        dominance = imp * (1.0 - vig)
+        # Tweak (2026-08-31): rank by model-aligned dominance --
+        # adjusted_score = dominance * (1 - |model - market| / 8pp), full
+        # credit at edge 0, 0 at the G2 band edge. Floor check above stays
+        # on pure dominance; this factor only orders eligible candidates.
+        mprob = model_prob_for(cand, model_probs, ranking)
+        if mprob is not None:
+            _edge = abs(float(mprob) - imp)
+            adjusted = dominance * max(0.0, 1.0 - _edge / 0.08)
         else:
-            adjusted = base_adjusted
+            adjusted = dominance
         directional = market == "Asian Handicap" or (market == "1X2" and raw != "Draw")
         reason: str | None = None
-        if adjusted < _floor:
-            reason = f"pasar tidak dominan ({adjusted:.0%} < {_floor:.0%} setelah vig)"
+        if dominance < _floor:
+            reason = f"pasar tidak dominan ({dominance:.0%} < {_floor:.0%} setelah vig)"
         elif directional and no_dir:
             reason = "model tanpa evidensi arah (kedua Elo prior + tanpa xG) — 1X2/AH hanya menyalin pasar"
         elif directional and decided:
@@ -255,7 +259,6 @@ def select_suggestion(
                 thin = [s for s in sides if (fl := _form_len(features, s)) is not None and fl < min_form]
                 if thin:
                     reason = f"form {'/'.join(thin)} < {min_form} laga — evidensi tipis"
-        mprob = model_prob_for(cand, model_probs, ranking)
         if reason is None and mprob is not None and (mprob < imp - conflict) and (
             bool(c["under_requires_model_agreement"]) or not raw.startswith("Under")
         ):
