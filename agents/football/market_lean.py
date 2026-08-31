@@ -36,12 +36,12 @@ from __future__ import annotations
 from typing import Any
 
 DEFAULTS: dict[str, Any] = {
-    # "dominant" = the same bar the engine uses to call a 1X2 side a CLEAR
-    # favourite (pick_gates.lambda_1x2_favourite_prob = 0.60), applied to
-    # implied*(1-vig). Under 2.5 @1.60 (58% -> 0.54 after vig) is NOT
-    # dominant; a 1.35 favourite (0.67) or Over @1.44 (0.66) is.
+    # "dominant" = clear favourite bar. 1X2 is 3-way so 40% after vig is
+    # already strong (Home 2.20 -> 42% fair); 60% is rare. Totals/BTTS are
+    # 2-way so 60% remains. Per-market floor applied in select_suggestion.
     "dominance_floor": 0.60,
-    "conflict_pp": 8.0,        # == models.signal_engine.conflict_pp
+    "dominance_floor_1x2": 0.55,
+    "conflict_pp": 5.0,        # tighter than signal_engine 8pp - SUG must agree with model
     "min_form_len": 3,
     "require_direction_evidence": True,
     "decided_tie_no_directional": True,
@@ -230,11 +230,21 @@ def select_suggestion(
         raw = str(cand.get("raw_label") or "")
         imp = float(cand.get("implied") or 0.0)
         vig = max(0.0, min(0.9, float(cand.get("vig") or 0.0)))
-        adjusted = imp * (1.0 - vig)
+        # Dominance floor is per-market: 1X2 55% (3-way), others 60% (2-way)
+        _floor = float(c.get("dominance_floor_1x2", 0.55)) if market == "1X2" else floor
+        base_adjusted = imp * (1.0 - vig)
+        # Model agreement factor: 1 at edge 0, 0 at edge >= conflict (5pp for SUG)
+        mprob_tmp = model_prob_for(cand, model_probs, ranking)
+        if mprob_tmp is not None:
+            _edge = abs(float(mprob_tmp) - imp)
+            _factor = max(0.0, 1.0 - _edge / conflict) if conflict > 0 else 0.0
+            adjusted = base_adjusted * (0.5 + 0.5 * _factor)  # 0.5 floor so dominant market not zeroed, but agreement still ranks higher
+        else:
+            adjusted = base_adjusted
         directional = market == "Asian Handicap" or (market == "1X2" and raw != "Draw")
         reason: str | None = None
-        if adjusted < floor:
-            reason = f"pasar tidak dominan ({adjusted:.0%} < {floor:.0%} setelah vig)"
+        if adjusted < _floor:
+            reason = f"pasar tidak dominan ({adjusted:.0%} < {_floor:.0%} setelah vig)"
         elif directional and no_dir:
             reason = "model tanpa evidensi arah (kedua Elo prior + tanpa xG) — 1X2/AH hanya menyalin pasar"
         elif directional and decided:

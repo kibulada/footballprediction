@@ -308,12 +308,13 @@
     "market_lean": {
       "suggestion": {
         "dominance_floor": 0.60,
-        "conflict_pp": 8.0,
+        "dominance_floor_1x2": 0.55,
+        "conflict_pp": 5.0,
         "min_form_len": 3,
         "require_direction_evidence": true,
         "decided_tie_no_directional": true,
         "under_requires_model_agreement": true,
-        "_note": "K4 2026-08-28: SUGGESTION TO PICK may be '—'. dominance_floor 0.60 == pick_gates.lambda_1x2_favourite_prob, the engine's own 'clear favourite' bar, applied to implied*(1-vig) (Under @1.60 = 0.54 is NOT dominant; 1.35 fav = 0.67 is); conflict_pp == signal_engine.conflict_pp (model must not contradict the selection by more). require_direction_evidence: both Elo on prior + no xG -> no 1X2/AH suggestion. decided_tie_no_directional: agg margin >= 2 -> no 1X2/AH. Stored on every snapshot as `suggestion` and graded by `runner settle --best-pick`."
+        "_note": "K4 2026-08-30: dominance_floor 0.60 (2-way) / 0.55 (1X2 3-way) - 1X2 Home 2.20=42% sudah kuat; conflict_pp 5.0 (was 8.0) + adjusted_score = dominance*(0.5+0.5*(1-|edge|/conflict)) so SUG ranks by dominance that agrees with model, not pure dominance. SUGGESTION may be '—'." 
       }
     },
     "signal_engine": {
