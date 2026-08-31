@@ -18,6 +18,7 @@ from agents.football.pick_gates import (  # noqa: E402
     lambda_1x2_gate,
     lambda_total_gate,
     price_gate,
+    resolve_elo_band,
 )
 
 
@@ -179,6 +180,37 @@ def test_elo_passes_credible_pair():
 
 def test_elo_without_ratings_only_checks_seeded_flag():
     assert elo_integrity_gate({"elo_seeded": True})[0] is True
+
+
+def test_elo_band_resolver_defaults_and_overrides():
+    """No cfg / unknown league -> the global senior band, byte-identical
+    behaviour for every league except the configured override."""
+    assert resolve_elo_band(None) == (1300.0, 2450.0)
+    assert resolve_elo_band({"elo_min": 1300.0, "elo_max": 2450.0}, "EPL") == (1300.0, 2450.0)
+    cfg = {"elo_min": 1300.0, "elo_max": 2450.0,
+           "elo_band_by_league": {"eerste divisie": {"min": 1150.0}}}
+    assert resolve_elo_band(cfg, "Eerste Divisie") == (1150.0, 2450.0)
+    assert resolve_elo_band(cfg, "eerste divisie") == (1150.0, 2450.0)
+    assert resolve_elo_band(cfg, "Eredivisie") == (1300.0, 2450.0)
+    # bare number means "max" (same convention as lambda_total_band_by_league)
+    cfg2 = {"elo_band_by_league": {"eerste divisie": 2600}}
+    assert resolve_elo_band(cfg2, "Eerste Divisie") == (1300.0, 2600.0)
+
+
+def test_elo_gate_passes_jong_pair_under_league_band():
+    """Jong PSV 1353 v Jong Ajax 1238 (2026-09-01): real reserve-XI ratings
+    from the live elofootball.com store, card-wide vetoed by the senior
+    floor. Under the per-league band they pass -- and the collision check
+    stays alive (it does not depend on the band)."""
+    mp = {"elo_seeded": True, "elo_home": 1353.0, "elo_away": 1238.0}
+    ok, rs = elo_integrity_gate(mp, lo=1300.0, hi=2450.0)
+    assert not ok and any("1238" in r for r in rs)
+    ok, rs = elo_integrity_gate(mp, lo=1150.0, hi=2450.0)
+    assert ok and rs == []
+    ok, rs = elo_integrity_gate(
+        {"elo_seeded": True, "elo_home": 1238.0, "elo_away": 1238.0}, lo=1150.0, hi=2450.0,
+    )
+    assert not ok and any("identik" in r for r in rs)
 
 
 # --------------------------------------------------------------------------

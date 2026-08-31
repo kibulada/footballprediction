@@ -120,6 +120,38 @@ DEFAULT_ELO_MIN = 1300.0
 DEFAULT_ELO_MAX = 2450.0
 DEFAULT_ELO_COLLISION_EPS = 0.01
 
+
+def resolve_elo_band(
+    cfg: dict[str, Any] | None,
+    league: str | None = None,
+) -> tuple[float, float]:
+    """G5 band: global min/max with optional per-league overrides.
+
+    The senior-club floor (1300) sweeps legitimate reserve-XI ratings:
+    the Jong teams of the Eerste Divisie rate 1238-1353 in the live
+    elofootball.com store (Jong PSV v Jong Ajax 2026-09-01 saw every pick
+    vetoed on a REAL away rating of 1238). Overrides come from
+    ``models.signal_engine.pick_gates.elo_band_by_league`` keyed by
+    case-insensitive league name; each entry is ``{"min": ..., "max": ...}``
+    with either key optional, or a bare number meaning "max". Unknown
+    leagues keep the global band. The collision and identical-rating
+    checks are unaffected -- they do not depend on the band.
+    """
+    cfg = cfg or {}
+    lo = float(cfg.get("elo_min", DEFAULT_ELO_MIN))
+    hi = float(cfg.get("elo_max", DEFAULT_ELO_MAX))
+    overrides = cfg.get("elo_band_by_league") or {}
+    if league:
+        entry = overrides.get(str(league).strip().lower())
+        if isinstance(entry, dict):
+            if entry.get("min") is not None:
+                lo = float(entry["min"])
+            if entry.get("max") is not None:
+                hi = float(entry["max"])
+        elif isinstance(entry, (int, float)):
+            hi = float(entry)
+    return lo, hi
+
 # --------------------------------------------------------------------------
 # G6 — entity integrity
 # --------------------------------------------------------------------------

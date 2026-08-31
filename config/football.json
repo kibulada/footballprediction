@@ -344,6 +344,11 @@
         "elo_require_seeded": true,
         "elo_min": 1300.0,
         "elo_max": 2450.0,
+        "elo_band_by_league": {
+          "eerste divisie": {
+            "min": 1150.0
+          }
+        },
         "lambda_1x2_low_scoring": true,
         "require_model_favorite_1x2": true,
         "source_consistency": true,
@@ -351,7 +356,7 @@
         "consistency_max_wins": 1,
         "consistency_min_form": 4,
         "consistency_min_ga": 3.0,
-        "_note_2026_08_28": "Post-mortem 25-27 Aug (plan coba-hari-ini-statistik). elo_integrity WIRED for the first time (was dead code): range/collision card-level + evidence scope (both Elo on prior -> directional veto, non-directional cap LOW; one side -> directional cap MEDIUM). elo_max 2100->2450 because Barcelona 2298 / Real Madrid 2243 / Arsenal 2361 are real ratings (all verified winners). lambda_1x2_low_scoring: the G3 contradiction also vetoes Under/BTTS No (Copenhagen 2026-08-27). source_consistency: market >=70% favourite whose OWN form is <=1W/4+ with >=3.0 conceded/game AND lambda underdog -> wrong entity -> card-wide NO BET + reports/entity_mismatch_*.jsonl.",
+        "_note_2026_08_28": "Post-mortem 25-27 Aug (plan coba-hari-ini-statistik). elo_integrity WIRED for the first time (was dead code): range/collision card-level + evidence scope (both Elo on prior -> directional veto, non-directional cap LOW; one side -> directional cap MEDIUM). elo_max 2100->2450 because Barcelona 2298 / Real Madrid 2243 / Arsenal 2361 are real ratings (all verified winners). lambda_1x2_low_scoring: the G3 contradiction also vetoes Under/BTTS No (Copenhagen 2026-08-27). source_consistency: market >=70% favourite whose OWN form is <=1W/4+ with >=3.0 conceded/game AND lambda underdog -> wrong entity -> card-wide NO BET + reports/entity_mismatch_*.jsonl. elo_band_by_league (2026-09-01): Jong PSV v Jong Ajax vetoed all picks on a REAL reserve-XI rating (Jong Ajax 1238, live elofootball.com store); reserve teams of the Eerste Divisie rate 1238-1353 so the league floor is 1150 -- other leagues keep the global band, collision + identical-rating checks unaffected.",
         "_note": "Post-mortem 2026-08-22 (reports/bestpick_postmortem_2026-08-22.md). agreement (G2) replaces disagreement_gate.max_total_dev_pp: symmetric, all markets. lambda_1x2_consistency (G3) and elo_integrity (G5) default OFF -- both are stricter than the evidence supports and elo_require_seeded would veto every unseeded-Elo league; measure with a replay over the full log before enabling. entity_integrity (G6) needs home/away threaded into run_signal_engine before it does anything. lambda_total_band_by_league (2026-08-22): league-aware G4 band -- Eredivisie averages ~3.2 goals/game so its ceiling is 4.0 (still below the SV Ried broken-lambda case at 4.09)."
       },
       "disagreement_gate": {

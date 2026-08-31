@@ -38,8 +38,6 @@ from .steam_detector import analyze_market_intelligence
 from .clv_tracker import log_clv_entry, clv_gate
 from .pick_gates import (
     DEFAULT_ELO_COLLISION_EPS,
-    DEFAULT_ELO_MAX,
-    DEFAULT_ELO_MIN,
     DEFAULT_MAX_DEV_PP,
     DIRECTIONAL_MARKETS,
     agreement_gate,
@@ -52,6 +50,7 @@ from .pick_gates import (
     lambda_total_gate,
     market_implied_total,
     price_gate,
+    resolve_elo_band,
     resolve_lambda_total_band,
     source_consistency_gate,
 )
@@ -2507,10 +2506,11 @@ def run_signal_engine(
     _elo_scope: str | None = None
     _elo_note: str | None = None
     if bool(_pg_cfg.get("elo_integrity", False)):
+        _elo_lo, _elo_hi = resolve_elo_band(_pg_cfg, league_name)
         _ok_g5, _rs_g5 = elo_integrity_gate(
             model_probs,
-            lo=float(_pg_cfg.get("elo_min", DEFAULT_ELO_MIN)),
-            hi=float(_pg_cfg.get("elo_max", DEFAULT_ELO_MAX)),
+            lo=_elo_lo,
+            hi=_elo_hi,
             require_seeded=False,
             collision_eps=float(_pg_cfg.get("elo_collision_eps", DEFAULT_ELO_COLLISION_EPS)),
         )

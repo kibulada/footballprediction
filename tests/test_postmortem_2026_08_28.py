@@ -330,6 +330,25 @@ def test_engine_vetoes_card_on_elo_out_of_band():
     assert any("1031" in r for r in res.get("disagreement_gate") or [])
 
 
+def test_engine_elo_band_league_override_unvetoes_jong_card():
+    """Jong PSV v Jong Ajax 2026-09-01: every pick vetoed on a REAL reserve-XI
+    away rating (1238). The per-league band un-vetoes the card; a different
+    league with the same ratings keeps the senior floor."""
+    cfg = {"pick_gates": {"elo_integrity": True, "agreement": False,
+                          "lambda_total_sanity": False, "source_consistency": False,
+                          "elo_min": 1300.0, "elo_max": 2450.0,
+                          "elo_band_by_league": {"eerste divisie": {"min": 1150.0}}},
+           "min_edge_pp": -50.0, "allow_negative_edge_pp": -50.0, "no_bet_score": 0.0,
+           "min_confluence": 0, "min_data_quality": 0.0}
+    mp = _mp(elo_home=1353.0, elo_away=1238.0)
+    res_jong = _engine(mp, league_name="Eerste Divisie", cfg=cfg)
+    assert not any(
+        "di luar band" in r for r in res_jong.get("disagreement_gate") or []
+    ), res_jong["disagreement_gate"]
+    res_strict = _engine(mp, league_name="Eredivisie", cfg=cfg)
+    assert any("di luar band" in r for r in res_strict.get("disagreement_gate") or [])
+
+
 def test_engine_caps_directional_medium_when_one_side_prior():
     res = _engine(_mp(elo_seeded=False, elo_away_seeded=False, elo_away=1500.0))
     assert res["elo_scope"] == "one"
