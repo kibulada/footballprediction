@@ -110,6 +110,11 @@ _EXTRA_ALIASES: dict[str, str] = {
     "Espanyol": "Espanyol Barcelona",
     "RCD Espanyol": "Espanyol Barcelona",
     "Barca": "FC Barcelona",
+    # EFL Championship short names (flashscore roster uses bare city name)
+    "Stoke": "Stoke City",
+    "Norwich": "Norwich City",
+    "Lincoln": "Lincoln City",
+    "Blackburn": "Blackburn Rovers",
 }
 
 # K2: tokens that mark a SECOND team of the same club (reserve / B side /

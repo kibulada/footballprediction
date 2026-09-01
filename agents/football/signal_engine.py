@@ -53,6 +53,7 @@ from .pick_gates import (
     resolve_elo_band,
     resolve_lambda_total_band,
     source_consistency_gate,
+    total_favor_gate,
 )
 from .tie_state import tie_state_note
 
@@ -2560,6 +2561,17 @@ def run_signal_engine(
             )
             if not _ok_g2:
                 _veto(s, _rs_g2[0])
+
+    # G8 (2026-09-02): Total/BTTS must favor the picked side when edge is negative.
+    # Lincoln 01-Sep Over 46% + edge -2.4 and Atalanta 31-Aug Over 49% + edge -0.9
+    # both lost 0-0/1-0 while model said Under. A contrarian Over with edge>0
+    # (e.g. model 46% vs market 30% edge +16) still passes — only the
+    # model-underdog + market-underdog combo is vetoed.
+    if bool(_pg_cfg.get("total_favor", True)):
+        for s in signals:
+            _ok_g8, _rs_g8 = total_favor_gate(s.market, s.selection, s.model_prob, s.edge_pp)
+            if not _ok_g8:
+                _veto(s, _rs_g8[0])
 
     # G10 (2026-08-31): 1X2 must be model favorite. A 1X2 underdog (e.g. Away 30% vs Home 44% favorite) has no model edge even if edge 0 vs market - picking it is pure market mirroring. Verified Monaco 2-0, Leeds 1-1, Pisa 2-1.
     if bool(_pg_cfg.get("require_model_favorite_1x2", True)):

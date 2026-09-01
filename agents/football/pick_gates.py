@@ -458,6 +458,39 @@ def entity_integrity_gate(
     return True, reasons
 
 
+def total_favor_gate(
+    market: str | None,
+    selection: str | None,
+    model_prob: float | None,
+    edge_pp: float | None,
+) -> tuple[bool, list[str]]:
+    """G8: Total/BTTS must favor the picked side (model_prob >= 0.5) when edge is negative.
+
+    Lincoln 01-Sep Over 2.5 46% (<50% Under favored) with edge -2.4pp and
+    Atalanta 31-Aug Over 49% (<50%) with edge -0.9pp both lost 1-0/0-0 while
+    the model itself said Under. Picking a side the model thinks is the
+    underdog AND the market also prices as underdog (edge<0) is a
+    contradiction — not value. A contrarian Over with edge>0 (e.g. model 46%
+    vs market 30% edge +16pp) still passes, so winners like that are kept.
+    """
+    if market not in ("Total", "BTTS"):
+        return True, []
+    if model_prob is None or edge_pp is None:
+        return True, []
+    try:
+        mp = float(model_prob)
+        ep = float(edge_pp)
+    except (TypeError, ValueError):
+        return True, []
+    if mp < 0.5 and ep < 0:
+        sel = selection or market
+        return False, [
+            f"{sel} model {mp:.0%} (<50% underdog) + edge {ep:+.1f}pp negatif — "
+            "pick lawan model dan lawan pasar, bukan value (pola Lincoln/Atalanta 0-0/1-0)"
+        ]
+    return True, []
+
+
 def price_gate(
     market_odds: float | None,
     *,
