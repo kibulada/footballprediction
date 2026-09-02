@@ -89,29 +89,29 @@ def test_match_id_suffix_strip_fallback_case_preserved():
     suffix strip (prefix AND suffix) with case preserved, so existing
     plain-name match_ids stay byte-identical.
 
-    Uses 'Derby' / 'Derby FC' as the non-aliased team -- neither resolves
+    Uses 'Riverton' / 'Riverton FC' as the non-aliased team -- neither resolves
     through any alias, standings, or word-boundary path in the EPL alias
     table, so they fall back to the suffix-strip canonicalizer.
     """
     # Canonical alias-table name kept verbatim
-    assert make_match_id("EPL", "Arsenal FC", "Derby FC", None) == \
-        "EPL||Arsenal FC||Derby||"
-    # 'Derby FC' / 'Derby' are not in the alias table -> fallback strip.
-    # Both strip to 'Derby', so the match_ids collide.
-    assert make_match_id("EPL", "Arsenal FC", "Derby FC", None) == \
-        make_match_id("EPL", "Arsenal FC", "Derby", None)
+    assert make_match_id("EPL", "Arsenal FC", "Riverton FC", None) == \
+        "EPL||Arsenal FC||Riverton||"
+    # 'Riverton FC' / 'Riverton' are not in the alias table -> fallback strip.
+    # Both strip to 'Riverton', so the match_ids collide.
+    assert make_match_id("EPL", "Arsenal FC", "Riverton FC", None) == \
+        make_match_id("EPL", "Arsenal FC", "Riverton", None)
     # P0 (plan v3 2026-08-24): reordered-prefix variants of an alias-table
     # club now UNIFY via significant-token containment ("FC Arsenal" ->
     # "Arsenal FC") -- one real-world club must not split into two match_ids
     # (the Atl. Madrid / Rennes duplicate-identity class). The suffix-strip
     # fallback remains authoritative ONLY for names with no containment hit.
-    assert make_match_id("EPL", "Arsenal FC", "Derby FC", None) == \
-        make_match_id("EPL", "FC Arsenal", "Derby FC", None) == \
-        "EPL||Arsenal FC||Derby||"
-    # Prefix strip: 'FC Derby' -> 'Derby' (prefix FC stripped), same as
-    # 'Derby' -> 'Derby', so they collide.
-    assert make_match_id("EPL", "Arsenal FC", "FC Derby", None) == \
-        make_match_id("EPL", "Arsenal FC", "Derby", None)
+    assert make_match_id("EPL", "Arsenal FC", "Riverton FC", None) == \
+        make_match_id("EPL", "FC Arsenal", "Riverton FC", None) == \
+        "EPL||Arsenal FC||Riverton||"
+    # Prefix strip: 'FC Riverton' -> 'Riverton' (prefix FC stripped), same as
+    # 'Riverton' -> 'Riverton', so they collide.
+    assert make_match_id("EPL", "Arsenal FC", "FC Riverton", None) == \
+        make_match_id("EPL", "Arsenal FC", "Riverton", None)
 
 
 def test_match_id_deterministic_repeated_calls():

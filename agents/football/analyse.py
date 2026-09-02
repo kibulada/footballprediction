@@ -161,46 +161,22 @@ def _norm_team_name(name: str) -> str:
 
 
 def _teams_match(a: str, b: str) -> bool:
-    """Tolerant team-name equality across providers.
+    """Tolerant team-name equality across providers (TOKEN level).
 
-    Providers disagree on prefixes ("FK Bodø/Glimt" vs "Bodø/Glimt") and
-    honorifics ("Royale Union Saint-Gilloise" vs "Union Saint-Gilloise"),
-    so we normalize, drop common prefixes, and fall back to token
-    containment: every token of the shorter name must appear in the longer
-    one (as an exact token or a substring of a longer token, min 3 chars).
+    2026-09-02 (wrong-team post-mortem): the previous body accepted
+    SUBSTRING containment ("south" in "southampton", "stoke" in
+    "basingstoke", "port" in "portsmouth"), so the LiveScore by-name form
+    built Southampton's window from South Carolina United's results, Stoke's
+    from Basingstoke's, and youth/women sides ("Birmingham City U18") passed
+    as the first team. Every provider matcher now delegates to
+    ``team_identity.names_match``: exact tokens (plural stem / dotted
+    abbreviation aware), club-prefix noise dropped, reserve/youth/women
+    markers must agree, club-type qualifiers must agree when both present,
+    and at most one extra identity token on the longer name.
     """
-    na, nb = _norm_team_name(a), _norm_team_name(b)
-    if not na or not nb:
-        return False
-    if na == nb:
-        return True
-    for pref in _TEAM_NAME_PREFIXES:
-        if na.startswith(pref + " ") and na[len(pref) + 1:] == nb:
-            return True
-        if nb.startswith(pref + " ") and nb[len(pref) + 1:] == na:
-            return True
-    ta, tb = na.split(), nb.split()
-    shorter, longer = (ta, tb) if len(ta) <= len(tb) else (tb, ta)
-    if not shorter:
-        return False
-    # Symmetric containment: "hearts" must match "heart of midlothian fc"
-    # ("heart" in "hearts"). The both-sides ambiguity guard (_side_role)
-    # rejects a name that matches BOTH home and away, so symmetric substrings
-    # cannot silently misassign sides. Containment is length-guarded on BOTH
-    # sides (2026-08-17, B1 fix): a 1-char token in the longer name ("a" in
-    # "Dep. A Coruna") must not match every token containing that letter
-    # ("las", "palmas") -- that made "Dep. A Coruna" match "Las Palmas" /
-    # "Albacete" and corrupted standings/form/side matching. Token EQUALITY
-    # stays unguarded ("sg" == "sg" is fine); only containment needs >= 3.
-    return all(
-        any(
-            t == w
-            or (len(t) >= 3 and t in w)
-            or (len(w) >= 3 and w in t)
-            for w in longer
-        )
-        for t in shorter
-    )
+    from .team_identity import names_match
+
+    return names_match(a, b)
 
 
 def _form_depth(form: dict[str, Any] | None) -> int:
@@ -478,24 +454,27 @@ def _primary_fields(
 
     now = utc_now_iso()
     fields: dict[str, Any] = {}
+    # 2026-09-02: every primary value was fetched for THIS resolved pair --
+    # say so, so the merge can verify secondary sources against it.
+    _ent = {"provider": "flashscore", "home": home, "away": away} if (home and away) else None
 
     if home and away:
         fields[FIELD_MATCH] = available(
             canonical_match_identity(home=home, away=away, kickoff=kickoff, competition=competition),
-            now,
+            now, entity=_ent,
         )
     else:
         fields[FIELD_MATCH] = missing()
 
     fields[FIELD_FORM] = (
-        available({"home": home_form, "away": away_form}, now)
+        available({"home": home_form, "away": away_form}, now, entity=_ent)
         if (home_form or away_form) else missing()
     )
 
     if h2h is None:
         fields[FIELD_H2H] = missing()
     elif any(h2h.get(k) for k in ("wins", "draws", "losses")):
-        fields[FIELD_H2H] = available(h2h, now)
+        fields[FIELD_H2H] = available(h2h, now, entity=_ent)
     else:
         fields[FIELD_H2H] = empty(now)
 
@@ -1658,9 +1637,16 @@ async def find_specific_match(
         if oddspapi is None or _budget_short(analysis_remaining(), margin=30.0):
             return None, None
         try:
-            odsp_fixture = await oddspapi.find_fixture(home_query, away_query)
+            # 2026-09-02: scope the fixture search to the analysed kickoff
+            # (never "today" for a fixture days out) and key the odds cache by
+            # the resolved fixture id, so a later re-resolution can never pair
+            # fixture B's names with fixture A's prices.
+            odsp_fixture = await oddspapi.find_fixture(
+                home_query, away_query, kickoff=(source_match or {}).get("kickoff"),
+            )
             if odsp_fixture and odsp_fixture.get("hasOdds"):
-                okey = f"oddspapi_{home_query}_{away_query}".replace("(", "").replace(")", "")
+                _fx_id = odsp_fixture.get("fixtureId") or odsp_fixture.get("id") or ""
+                okey = f"oddspapi_{_fx_id}_{home_query}_{away_query}".replace("(", "").replace(")", "")
                 cached_payload = cache.get(okey, ttl_seconds=3600) if cache is not None else None
                 odsp_payload = cached_payload or await oddspapi.fetch_odds(odsp_fixture)
                 if odsp_payload:
@@ -1739,6 +1725,15 @@ async def find_specific_match(
                 "league mismatch: user '%s' -> fixture competition '%s' -> '%s'",
                 league_key, _fs_match_comp, _actual_key,
             )
+            # 2026-09-02 (wrong-team post-mortem): the FIXTURE's competition is
+            # the truth for every league-scoped lookup that follows -- the
+            # by-name form filter (G5), the provider team search, the alias
+            # scope behind the canonical id and the Elo key. Keeping the
+            # typed league here registered Atalanta v Bologna under
+            # "EFL Championship" (cache/football/entity_registry.json) and
+            # rejected every Serie A result from the form window.
+            league_key = _actual_key
+            meta_with_season["_league_key"] = _actual_key
 
     # P3 + RE-PRIORITAS 2026-08-24 ("NowGoal primary, OddsPapi validator"):
     # collect EVERY consulted odds payload so key lines can be cross-checked
@@ -1851,6 +1846,19 @@ async def find_specific_match(
 
     home_name = home_team["name"]
     away_name = away_team["name"]
+    # P4 (2026-09-02): canonical teams.json names for the Elo lookup. The
+    # live display name ("Lille", "Genk") is a single token the K2 resolver
+    # guard refuses to partial-match; "Lille OSC" / "KRC Genk" resolve
+    # exactly. Both names are tried, canonical first (EloModel.resolve_first).
+    _elo_key_home: str | None = None
+    _elo_key_away: str | None = None
+    try:
+        from .prediction_log import _canonical_team_name as _canon_team_name
+
+        _elo_key_home = _canon_team_name(home_name, league_key) or None
+        _elo_key_away = _canon_team_name(away_name, league_key) or None
+    except Exception as exc:  # noqa: BLE001 -- lookup aid, never blocks analyse
+        logger.warning("canonical elo key lookup failed: %s", exc)
 
     # G2: canonical entity identity per side, persisted on the snapshot.
     # ``home_team``/``away_team`` carry the resolving provider's id + (after
@@ -2190,7 +2198,10 @@ async def find_specific_match(
     _tie_state: dict[str, Any] | None = None
     try:
         from .tie_state import tie_state_from_h2h
-        _tie_state = tie_state_from_h2h(h2h, home=home_name, away=away_name, kickoff=kickoff)
+        _tie_state = tie_state_from_h2h(
+            h2h, home=home_name, away=away_name, kickoff=kickoff,
+            competition=(source_match or {}).get("competition"),
+        )
         if _tie_state:
             logger.info(
                 "tie_state: leg-2 %s (%s, agg_margin_home=%+d)",
@@ -2224,6 +2235,19 @@ async def find_specific_match(
     # No data leakage: live/final event stats are only usable pre-match. If the
     # queried fixture has kicked off, its own stats would leak into the model.
     fixture_flash_url = fixture.get("flashscore_url") if fixture else None
+    # 2026-09-02 (wrong-team audit): every context fetch below (stats,
+    # lineups, match info, GraphQL event context) is keyed by this url. The
+    # url embeds both team slugs -- when they do not name THIS pair, the url
+    # belongs to another fixture and nothing keyed by it may be attached.
+    if fixture_flash_url:
+        from .team_identity import flashscore_url_matches
+
+        if flashscore_url_matches(fixture_flash_url, home_name, away_name) is None:
+            logger.warning(
+                "flashscore url %s does not name %s vs %s -- context fetches skipped",
+                fixture_flash_url, home_name, away_name,
+            )
+            fixture_flash_url = None
     fixture_is_prematch = bool(
         fixture
         and fixture.get("status") == "notstarted"
@@ -2342,6 +2366,23 @@ async def find_specific_match(
                 # Overlapped fetch (started before the browser renders);
                 # identical endpoint/arguments as the legacy inline call.
                 _ctx = await _ctx_task
+                # 2026-09-02: the payload names its sides -- verify they are
+                # THIS pair (drop otherwise) and honour a reversed rendering.
+                if _ctx:
+                    from .team_identity import same_fixture as _same_fx
+
+                    _ctx_h = ((_ctx.get("home") or {}).get("name") if isinstance(_ctx.get("home"), dict) else None)
+                    _ctx_a = ((_ctx.get("away") or {}).get("name") if isinstance(_ctx.get("away"), dict) else None)
+                    if _ctx_h and _ctx_a:
+                        _orient = _same_fx(home_name, away_name, _ctx_h, _ctx_a)
+                        if _orient is None:
+                            logger.warning(
+                                "flashscore event context names %s vs %s, not %s vs %s -- dropped",
+                                _ctx_h, _ctx_a, home_name, away_name,
+                            )
+                            _ctx = None
+                        elif _orient == "reversed":
+                            _ctx = {**_ctx, "home": _ctx.get("away"), "away": _ctx.get("home")}
                 if _ctx:
                     missing_players = {
                         side: {
@@ -2384,6 +2425,11 @@ async def find_specific_match(
                     row = _match_standings_team(tbl, target)
                     if row:
                         matched[side] = row
+                # 2026-09-02: both sides landing on ONE row is an identity
+                # failure (closely spelled clubs) -- never render it as data.
+                if matched.get("home") is not None and matched.get("home") is matched.get("away"):
+                    logger.warning("standings: home and away matched the same row (%s) -- dropped", target)
+                    matched = {}
                 if matched:
                     standings["teams"] = matched
         except Exception as exc:
@@ -2643,6 +2689,10 @@ async def find_specific_match(
             ),
             secondary=_build_secondary_source(cfg, cache=cache),
             ref={"home": home_name, "away": away_name, "kickoff": kickoff,
+                 # 2026-09-02: canonical ids so an adapter that carries ids
+                 # is verified by identity, not only by spelling.
+                 "home_cid": ((entities or {}).get("home") or {}).get("canonical_id"),
+                 "away_cid": ((entities or {}).get("away") or {}).get("canonical_id"),
                  "match_status": (source_match or {}).get("status") if (source_match or {}).get("source") == "flashscore" else None},
             config=_data_sources_config(cfg),
         )
@@ -2694,6 +2744,8 @@ async def find_specific_match(
             home=home_name,
             away=away_name,
             kickoff=kickoff,
+            home_elo_key=_elo_key_home,
+            away_elo_key=_elo_key_away,
             stats={
                 "home_form": (home_form or {}).get("sequence"),
                 "away_form": (away_form or {}).get("sequence"),
@@ -2766,6 +2818,9 @@ async def find_specific_match(
         ensemble = Ensemble(
             elo_weight=ens_cfg.get("elo_weight", 0.5),
             poisson_weight=ens_cfg.get("poisson_weight", 0.5),
+            # M1 (2026-09-02): market-anchored probabilities, alpha by Elo
+            # evidence (models.ensemble.market_anchor).
+            market_anchor=ens_cfg.get("market_anchor"),
         )
         # Phase 5: per-league calibration. EPL uses the global (EPL-fitted)
         # file; any other league must have its own fit or the calibrator is a
@@ -3194,6 +3249,21 @@ async def find_specific_match(
                     cfg=(cfg.get("models") or {}).get("signal_engine"),
                     score_threshold=_cal["threshold"],
                 )
+            # K7/K8 (2026-09-02): tier the FINAL pick. ``run_signal_engine``
+            # tiered the freshly computed top; when the stability layer held
+            # the previous pick instead, the label must follow the held
+            # pick's own score / probability / edge, never the suppressed one
+            # (Wrexham 2026-08-28: held Home Win 0.524 wore the tier of a
+            # 0.670 BTTS Yes it was hiding).
+            if signal_engine_result is not None:
+                from .signal_engine import pick_tier_for as _pick_tier_for
+
+                _tier, _tier_reason = _pick_tier_for(
+                    signal_engine_result.get("best_pick"),
+                    (cfg.get("models") or {}).get("signal_engine") or {},
+                )
+                signal_engine_result["pick_tier"] = _tier
+                signal_engine_result["tier_reason"] = _tier_reason
             # Phase 5.1 (honest presentation): "BEST PICK" becomes "TOP
             # SIGNAL" whenever the league lacks a validated per-league
             # calibration (Phase 1.5 threshold), and a stale edge benchmark
@@ -3313,8 +3383,8 @@ async def find_specific_match(
             # attack/defense, form sequences, completeness -- so similar-signal
             # analysis can explain WHY a prediction was made.
             features = {
-                "elo_home": elo.rating(home_name) if elo else None,
-                "elo_away": elo.rating(away_name) if elo else None,
+                "elo_home": elo.rating((_elo_key_home, home_name)) if elo else None,
+                "elo_away": elo.rating((_elo_key_away, away_name)) if elo else None,
                 "lambda_home": mp.get("lambda_home"),
                 "lambda_away": mp.get("lambda_away"),
                 "lambda_source": mp.get("lambda_source"),
@@ -3360,6 +3430,11 @@ async def find_specific_match(
                     # K5 (2026-08-28): BEST PICK vs LEAN tier, so the
                     # evaluation can report them separately.
                     "tier": _se_res.get("pick_tier"),
+                    # K7 (2026-09-02): why the tier is LEAN, and the model's
+                    # own probability for the pick (the number the tier and
+                    # the confidence cap are decided on).
+                    "tier_reason": _se_res.get("tier_reason"),
+                    "model_prob": _se_bp.get("model_prob"),
                     "market": _se_bp.get("market"),
                     "selection": _se_bp.get("selection"),
                     "score": _se_bp.get("score"),

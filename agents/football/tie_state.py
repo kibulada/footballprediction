@@ -36,13 +36,21 @@ def _squash(name: str | None) -> str:
 
 
 def _same_team(a: str | None, b: str | None) -> bool:
+    """Token-level identity (2026-09-02: shared ``team_identity``); the old
+    4-char substring rule turned any same-named reserve/youth meeting into a
+    phantom first leg."""
+    from .team_identity import names_match
+
+    return names_match(a, b)
+
+
+def _same_competition(a: str | None, b: str | None) -> bool | None:
+    """True/False when both known (tolerant containment on squashed names),
+    None when either is unknown."""
     x, y = _squash(a), _squash(b)
     if not x or not y:
-        return False
-    if x == y:
-        return True
-    shorter, longer = (x, y) if len(x) <= len(y) else (y, x)
-    return len(shorter) >= 4 and shorter in longer
+        return None
+    return x == y or x in y or y in x
 
 
 def _to_dt(raw: Any) -> datetime | None:
@@ -84,8 +92,13 @@ def tie_state_from_h2h(
     away: str,
     kickoff: str | None,
     max_days: int = MAX_DAYS_BETWEEN_LEGS,
+    competition: str | None = None,
 ) -> dict[str, Any] | None:
     """Detect a second leg from the H2H rows; None when no first leg is found.
+
+    ``competition`` (2026-09-02): when the analysed match's competition and
+    the meeting's competition are both known and differ, the meeting is not
+    a first leg (a rescheduled league fixture next to a cup tie).
 
     Returns ``{leg: 2, first_leg, first_leg_home_goals, first_leg_away_goals,
     agg_margin_home, state, leader, days_between, competition, source}``
@@ -103,6 +116,8 @@ def tie_state_from_h2h(
             continue
         # First leg = reversed venue: today's away side hosted.
         if not (_same_team(m.get("home"), away) and _same_team(m.get("away"), home)):
+            continue
+        if _same_competition(competition, m.get("competition") or m.get("league")) is False:
             continue
         dt = _to_dt(m.get("kickoff") if "kickoff" in m else m.get("date"))
         if dt is None:

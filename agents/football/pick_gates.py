@@ -22,10 +22,19 @@ Gate map (IDs match the report):
     G5  elo_integrity_gate    seeded + in range + no duplicate-rating collision
     G6  entity_integrity_gate no asymmetric Women/youth/reserve pairing
     G7  price_gate            a price and enough books actually exist
+    G11 total_favor_gate      Total/BTTS: model underdog AND market underdog
+                              is a contradiction, not value (2026-09-02)
 
-G1 (respect the independent 1X2 decision layer) and G8 (published pick ==
-ranking[0]) are enforced at the decision site in ``signal_engine`` /
-``analyse``, not here, because they need the ranking object itself.
+G1 (respect the independent 1X2 decision layer), G8 (published pick ==
+ranking[0]) and G10 (1X2 selection must be the model favourite) are
+enforced at the decision site in ``signal_engine`` / ``analyse``, not here,
+because they need the ranking object itself.
+
+K6 ``lambda_direction_conflict`` (2026-09-02) is NOT a gate: it returns a
+note the engine uses to CAP confidence at MEDIUM when the Elo-led blend and
+the Poisson lambdas disagree on direction (Coventry / Cercle 2026-08-29
+lost, LASK the same day won -- measured via failure_class K6 before it can
+ever become a veto).
 """
 from __future__ import annotations
 
@@ -380,6 +389,55 @@ def lambda_1x2_gate(
     ]
 
 
+def lambda_direction_conflict(
+    model_probs: dict[str, Any] | None,
+    market: str | None,
+    selection: str | None,
+    side: str | None = None,
+) -> tuple[bool, str | None]:
+    """K6 (2026-09-02): the pick backs the blend favourite, but the lambda
+    matrix has that side scoring LESS than its opponent.
+
+    Two halves of the same model disagree on WHO is stronger: the Elo-led
+    ensemble (weight 0.6) says one side, the feature Poisson says the other.
+    Coventry v Hull (1X2 home 55%, lam 1.41 v 1.43, FT 0-1) and Cercle v
+    Lommel (home 57%, lam 1.45 v 1.76, FT 0-1) both lost; LASK v Altach
+    (home 65%, lam 1.54 v 1.90, FT 3-0) won -- so this is a confidence CAP
+    plus a tracked failure class, never a veto. Only directional picks on the
+    blend favourite are affected (an AH underdog line never needs its side
+    to be the stronger one). Returns ``(conflict, note)``.
+    """
+    if not is_directional_selection(market, selection):
+        return False, None
+    mp = model_probs or {}
+    p = mp.get("1x2") or {}
+    lh, la = mp.get("lambda_home"), mp.get("lambda_away")
+    if lh is None or la is None or not p:
+        return False, None
+    try:
+        lh_f, la_f = float(lh), float(la)
+        ph, pa = float(p.get("home", 0.0)), float(p.get("away", 0.0))
+    except (TypeError, ValueError):
+        return False, None
+    sel = str(selection or "").strip().lower()
+    pick_side = side or ("home" if sel.startswith("home") else ("away" if sel.startswith("away") else None))
+    if pick_side not in ("home", "away"):
+        return False, None
+    blend_fav = "home" if ph >= pa else "away"
+    # Equal lambdas carry no direction -- only a STRICT reversal is a conflict.
+    if abs(lh_f - la_f) < 1e-9:
+        return False, None
+    lam_fav = "home" if lh_f > la_f else "away"
+    if pick_side != blend_fav or lam_fav == blend_fav:
+        return False, None
+    # Wording stays free of engine internals (the primary card bans "λ").
+    return True, (
+        f"gol ekspektasi {lh_f:.2f} vs {la_f:.2f} memihak {lam_fav} padahal 1X2 model "
+        f"favorit {blend_fav} — dua bagian model tidak sepakat arah, confidence dibatasi "
+        "MEDIUM (pola Coventry/Cercle 2026-08-29)"
+    )
+
+
 def elo_integrity_gate(
     model_probs: dict[str, Any] | None,
     *,
@@ -464,7 +522,7 @@ def total_favor_gate(
     model_prob: float | None,
     edge_pp: float | None,
 ) -> tuple[bool, list[str]]:
-    """G8: Total/BTTS must favor the picked side (model_prob >= 0.5) when edge is negative.
+    """G11: Total/BTTS must favor the picked side (model_prob >= 0.5) when edge is negative.
 
     Lincoln 01-Sep Over 2.5 46% (<50% Under favored) with edge -2.4pp and
     Atalanta 31-Aug Over 49% (<50%) with edge -0.9pp both lost 1-0/0-0 while

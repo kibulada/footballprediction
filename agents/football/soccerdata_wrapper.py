@@ -346,12 +346,18 @@ class SoccerDataWrapper:
             logger.warning("soccerdata columns unresolved (team cols), cols=%s", list(df.columns))
             return None
 
-        team_lower = team_name.lower()
-        team_mask = (
-            df[team_col].astype(str).str.lower().str.contains(team_lower, na=False, regex=False)
-            | df[away_col].astype(str).str.lower().str.contains(team_lower, na=False, regex=False)
+        # 2026-09-02 (wrong-team post-mortem): token-level identity with an
+        # ambiguity guard instead of raw ``in`` ("inter" matched "Winterthur"
+        # and the substring also decided the home/away side).
+        from .team_identity import match_side as _match_side
+
+        _sides = df.apply(
+            lambda r: _match_side(team_name, str(r.get(team_col, "")), str(r.get(away_col, ""))),
+            axis=1,
         )
+        team_mask = _sides.notna()
         matches = df[team_mask].copy()
+        matches["_side"] = _sides[team_mask]
         if matches is None or len(matches) == 0:
             return None
         today_utc = pd.Timestamp.now(tz="UTC")
@@ -377,8 +383,7 @@ class SoccerDataWrapper:
         home_w = home_d = home_l = 0
         away_w = away_d = away_l = 0
         for _, row in matches.iterrows():
-            home_name = str(row.get(team_col, "")).lower()
-            is_home = team_lower in home_name
+            is_home = row.get("_side") == "home"
             try:
                 if score_col is not None:
                     raw_score = str(row.get(score_col))
@@ -558,19 +563,16 @@ class SoccerDataWrapper:
         if not all([home_col, away_col]) or (score_col is None and (hg_col is None or ag_col is None)):
             return None
 
-        a_lower = team_a.lower()
-        b_lower = team_b.lower()
-        mask = (
-            (
-                df[home_col].astype(str).str.lower().str.contains(a_lower, regex=False, na=False)
-                & df[away_col].astype(str).str.lower().str.contains(b_lower, regex=False, na=False)
-            )
-            | (
-                df[home_col].astype(str).str.lower().str.contains(b_lower, regex=False, na=False)
-                & df[away_col].astype(str).str.lower().str.contains(a_lower, regex=False, na=False)
-            )
+        # 2026-09-02: fixture identity by tokens, orientation carried per row.
+        from .team_identity import same_fixture as _same_fixture
+
+        _orient = df.apply(
+            lambda r: _same_fixture(team_a, team_b, str(r.get(home_col, "")), str(r.get(away_col, ""))),
+            axis=1,
         )
+        mask = _orient.notna()
         rows = df[mask].copy()
+        rows["_orient"] = _orient[mask]
         if rows is None or len(rows) == 0:
             return None
         if date_col:
@@ -599,8 +601,7 @@ class SoccerDataWrapper:
                     ag = int(row.get(ag_col))
             except (TypeError, ValueError):
                 continue
-            home_team_name = str(row.get(home_col, "")).lower()
-            team_a_is_home = a_lower in home_team_name
+            team_a_is_home = row.get("_orient") == "ordered"
             if hg == ag:
                 draws += 1
             elif (hg > ag) == team_a_is_home:

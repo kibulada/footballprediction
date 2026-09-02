@@ -545,6 +545,9 @@ def test_fetch_team_form_livescore_last_resort():
         meta = _meta(provider="football_data", fallback="thesportsdb")
         meta["_league_key"] = "Eredivisie"
         meta["display"] = "Eredivisie"
+        # 2026-09-02: the by-name LiveScore form is country-scoped -- the feed
+        # rows are Dutch, so the analysed league must be too.
+        meta["country"] = "Netherlands"
         meta["football_data_code"] = "DED"
         meta["_team_names"] = {"670": "ADO Den Haag"}
 
@@ -598,6 +601,9 @@ def test_fetch_team_form_thin_football_data_filled_by_livescore():
         meta = _meta()
         meta["_league_key"] = "Eredivisie"
         meta["display"] = "Eredivisie"
+        # 2026-09-02: the by-name LiveScore form is country-scoped -- the feed
+        # rows are Dutch, so the analysed league must be too.
+        meta["country"] = "Netherlands"
         meta["football_data_code"] = "DED"
         meta["_team_names"] = {"670": "ADO Den Haag"}
 

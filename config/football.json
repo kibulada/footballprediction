@@ -161,11 +161,18 @@
     },
     "ensemble": {
       "elo_weight": 0.6,
-      "poisson_weight": 0.4
+      "poisson_weight": 0.4,
+      "market_anchor": {
+        "enabled": true,
+        "alpha_both_seeded": 0.5,
+        "alpha_one_prior": 0.25,
+        "alpha_none": 0.0,
+        "_note": "M1 2026-09-02: p_final = alpha*model + (1-alpha)*devigged market for 1x2 / over_2.5 / btts_yes (models.run_prediction_engine, last step). Measured 25 Aug-1 Sep (147 settled): Brier 1X2 ensemble 0.530 vs market 0.488; both seeded 0.525 vs 0.525 (level), one side on the 1500 prior 0.534 vs 0.457 (model far worse). raw pre-anchor probs kept in model_probs.raw; alpha in model_probs.market_anchor_alpha. M2: with BOTH sides on the prior the Elo component is dropped from the blend when a feature Poisson exists (Ensemble.predict); sub-model views persisted in model_probs.components_1x2 for a later weight fit (scripts/calibration_report.py)."
+      }
     },
     "calibration": {
       "file": "cache/football/calibration.json",
-      "min_samples": 200,
+      "min_samples": 100,
       "league_min_samples": 100,
       "always_calibrated": [
         "EPL",
@@ -351,6 +358,8 @@
         },
         "lambda_1x2_low_scoring": true,
         "require_model_favorite_1x2": true,
+        "total_favor": true,
+        "lambda_direction_cap": true,
         "source_consistency": true,
         "consistency_fav_implied": 0.70,
         "consistency_max_wins": 1,
@@ -387,6 +396,9 @@
       "high_score": 0.65,
       "medium_score": 0.52,
       "low_score": 0.4,
+      "best_pick_min_prob": 0.6,
+      "best_pick_value_min_prob": 0.5,
+      "_note_2026_09_02": "Evaluasi 26 Agu-1 Sep (83 pick): BEST PICK tier 42-15. Skor komposit bukan probabilitas -- pick prob model >= 0.60 went 27-4, prob 0.50-0.60 dengan edge >= 0 went 9-2, sisanya 6-9. K7 tier rule (signal_engine.pick_tier_for): BEST PICK = prob >= best_pick_min_prob ATAU (prob >= best_pick_value_min_prob DAN edge >= 0), selain itu LEAN (tetap tampil, dengan alasan); HIGH/VERY HIGH dibatasi MEDIUM di bawah best_pick_min_prob. K8: apply_pick_stability melepas hold bila kandidat lain unggul >= best_pick_margin atau held melemah >= ambang (Wrexham 2026-08-28). K6 (pick_gates.lambda_direction_cap): Elo vs Poisson beda arah -> cap MEDIUM + failure_class K6, bukan veto (LASK menang). G11 (pick_gates.total_favor): Total/BTTS model <50% & edge <0 diveto (Atalanta/Lincoln, 0 win terkena).",
       "movement_pct_threshold": 2.0,
       "reversal_pct": 1.5,
       "evidence_floor": {

@@ -102,11 +102,24 @@ def _summary_best_pick_value(se: dict[str, Any], match_data: dict[str, Any] | No
         _warn = "\n⚠️ **LIGA TIDAK TERKALIBRASI — REKOMENDASI: SKIP**"
     if se.get("pick_tier") == "LEAN":
         # K5: a LEAN is shown, but never dressed up as a BEST PICK.
-        _warn += "\n📌 **LEAN — pick lemah (score/confidence rendah), bukan BEST PICK**"
+        # K7 (2026-09-02): with the reason (score / confidence / conviction).
+        _reason = se.get("tier_reason")
+        _warn += (
+            f"\n📌 **LEAN — bukan BEST PICK ({_reason})**" if _reason
+            else "\n📌 **LEAN — pick lemah (score/confidence rendah), bukan BEST PICK**"
+        )
+    # K7: the score is a composite, not a probability -- show both.
+    _prob_txt = ""
+    _mp = bp.get("model_prob")
+    if _mp is not None:
+        try:
+            _prob_txt = f" • Peluang model: {float(_mp):.0%}"
+        except (TypeError, ValueError):
+            _prob_txt = ""
     # 20% lebih besar: bold+underline untuk BEST PICK (≈20% visual)
     out = (
         f"**__{icon} {bp['selection'].upper()}{odds}__**\n"
-        f"Score: {score}/100 • Confidence: {bp.get('confidence')}\n"
+        f"Score: {score}/100 • Confidence: {bp.get('confidence')}{_prob_txt}\n"
         f"{short}{_warn}"
     )
     if risk_reason:

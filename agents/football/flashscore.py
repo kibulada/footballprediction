@@ -139,7 +139,9 @@ def _squash_matches(sq_name: str, sq_slug: str) -> bool:
     if not sq_name or not sq_slug:
         return False
     short, long = (sq_name, sq_slug) if len(sq_name) <= len(sq_slug) else (sq_slug, sq_name)
-    return short in long
+    # 2026-09-02: squashed containment needs a real overlap -- "stoke" inside
+    # "basingstoke" (45%) is not the same club; "stokecity" vs "stoke" is.
+    return short == long or (len(short) >= 4 and short in long and len(short) / len(long) >= 0.6)
 
 
 def _assign_slug_roles(
@@ -286,13 +288,28 @@ def _find_pair_in_rows(
     away_variants = [n for n in (norm_away if isinstance(norm_away, list) else [norm_away]) if n]
     if not (home_variants and away_variants):
         return None
+    from .team_identity import has_marker as _has_marker
+
+    def _contains(v: str, s: str) -> bool:
+        # 2026-09-02: guarded squashed containment (see _squash_matches) --
+        # "stoke" must not hit "basingstoke", "south" must not hit
+        # "southampton".
+        return _squash_matches(v, s)
+
     for r in rows:
         h = _squash(_norm_name(r.get("home_name") or ""))
         a = _squash(_norm_name(r.get("away_name") or ""))
         if not (h and a):
             continue
-        home_in_home = any(nh in h or h in nh for nh in home_variants)
-        away_in_away = any(na in a or a in na for na in away_variants)
+        # A reserve / youth / women row can only match a variant that carries
+        # the same marker ("Birmingham City U21" is not "Birmingham").
+        _hm, _am = _has_marker(r.get("home_name")), _has_marker(r.get("away_name"))
+        if (_hm and not any(_has_marker(v) for v in home_variants + away_variants)) or (
+            _am and not any(_has_marker(v) for v in home_variants + away_variants)
+        ):
+            continue
+        home_in_home = any(_contains(nh, h) for nh in home_variants)
+        away_in_away = any(_contains(na, a) for na in away_variants)
         if home_in_home and away_in_away:
             return {
                 "home": {"slug": r["home_slug"], "id": r["home_id"], "name": r["home_name"]},
@@ -308,8 +325,8 @@ def _find_pair_in_rows(
             }
         # swapped sides in the row (defensive): home variant on the away side
         # AND away variant on the home side
-        home_in_away = any(nh in a or a in nh for nh in home_variants)
-        away_in_home = any(na in h or h in na for na in away_variants)
+        home_in_away = any(_contains(nh, a) for nh in home_variants)
+        away_in_home = any(_contains(na, h) for na in away_variants)
         if home_in_away and away_in_home:
             return {
                 "home": {"slug": r["away_slug"], "id": r["away_id"], "name": r["away_name"]},
@@ -1346,23 +1363,40 @@ def _pick_suggest_team(text: str, sq: str | list[str]) -> tuple[str, str] | None
             return False
         if not sqs:
             return True
-        return any(sq == s or sq in s or s in sq for sq in sqs)
+        return any(_squash_matches(sq, s) for sq in sqs)
 
     entries: list[tuple[str, str]] = []
     try:
         entries = _flatten_suggest_entries(json.loads(text))
     except (ValueError, TypeError):
         entries = []
-    best: tuple[str, str] | None = None
+    best: tuple[int, int, str, str] | None = None
+    partial_clubs: list[str] = []
     for name, url in entries:
         s = _squash(_norm_name(name))
         if not _matches(s):
             continue
         m = url_re.search(url)
-        if m and (best is None or len(m.group(1)) > len(best[0])):
-            best = (m.group(1), m.group(2))
+        if not m:
+            continue
+        # 2026-09-02: an EXACT squashed match wins; among partial hits prefer
+        # the SHORTEST slug. The old longest-slug tiebreak picked lower-league
+        # clubs whose slug merely contained the query (the Copenhagen shape).
+        is_exact = any(sq == s for sq in sqs)
+        if not is_exact:
+            partial_clubs.append(name)
+        rank = (0 if is_exact else 1, len(m.group(1)))
+        if best is None or rank < best[:2]:
+            best = (rank[0], rank[1], m.group(1), m.group(2))
     if best:
-        return best
+        if best[0] == 1:
+            from .team_identity import distinct_clubs
+
+            # Only partial hits and they name DIFFERENT clubs -> the query is
+            # ambiguous on this API: refuse rather than guess.
+            if distinct_clubs(partial_clubs) > 1:
+                return None
+        return best[2], best[3]
     # Unknown JSON shape: fall back to the first slug pattern whose slug
     # still agrees with the query token.
     for m in url_re.finditer(text):
@@ -1388,6 +1422,7 @@ def _pick_sphinx_team(data: Any, sq: list[str]) -> tuple[str, str] | None:
     items = data if isinstance(data, list) else (data or {}).get("results") or []
     exact: tuple[str, str] | None = None
     contain: tuple[str, str] | None = None
+    contain_names: list[str] = []
     for it in items:
         if not isinstance(it, dict):
             continue
@@ -1423,9 +1458,20 @@ def _pick_sphinx_team(data: Any, sq: list[str]) -> tuple[str, str] | None:
         if any(s == sq for sq in sq):
             if exact is None:
                 exact = (slug, tid)
-        elif contain is None:
-            contain = (slug, tid)
-    return exact or contain
+        else:
+            contain_names.append(name)
+            if contain is None:
+                contain = (slug, tid)
+    if exact:
+        return exact
+    if contain:
+        from .team_identity import distinct_clubs
+
+        # 2026-09-02: containment hits from DIFFERENT clubs ("Inter Milan",
+        # "Inter Turku") -> ambiguous query, refuse rather than take the first.
+        if distinct_clubs(contain_names) > 1:
+            return None
+    return contain
 
 
 def _suggest_team(query: str) -> tuple[str, str] | None:

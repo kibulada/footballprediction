@@ -47,6 +47,7 @@ from .pick_gates import (
     is_directional_selection,
     is_low_scoring_selection,
     lambda_1x2_gate,
+    lambda_direction_conflict,
     lambda_total_gate,
     market_implied_total,
     price_gate,
@@ -79,6 +80,17 @@ BEST_PICK_MARGIN = 0.06     # top1 - top2 score must clear this (S22)
 NO_BET_SCORE = 0.45         # best score below this -> NO BET (S24)
 MIN_CONFLUENCE = 2          # minimum agreeing evidence groups (S20)
 MIN_DATA_QUALITY = 0.30     # completeness floor for a bettable signal (S24)
+
+# K7 (2026-09-02): the BEST PICK tier needs model CONVICTION or VALUE, not a
+# composite score. 26 Aug-1 Sep 2026 (83 picks): BEST PICK-tier picks with
+# model_prob >= 0.60 went 27-4, 0.50-0.60 with edge >= 0 went 9-2, everything
+# else 6-9 (Racing AH 0.505/-2.9, Lorient 0.47/-1.8, Lazio AH 0.46/-3.0 ...).
+# 0.60 is the repo's existing favourite/dominance constant
+# (lambda_1x2_favourite_prob, dominance_floor); 0.50 = majority; edge 0 =
+# the model is not BELOW the market. Mirrored in config as
+# best_pick_min_prob / best_pick_value_min_prob.
+BEST_PICK_MIN_PROB = 0.60
+BEST_PICK_VALUE_MIN_PROB = 0.50
 
 # F2 (evidence floor): a form window shorter than this many finished matches
 # per team carries no empirical signal -- the statistical component is noise
@@ -914,6 +926,81 @@ def _cap_confidence(label: str, cap: str | None) -> str:
     return label if _CONF_ORDER.index(label) <= _CONF_ORDER.index(cap) else cap
 
 
+def _tighten_cap(sig: Any, cap: str) -> None:
+    """Lower ``sig.confidence_cap`` to ``cap`` when ``cap`` is stricter."""
+    cur = getattr(sig, "confidence_cap", None)
+    if cur in _CONF_ORDER and cap in _CONF_ORDER:
+        sig.confidence_cap = cur if _CONF_ORDER.index(cur) <= _CONF_ORDER.index(cap) else cap
+    else:
+        sig.confidence_cap = cap
+
+
+def _bp_get(bp: Any, key: str, default: Any = None) -> Any:
+    if bp is None:
+        return default
+    if isinstance(bp, dict):
+        return bp.get(key, default)
+    return getattr(bp, key, default)
+
+
+def pick_tier_for(best_pick: Any, cfg: dict[str, Any] | None = None) -> tuple[str | None, str | None]:
+    """K5 + K7: ``(tier, reason)`` for a selected pick (Signal or dict).
+
+    LEAN (never advertised as BEST PICK) when ANY of:
+      * score below ``medium_score`` (K5, 2026-08-28);
+      * confidence LOW (K5);
+      * the model's own probability for the pick is below
+        ``best_pick_min_prob`` (0.60) AND it is not a value pick, i.e. not
+        (probability >= ``best_pick_value_min_prob`` (0.50) with edge >= 0)
+        (K7, 2026-09-02).
+
+    ``model_prob`` for an Asian-Handicap quarter line is the expected-return
+    probability (win + half of the half-win mass), not P(full win) -- the
+    same quantity the engine scores and the card prints. ``reason`` is the
+    human-readable explanation rendered next to the LEAN label; ``None``
+    when the pick is a BEST PICK or when no pick exists.
+    """
+    if best_pick is None:
+        return None, None
+    cfg = cfg or {}
+    medium = float(cfg.get("medium_score", MEDIUM_SCORE))
+    min_prob = float(cfg.get("best_pick_min_prob", BEST_PICK_MIN_PROB))
+    value_min = float(cfg.get("best_pick_value_min_prob", BEST_PICK_VALUE_MIN_PROB))
+    try:
+        score = float(_bp_get(best_pick, "score") or 0.0)
+    except (TypeError, ValueError):
+        score = 0.0
+    conf = _bp_get(best_pick, "confidence")
+    reasons: list[str] = []
+    if score < medium:
+        reasons.append(f"skor {score:.2f} < {medium:.2f}")
+    if conf == "LOW":
+        reasons.append("confidence LOW")
+    prob_raw = _bp_get(best_pick, "model_prob")
+    edge_raw = _bp_get(best_pick, "edge_pp")
+    if prob_raw is not None:
+        try:
+            p = float(prob_raw)
+        except (TypeError, ValueError):
+            p = None
+        try:
+            e = float(edge_raw) if edge_raw is not None else None
+        except (TypeError, ValueError):
+            e = None
+        if p is not None and p < min_prob and not (p >= value_min and e is not None and e >= 0.0):
+            if p < value_min:
+                reasons.append(f"keyakinan model {p:.0%} < {value_min:.0%}")
+            elif e is None:
+                reasons.append(f"keyakinan model {p:.0%} < {min_prob:.0%} tanpa edge terhadap pasar")
+            else:
+                reasons.append(
+                    f"keyakinan model {p:.0%} < {min_prob:.0%} dan edge {e:+.1f}pp (tidak ada value)"
+                )
+    if reasons:
+        return "LEAN", "; ".join(reasons)
+    return "BEST PICK", None
+
+
 def _movement_available(mv: dict[str, Any] | None) -> bool:
     """True when the movement block carries a real opening->latest signal."""
     if not isinstance(mv, dict):
@@ -1619,6 +1706,16 @@ def rank_and_pick(
         )
         s.confidence = _coverage_floor(completeness, s.confidence, _cov_cfg)
         s.confidence = _cap_confidence(s.confidence, getattr(s, "confidence_cap", None))
+        # K7 (2026-09-02): HIGH / VERY HIGH require model conviction >= the
+        # favourite constant. Coventry v Hull 2026-08-29 printed HIGH on a
+        # 55% proposition (score 0.651 built from market agreement) -- the
+        # label must never outrun the probability behind it.
+        _min_prob = float((confidence_thresholds or {}).get("best_pick_min_prob", BEST_PICK_MIN_PROB))
+        if s.confidence in ("VERY HIGH", "HIGH") and float(s.model_prob) < _min_prob:
+            s.confidence = "MEDIUM"
+            s.evidence_notes = list(getattr(s, "evidence_notes", None) or []) + [
+                f"keyakinan model {float(s.model_prob):.0%} < {_min_prob:.0%} — confidence dibatasi MEDIUM"
+            ]
         # 2026-08-22: a gated candidate keeps its SCORE (so the card can show
         # what the evidence was worth) but must never advertise a confidence --
         # "Score: 62/100 / Confidence: HIGH" next to a rejected pick is exactly
@@ -2195,6 +2292,35 @@ def apply_pick_stability(
             f"pick sebelumnya melemah ({entry['selection']} skor "
             f"{entry['score']:.2f}, confidence {entry.get('confidence')})"
         )
+    # K8 (2026-09-02): a hold must not outlive its own evidence. The delta
+    # test above compares the NEW top against the prior pick's OLD score, so
+    # a held pick that decayed while a different candidate stayed strong was
+    # never released: Wrexham v Birmingham 2026-08-28 held Home Win at 0.524
+    # (logged at 0.630) while BTTS Yes stood at 0.670 HIGH and won. Two
+    # explicit release rules, both labelled (never a silent swap):
+    #   1. another bet beats the held pick's CURRENT score by
+    #      ``best_pick_margin`` (0.06 -- the S22 margin);
+    #   2. the held pick itself fell by >= the calibrated threshold since it
+    #      was logged.
+    _margin = float((cfg or {}).get("best_pick_margin", BEST_PICK_MARGIN))
+    _top_same_bet = (
+        top.get("market") == entry.get("market")
+        and (
+            top.get("selection") == entry.get("selection")
+            or (entry.get("line_key") and top.get("line_key") == entry.get("line_key"))
+        )
+    )
+    if not _top_same_bet and float(top["score"]) - float(entry["score"]) >= _margin:
+        return _changed(
+            f"kandidat lain lebih kuat: {top['selection']} {float(top['score']):.2f} vs "
+            f"pick sebelumnya {entry['selection']} {float(entry['score']):.2f} "
+            f"(gap ≥ {_margin:.2f})"
+        )
+    if float(entry["score"]) <= prev_score - threshold:
+        return _changed(
+            f"pick sebelumnya melemah {prev_score:.2f} → {float(entry['score']):.2f} "
+            f"(turun ≥ ambang {threshold:.2f})"
+        )
     held = {
         "market": entry["market"],
         "selection": entry["selection"],
@@ -2562,16 +2688,18 @@ def run_signal_engine(
             if not _ok_g2:
                 _veto(s, _rs_g2[0])
 
-    # G8 (2026-09-02): Total/BTTS must favor the picked side when edge is negative.
+    # G11 (2026-09-02): Total/BTTS must favor the picked side when edge is negative.
     # Lincoln 01-Sep Over 46% + edge -2.4 and Atalanta 31-Aug Over 49% + edge -0.9
     # both lost 0-0/1-0 while model said Under. A contrarian Over with edge>0
     # (e.g. model 46% vs market 30% edge +16) still passes — only the
-    # model-underdog + market-underdog combo is vetoed.
+    # model-underdog + market-underdog combo is vetoed. Replay 26 Aug-1 Sep:
+    # 2 losses caught, 0 wins touched. (ID G11: G8 already names the
+    # "published pick == ranking[0]" decision-site rule.)
     if bool(_pg_cfg.get("total_favor", True)):
         for s in signals:
-            _ok_g8, _rs_g8 = total_favor_gate(s.market, s.selection, s.model_prob, s.edge_pp)
-            if not _ok_g8:
-                _veto(s, _rs_g8[0])
+            _ok_g11, _rs_g11 = total_favor_gate(s.market, s.selection, s.model_prob, s.edge_pp)
+            if not _ok_g11:
+                _veto(s, _rs_g11[0])
 
     # G10 (2026-08-31): 1X2 must be model favorite. A 1X2 underdog (e.g. Away 30% vs Home 44% favorite) has no model edge even if edge 0 vs market - picking it is pure market mirroring. Verified Monaco 2-0, Leeds 1-1, Pisa 2-1.
     if bool(_pg_cfg.get("require_model_favorite_1x2", True)):
@@ -2706,6 +2834,16 @@ def run_signal_engine(
         # vetoed above; whatever survives (Draw / Totals / BTTS) must never
         # advertise more than LOW -- reuse the evidence-floor cap path.
         evidence_floor = {"veto": False, "note": _elo_note or "kedua tim tanpa Elo — confidence dibatasi"}
+    # K6 (2026-09-02): Elo-led blend and Poisson lambdas disagree on WHO is
+    # stronger -> directional picks on the blend favourite are capped at
+    # MEDIUM with an explicit note (soft; tracked as failure_class K6, never
+    # a veto -- LASK v Altach 2026-08-29 won with the same conflict).
+    if bool(_pg_cfg.get("lambda_direction_cap", True)):
+        for s in signals:
+            _k6, _k6_note = lambda_direction_conflict(model_probs, s.market, s.selection, s.side)
+            if _k6 and _k6_note:
+                _tighten_cap(s, "MEDIUM")
+                s.evidence_notes = list(getattr(s, "evidence_notes", None) or []) + [_k6_note]
     result = rank_and_pick(
         signals,
         best_pick_margin=best_pick_margin,
@@ -2760,16 +2898,12 @@ def run_signal_engine(
     # ``medium_score`` or labelled LOW is a LEAN, not a BEST PICK -- 25-27 Aug
     # LOW picks went 8-4 while MEDIUM+ went 12-2; printing both as
     # "BEST PICK" hid that difference from the reader and from the stats.
+    # K7 (2026-09-02): the tier also needs model conviction or value -- see
+    # ``pick_tier_for``. The analyser recomputes this from the FINAL pick
+    # after the stability layer (a held pick must be tiered on its own
+    # numbers, not on the freshly computed top's).
     _medium_score = float(cfg.get("medium_score", MEDIUM_SCORE))
-    if result["best_pick"] is not None:
-        _bp_obj = result["best_pick"]
-        result["pick_tier"] = (
-            "LEAN"
-            if (float(_bp_obj.score) < _medium_score or _bp_obj.confidence == "LOW")
-            else "BEST PICK"
-        )
-    else:
-        result["pick_tier"] = None
+    result["pick_tier"], result["tier_reason"] = pick_tier_for(result["best_pick"], cfg)
     result["tier_threshold"] = _medium_score
     # K1/K2/K3 audit trail (persisted with the snapshot via the analyser).
     result["elo_scope"] = _elo_scope

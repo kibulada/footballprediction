@@ -642,33 +642,15 @@ def _norm_team(name: str) -> str:
 
 
 def _same_team(a: str, b: str) -> bool:
-    na, nb = _norm_team(a), _norm_team(b)
-    if not na or not nb:
-        return False
-    if na == nb:
-        return True
-    for pref in _TEAM_PREFIXES:
-        if na.startswith(pref + " ") and na[len(pref) + 1:] == nb:
-            return True
-        if nb.startswith(pref + " ") and nb[len(pref) + 1:] == na:
-            return True
-    ta, tb = na.split(), nb.split()
-    shorter, longer = (ta, tb) if len(ta) <= len(tb) else (tb, ta)
-    if not shorter:
-        return False
-    # Substring containment is only meaningful when BOTH tokens are at least
-    # 3 chars. Without the ``len(w) >= 3`` guard, a single-letter token on the
-    # longer side (e.g. "b" from a "B team" suffix) makes every name that
-    # contains that letter match -- e.g. "Cadiz B" matched "Genclerbirligi"
-    # ("b" in "genclerbirligi") and the wrong fixture was picked for a real
-    # match. Exact-token and prefix matches above are unaffected.
-    return all(
-        any(
-            t == w or (len(t) >= 3 and len(w) >= 3 and (t in w or w in t))
-            for w in longer
-        )
-        for t in shorter
-    )
+    """Token-level team identity (2026-09-02: shared ``team_identity``).
+
+    The previous substring containment let "Cadiz B" match "Genclerbirligi"
+    and youth/reserve rows pass as the first team; every provider now uses
+    the one strict matcher.
+    """
+    from .team_identity import names_match
+
+    return names_match(a, b)
 
 
 # ---- client ---------------------------------------------------------------
@@ -1787,11 +1769,17 @@ class NowGoalClient:
                 )
                 row_home = names[0].strip() if len(names) >= 1 else ""
                 row_away = names[1].strip() if len(names) >= 2 else ""
-                is_home = bool(
-                    row_home and _same_team(team_ref, row_home)
-                ) or (
-                    bool(row_away) and not _same_team(team_ref, row_away)
-                )
+                # 2026-09-02 (wrong-team post-mortem): FAIL CLOSED. The old
+                # rule defaulted to HOME when the team matched NEITHER rendered
+                # side, so a spelling drift silently swapped gf/ga for the row.
+                # A row that does not name the table's team (or names it on
+                # both sides) is dropped, never guessed.
+                from .team_identity import match_side as _row_side
+
+                _side = _row_side(team_ref, row_home, row_away)
+                if _side is None:
+                    continue
+                is_home = _side == "home"
                 gf = fh if is_home else fa
                 ga = fa if is_home else fh
                 gf_list.append(gf)

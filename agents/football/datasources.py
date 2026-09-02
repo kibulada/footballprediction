@@ -91,8 +91,8 @@ def normalize_team_name(name: str) -> str:
 
 
 def teams_match(a: str, b: str) -> bool:
-    """Tolerant team-name equality: existing matcher + unambiguous aliases."""
-    from .analyse import _teams_match
+    """Tolerant team-name equality: strict token matcher + unambiguous aliases."""
+    from .team_identity import names_match as _teams_match
     if _teams_match(a, b):
         return True
     from .team_alias import canonical_abbreviation
@@ -253,14 +253,26 @@ def dedupe_matches(
 @dataclass
 class FieldSample:
     """One field as reported by ONE source (status distinguishes empty vs
-    unknown; ``value`` is the already-normalized representation)."""
+    unknown; ``value`` is the already-normalized representation).
+
+    ``entity`` (2026-09-02, wrong-team audit) names WHICH fixture the source
+    fetched the value for -- ``{"home", "away"}`` names, optionally
+    ``home_id`` / ``away_id`` / ``home_cid`` / ``away_cid`` / ``provider``.
+    The merge verifies it against the analysed pair before the value can win
+    or count as agreement; a value about another pair is rejected.
+    """
     status: str = STATUS_UNAVAILABLE
     value: Any = None
     fetched_at: str | None = None
+    entity: dict[str, Any] | None = None
 
 
-def available(value: Any, fetched_at: str | None = None) -> FieldSample:
-    return FieldSample(STATUS_AVAILABLE, value, fetched_at)
+def available(
+    value: Any,
+    fetched_at: str | None = None,
+    entity: dict[str, Any] | None = None,
+) -> FieldSample:
+    return FieldSample(STATUS_AVAILABLE, value, fetched_at, entity)
 
 
 def empty(fetched_at: str | None = None) -> FieldSample:
@@ -285,6 +297,12 @@ class FieldValue:
     timestamp: str | None = None
     stale: bool = False
     secondary: list[dict[str, Any]] = field(default_factory=list)  # preserved conflicts
+    # 2026-09-02: identity of the WINNING value ("verified" / "reversed" /
+    # "unknown") and every sample the merge refused because it described a
+    # different pair (source, reason). Provenance now says WHICH club, not
+    # only which provider.
+    identity: str | None = None
+    identity_rejected: list[dict[str, Any]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -298,6 +316,8 @@ class FieldValue:
             "timestamp": self.timestamp,
             "stale": self.stale,
             "secondary": self.secondary,
+            "identity": self.identity,
+            "identity_rejected": self.identity_rejected,
         }
 
 
@@ -449,9 +469,12 @@ def _h2h_counts_from_meetings(
         if not isinstance(hg, int) or not isinstance(ag, int):
             continue
         mh, ma = str(m.get("home") or ""), str(m.get("away") or "")
-        if teams_match(home_name, mh):
+        from .team_identity import match_side as _match_side
+
+        _side = _match_side(home_name, mh, ma)
+        if _side == "home":
             cur, opp = hg, ag
-        elif teams_match(home_name, ma):
+        elif _side == "away":
             cur, opp = ag, hg
         else:
             continue
@@ -691,6 +714,105 @@ def field_confidence(
     return _downgrade(base) if stale else base
 
 
+IDENTITY_VERIFIED = "verified"
+IDENTITY_REVERSED = "reversed"
+IDENTITY_UNKNOWN = "unknown"
+IDENTITY_REJECT = "reject"
+
+_SIDE_KEYED_FIELDS = (FIELD_FORM, FIELD_LINEUP, FIELD_INJURIES, FIELD_STATISTICS)
+
+
+def _side_name(entry: Any) -> str | None:
+    """Team name carried inside a per-side value (form ``team_name``, lineup
+    / context ``name``), or None."""
+    if not isinstance(entry, dict):
+        return None
+    for k in ("team_name", "name", "team"):
+        v = entry.get(k)
+        if isinstance(v, str) and v.strip():
+            return v
+    return None
+
+
+def sample_identity(
+    field_name: str,
+    sample: FieldSample,
+    ref: dict[str, Any] | None,
+) -> tuple[str, str | None]:
+    """Does this sample describe the analysed pair? -> (verdict, reason).
+
+    Verdicts: ``verified`` (same pair, same orientation), ``reversed`` (same
+    pair, sides swapped -- the merge swaps side-keyed values), ``unknown``
+    (nothing in the sample names a team; accepted as before) and ``reject``
+    (names another pair / another club). Identity comes from
+    ``sample.entity`` when the adapter set it; otherwise from names carried
+    by the value itself (match home/away, H2H meetings, per-side
+    ``team_name`` / ``name``). Canonical ids win over names when both sides
+    carry them.
+    """
+    from .team_identity import names_match, same_fixture
+
+    ref = ref or {}
+    rh, ra = ref.get("home"), ref.get("away")
+    if not (rh and ra):
+        return IDENTITY_UNKNOWN, None
+    ent = sample.entity if isinstance(sample.entity, dict) else None
+    if ent and (ent.get("home") or ent.get("away")):
+        eh, ea = ent.get("home"), ent.get("away")
+        rcids = (ref.get("home_cid"), ref.get("away_cid"))
+        ecids = (ent.get("home_cid"), ent.get("away_cid"))
+        if all(rcids) and all(ecids):
+            if (ecids[0], ecids[1]) == (rcids[0], rcids[1]):
+                return IDENTITY_VERIFIED, None
+            if (ecids[1], ecids[0]) == (rcids[0], rcids[1]):
+                return IDENTITY_REVERSED, None
+            return IDENTITY_REJECT, f"entity {eh} v {ea} is another pair (canonical ids differ)"
+        o = same_fixture(rh, ra, eh, ea)
+        if o == "ordered":
+            return IDENTITY_VERIFIED, None
+        if o == "reversed":
+            return IDENTITY_REVERSED, None
+        return IDENTITY_REJECT, f"entity {eh} v {ea} does not name {rh} v {ra}"
+    v = sample.value
+    if field_name == FIELD_MATCH and isinstance(v, dict) and v.get("home") and v.get("away"):
+        o = same_fixture(rh, ra, str(v.get("home")), str(v.get("away")))
+        if o == "ordered":
+            return IDENTITY_VERIFIED, None
+        # a match record is only the same fixture in the same orientation
+        return IDENTITY_REJECT, f"match {v.get('home')} v {v.get('away')} is not {rh} v {ra}"
+    if field_name == FIELD_H2H and isinstance(v, dict):
+        rows = v.get("meetings") if isinstance(v.get("meetings"), list) else v.get("match_list")
+        checked = 0
+        for m in (rows or [])[:6]:
+            if not isinstance(m, dict) or not (m.get("home") and m.get("away")):
+                continue
+            checked += 1
+            if same_fixture(rh, ra, str(m.get("home")), str(m.get("away"))) is None:
+                return IDENTITY_REJECT, f"h2h meeting {m.get('home')} v {m.get('away')} is not {rh} v {ra}"
+        return (IDENTITY_VERIFIED if checked else IDENTITY_UNKNOWN), None
+    if field_name in _SIDE_KEYED_FIELDS and isinstance(v, dict):
+        hn, an = _side_name(v.get("home")), _side_name(v.get("away"))
+        if hn or an:
+            h_ok = names_match(rh, hn) if hn else None
+            a_ok = names_match(ra, an) if an else None
+            if h_ok is not False and a_ok is not False:
+                return IDENTITY_VERIFIED, None
+            h_x = names_match(ra, hn) if hn else None
+            a_x = names_match(rh, an) if an else None
+            if h_x is not False and a_x is not False and (h_x or a_x):
+                return IDENTITY_REVERSED, None
+            return IDENTITY_REJECT, f"{field_name} names {hn} / {an}, not {rh} / {ra}"
+    return IDENTITY_UNKNOWN, None
+
+
+def _swap_sides(field_name: str, value: Any) -> Any:
+    if field_name in _SIDE_KEYED_FIELDS and isinstance(value, dict) and ("home" in value or "away" in value):
+        out = dict(value)
+        out["home"], out["away"] = value.get("away"), value.get("home")
+        return out
+    return value
+
+
 def merge_field(
     field_name: str,
     samples: dict[str, FieldSample],
@@ -710,6 +832,25 @@ def merge_field(
     priority = priority or {}
     now = now or datetime.now(timezone.utc)
     fv = FieldValue(field=field_name)
+
+    # 2026-09-02 (wrong-team audit): identity BEFORE value. A sample that
+    # describes another pair can neither win nor "agree"; a reversed one is
+    # swapped onto the analysed orientation. Rejections are kept on the
+    # merged value for the audit trail (source + reason).
+    identities: dict[str, str] = {}
+    samples = dict(samples)
+    for s in list(samples.keys()):
+        smp = samples[s]
+        if smp.status != STATUS_AVAILABLE:
+            continue
+        verdict, reason = sample_identity(field_name, smp, ref)
+        if verdict == IDENTITY_REJECT:
+            fv.identity_rejected.append({"source": s, "reason": reason, "fetched_at": smp.fetched_at})
+            samples.pop(s)
+            continue
+        if verdict == IDENTITY_REVERSED:
+            samples[s] = FieldSample(smp.status, _swap_sides(field_name, smp.value), smp.fetched_at, smp.entity)
+        identities[s] = verdict
 
     ordered = sorted(samples.keys(), key=lambda s: (-priority.get(s, 0), s))
     avail = [s for s in ordered if samples[s].status == STATUS_AVAILABLE]
@@ -738,6 +879,7 @@ def merge_field(
     fv.source = primary
     fv.value = samples[primary].value
     fv.timestamp = samples[primary].fetched_at
+    fv.identity = identities.get(primary, IDENTITY_UNKNOWN)
 
     if len(avail) == 1:
         fv.agreement = None
@@ -820,7 +962,12 @@ class UnifiedMatch:
         for f, fv in self.fields.items():
             out[f] = fv.to_dict()
         out["source_metadata"] = {
-            f: {"source": fv.source, "timestamp": fv.timestamp, "status": fv.status}
+            f: {
+                "source": fv.source, "timestamp": fv.timestamp, "status": fv.status,
+                # 2026-09-02: which CLUB pair the winning value was verified for.
+                "identity": fv.identity,
+                "identity_rejected": [r.get("source") for r in fv.identity_rejected],
+            }
             for f, fv in self.fields.items()
         }
         out["confidence"] = {f: fv.confidence for f, fv in self.fields.items()}
@@ -1033,6 +1180,16 @@ class FlashscoreDataSource(FootballDataSource):
         super().__init__()
         self.fetcher = fetcher
 
+    @staticmethod
+    def _entity(ref: dict[str, Any]) -> dict[str, Any]:
+        """The pair this adapter fetched for (the resolved ids + names)."""
+        return {
+            "provider": "flashscore",
+            "home": ref.get("home"), "away": ref.get("away"),
+            "home_id": ref.get("home_id"), "away_id": ref.get("away_id"),
+            "home_cid": ref.get("home_cid"), "away_cid": ref.get("away_cid"),
+        }
+
     async def get_match(self, ref: dict[str, Any]) -> FieldSample:
         try:
             fixture = await self.fetcher.fetch_upcoming_fixture(
@@ -1040,7 +1197,12 @@ class FlashscoreDataSource(FootballDataSource):
             )
         except Exception:  # noqa: BLE001
             return missing()
-        return available(fixture) if fixture else missing()
+        if not fixture:
+            return missing()
+        ent = None
+        if isinstance(fixture, dict) and fixture.get("home") and fixture.get("away"):
+            ent = {"provider": "flashscore", "home": fixture.get("home"), "away": fixture.get("away")}
+        return available(fixture, entity=ent)
 
     async def get_form(self, ref: dict[str, Any]) -> FieldSample:
         try:
@@ -1050,14 +1212,14 @@ class FlashscoreDataSource(FootballDataSource):
             return missing()
         if home is None and away is None:
             return missing()
-        return available({"home": home, "away": away})
+        return available({"home": home, "away": away}, entity=self._entity(ref))
 
     async def get_h2h(self, ref: dict[str, Any]) -> FieldSample:
         try:
             h2h = await self.fetcher.fetch_h2h(ref.get("home_id"), ref.get("away_id"), ref.get("league_meta") or {})
         except Exception:  # noqa: BLE001
             return missing()
-        return available(h2h) if h2h else missing()
+        return available(h2h, entity=self._entity(ref)) if h2h else missing()
 
     async def get_lineup(self, ref: dict[str, Any]) -> FieldSample:
         url = ref.get("match_url")

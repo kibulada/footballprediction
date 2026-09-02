@@ -169,21 +169,30 @@ def apply_h2h_window(
         # perspective (same rule parse_h2h uses; here the fixture home is
         # matched by name). Unattributable rows are simply not counted.
         if home_name:
+            from .team_identity import match_side
+
             w = d = l = 0
+            attributed = 0
             for m in kept:
                 if str(m.get("status") or "").lower() not in ("finished", "ft"):
                     continue
                 tr1, tr2 = _to_int(m.get("home_score")), _to_int(m.get("away_score"))
                 if tr1 is None or tr2 is None:
                     continue
-                hm = _squash(str(m.get("home") or ""))
-                am = _squash(str(m.get("away") or ""))
-                hf = _squash(str(home_name or ""))
-                if hm == hf:
+                # 2026-09-02: token-level side attribution (accent/stroke safe,
+                # "Bodø/Glimt" == "Bodo/Glimt"); an ambiguous row is skipped.
+                side = match_side(home_name, str(m.get("home") or ""), str(m.get("away") or ""))
+                if side == "home":
                     w, d, l = w + (tr1 > tr2), d + (tr1 == tr2), l + (tr1 < tr2)
-                elif am == hf:
+                elif side == "away":
                     w, d, l = w + (tr2 > tr1), d + (tr2 == tr1), l + (tr2 < tr1)
-            h2h["wins"], h2h["draws"], h2h["losses"] = w, d, l
+                else:
+                    continue
+                attributed += 1
+            # Only overwrite the provider's tally when the meetings could be
+            # attributed; a spelling mismatch must never zero a real record.
+            if attributed or not kept:
+                h2h["wins"], h2h["draws"], h2h["losses"] = w, d, l
     else:
         ml = h2h.get("match_list")
         if isinstance(ml, list):
@@ -416,6 +425,47 @@ def _team_form(team: dict[str, Any], events: list[Any]) -> dict[str, Any]:
         "recent_goals": window or None,
         "recent": list(reversed(recent[-FORM_WINDOW:])),
     }
+
+
+def team_form_by_id(
+    payload: dict[str, Any] | None,
+    team_id: Any,
+    limit: int | None = None,
+) -> dict[str, Any] | None:
+    """Form for ONE team from the ``/form-e`` payload, selected by TEAM ID.
+
+    P4b (wrong-team post-mortem 2026-09-02): the by-name date-feed rebuild
+    (``multi_source._livescore_form``) attributed other clubs' results to the
+    analysed team ("Southampton" <- "South Carolina United"). The per-event
+    form endpoint carries both teams' verified event lists keyed by LiveScore
+    team id; picking the block whose ``ID`` equals the resolved ``team_id``
+    can never return another club, and never depends on T1/T2 orientation.
+    Returns None when the id is not in the payload (never guesses a side).
+    """
+    if not isinstance(payload, dict) or team_id is None:
+        return None
+    tid = str(team_id)
+    for key in ("T1", "T2"):
+        lst = payload.get(key) or []
+        t = lst[0] if lst and isinstance(lst[0], dict) else None
+        if t and str(t.get("ID") or "") == tid:
+            form = _team_form(t, t.get("EL") or [])
+            if not form.get("sequence"):
+                return None
+            if limit:
+                seq = [p for p in str(form["sequence"]).split("-") if p][-int(limit):]
+                rg = list(form.get("recent_goals") or [])[-int(limit):]
+                form["sequence"] = "-".join(seq)
+                form["recent_goals"] = rg or None
+                form["sample_size"] = len(rg)
+                if rg:
+                    form["gf_avg"] = round(sum(g for g, _ in rg) / len(rg), 2)
+                    form["ga_avg"] = round(sum(a for _, a in rg) / len(rg), 2)
+            form["team_id"] = tid
+            form["team_name"] = t.get("Nm")
+            form["source"] = "livescore_event"
+            return form
+    return None
 
 
 def parse_form(payload: dict[str, Any] | None, _fx: dict[str, Any] | None = None) -> dict[str, Any] | None:
@@ -693,12 +743,19 @@ class LiveScoreDataSource(FootballDataSource):
             ref.get("kickoff"),
         )
 
-    def _orient(self, fx: dict[str, Any], ref: dict[str, Any]) -> dict[str, Any]:
-        ordered = teams_match(ref.get("home"), fx.get("home")) and teams_match(
-            ref.get("away"), fx.get("away")
-        )
-        if ordered:
+    def _orient(self, fx: dict[str, Any], ref: dict[str, Any]) -> dict[str, Any] | None:
+        """Return the fixture oriented like ``ref`` -- or None when the pair
+        cannot be assigned unambiguously (2026-09-02: the old rule swapped
+        sides whenever the ordered check failed, a fail-open orientation)."""
+        # ``teams_match`` = the strict token matcher PLUS the unambiguous
+        # alias bridge ("Man Utd"); both orientations are tried and a pair
+        # that fits both (or neither) is refused.
+        ordered = teams_match(ref.get("home"), fx.get("home")) and teams_match(ref.get("away"), fx.get("away"))
+        reversed_ = teams_match(ref.get("home"), fx.get("away")) and teams_match(ref.get("away"), fx.get("home"))
+        if ordered and not reversed_:
             return fx
+        if not reversed_ or ordered:
+            return None
         score = fx.get("score") or {}
         return {
             "source_id": fx.get("source_id"),
@@ -717,7 +774,9 @@ class LiveScoreDataSource(FootballDataSource):
                 payload = await self._cached_date(date, page)
                 for fx in parse_soccer_payload(payload):
                     if same_match(ref, fx, kickoff_tolerance_minutes=KICKOFF_TOLERANCE_MINUTES):
-                        return self._orient(fx, ref)
+                        oriented = self._orient(fx, ref)
+                        if oriented is not None:
+                            return oriented
         return None
 
     async def _resolve_fixture(self, ref: dict[str, Any]) -> dict[str, Any] | None:
@@ -727,6 +786,16 @@ class LiveScoreDataSource(FootballDataSource):
         return self._fixture_cache[key]
 
     # -- field extraction ------------------------------------------------------
+
+    @staticmethod
+    def _entity(fx: dict[str, Any]) -> dict[str, Any]:
+        """The verified LiveScore pair every event-keyed field belongs to."""
+        return {
+            "provider": "livescore",
+            "home": fx.get("home"), "away": fx.get("away"),
+            "home_id": fx.get("home_id"), "away_id": fx.get("away_id"),
+            "source_id": fx.get("source_id"),
+        }
 
     async def get_match(self, ref: dict[str, Any]) -> FieldSample:
         if not self._active():
@@ -742,6 +811,7 @@ class LiveScoreDataSource(FootballDataSource):
                     kickoff=fx["kickoff"], competition=fx["competition"],
                 ),
                 utc_now_iso(),
+                entity=self._entity(fx),
             )
         except Exception as exc:  # noqa: BLE001
             logger.warning("livescore fixture lookup failed: %s", type(exc).__name__)
@@ -764,7 +834,7 @@ class LiveScoreDataSource(FootballDataSource):
             if not parsed:
                 return missing()
             from .timeutil import utc_now_iso
-            return available(parsed, utc_now_iso())
+            return available(parsed, utc_now_iso(), entity=self._entity(fx))
         except Exception as exc:  # noqa: BLE001
             logger.warning("livescore %s failed: %s", kind, type(exc).__name__)
             return missing()
@@ -809,7 +879,7 @@ class LiveScoreDataSource(FootballDataSource):
             if not parsed:
                 return missing()
             from .timeutil import utc_now_iso
-            return available(parsed, utc_now_iso())
+            return available(parsed, utc_now_iso(), entity=self._entity(fx))
         except Exception as exc:  # noqa: BLE001
             logger.warning("livescore standings failed: %s", type(exc).__name__)
             return missing()

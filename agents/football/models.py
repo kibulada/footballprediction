@@ -268,6 +268,84 @@ def calibrate_total_to_market(
     )
 
 
+def market_anchor_alpha(
+    cfg: dict[str, Any] | None,
+    home_seeded: bool,
+    away_seeded: bool,
+) -> float:
+    """M1 (2026-09-02): model weight ``alpha`` in the market anchor.
+
+    Measured on 147 settled matches (25 Aug-1 Sep 2026, Brier 1X2): the
+    ensemble scores 0.530 vs the devigged market 0.488; with BOTH teams
+    seeded the two are level (0.525 / 0.525), with ONE side on the 1500
+    prior the model is far worse (0.534 vs 0.457). So the model keeps half
+    the weight only when it actually knows both teams, a quarter when it
+    knows one, and none when it knows neither (the direction would be pure
+    home-advantage noise). All three are config knobs
+    (``models.ensemble.market_anchor``).
+    """
+    cfg = cfg or {}
+    if home_seeded and away_seeded:
+        a = cfg.get("alpha_both_seeded", 0.5)
+    elif home_seeded or away_seeded:
+        a = cfg.get("alpha_one_prior", 0.25)
+    else:
+        a = cfg.get("alpha_none", 0.0)
+    try:
+        return max(0.0, min(1.0, float(a)))
+    except (TypeError, ValueError):
+        return 1.0
+
+
+def _fair_two_way(market_totals: dict[str, Any] | None, a_key: str, b_key: str) -> float | None:
+    """Margin-free P(a) from a two-way pair in ``market_totals`` (or None)."""
+    mt = market_totals or {}
+    try:
+        a = float((mt.get(a_key) or {}).get("odds") or 0)
+        b = float((mt.get(b_key) or {}).get("odds") or 0)
+    except (TypeError, ValueError, AttributeError):
+        return None
+    if a <= 1.0 or b <= 1.0:
+        return None
+    ia, ib = 1.0 / a, 1.0 / b
+    return ia / (ia + ib)
+
+
+def apply_market_anchor(
+    p1x2: dict[str, float],
+    totals: dict[str, float],
+    norm_implied: dict[str, float] | None,
+    market_totals: dict[str, Any] | None,
+    *,
+    alpha: float,
+) -> tuple[dict[str, float], dict[str, float], bool]:
+    """M1: ``p = alpha * model + (1 - alpha) * market`` (pure).
+
+    1X2 uses the margin-free consensus; ``over_2.5`` / ``btts_yes`` use the
+    devigged two-way pair when the market carries it (otherwise they stay
+    as modelled). ``over_1.5`` / ``over_3.5`` are left raw -- no dependable
+    market pair is stored for them. Returns ``(p1x2, totals, applied)``;
+    ``alpha >= 1`` or no market -> unchanged, ``applied`` False.
+    """
+    a = max(0.0, min(1.0, float(alpha)))
+    if a >= 1.0 or not norm_implied:
+        return p1x2, totals, False
+    keys = ("home", "draw", "away")
+    if not all(k in norm_implied and k in p1x2 for k in keys):
+        return p1x2, totals, False
+    mixed = {k: a * float(p1x2[k]) + (1.0 - a) * float(norm_implied[k]) for k in keys}
+    s = sum(mixed.values()) or 1.0
+    new_1x2 = {k: v / s for k, v in mixed.items()}
+    new_totals = dict(totals)
+    fair_over = _fair_two_way(market_totals, "Over 2.5", "Under 2.5")
+    if fair_over is not None and totals.get("over_2.5") is not None:
+        new_totals["over_2.5"] = a * float(totals["over_2.5"]) + (1.0 - a) * fair_over
+    fair_btts = _fair_two_way(market_totals, "BTTS Yes", "BTTS No")
+    if fair_btts is not None and totals.get("btts_yes") is not None:
+        new_totals["btts_yes"] = a * float(totals["btts_yes"]) + (1.0 - a) * fair_btts
+    return new_1x2, new_totals, True
+
+
 class PoissonModel:
     """Feature-based Poisson with Dixon-Coles rho.
 
@@ -432,9 +510,18 @@ class Ensemble:
     it sums to exactly 1.0.
     """
 
-    def __init__(self, elo_weight: float = 0.5, poisson_weight: float = 0.5) -> None:
+    def __init__(
+        self,
+        elo_weight: float = 0.5,
+        poisson_weight: float = 0.5,
+        market_anchor: dict[str, Any] | None = None,
+    ) -> None:
         self.weights = {"elo": elo_weight, "poisson": poisson_weight}
         self._league_quality: dict[str, float] | None = None
+        # M1 (2026-09-02): ``models.ensemble.market_anchor`` -- consumed by
+        # ``run_prediction_engine`` (the blend itself stays market-free so
+        # the stored ``components_1x2`` are honest sub-model views).
+        self.market_anchor: dict[str, Any] = dict(market_anchor or {})
 
     def _load_league_quality(self) -> dict[str, float]:
         """Load league quality coefficients (lazy, cached)."""
@@ -577,7 +664,10 @@ class Ensemble:
         poisson: PoissonModel,
     ) -> dict[str, Any] | None:
         parts: list[tuple[float, dict[str, float], str]] = []
-        elo_lh, elo_la = elo.expected_lambdas(ctx.home, ctx.away)
+        # P4 (2026-09-02): canonical-first Elo lookup (see MatchContext).
+        _hn = getattr(ctx, "home_elo_names", None) or (ctx.home,)
+        _an = getattr(ctx, "away_elo_names", None) or (ctx.away,)
+        elo_lh, elo_la = elo.expected_lambdas(_hn, _an)
 
         # Get Poisson lambdas if available
         pm = poisson.predict(ctx)
@@ -616,7 +706,16 @@ class Ensemble:
         # Zero-weight components are skipped (not just weighted by 0): with
         # elo_weight=0 and no feature-Poisson data the naive ``parts`` would
         # hold only zero weights and total_w would be 0 -> ZeroDivisionError.
-        if self.weights["elo"] > 0:
+        # M2 (2026-09-02): with BOTH sides on the 1500 prior the Elo vector
+        # is pure home advantage -- no team information -- so a feature
+        # Poisson takes the whole weight. With one side seeded the blend
+        # still beats either sub-model alone (Brier 0.534 vs 0.559/0.582 on
+        # 81 such matches), so Elo keeps its weight there. Elo remains the
+        # only component when nothing else ran (never an empty blend).
+        _elo_informative = (
+            elo.known(_hn, _an) or pm is None or self.weights["poisson"] <= 0
+        )
+        if self.weights["elo"] > 0 and _elo_informative:
             parts.append((self.weights["elo"], p1x2_elo, "elo"))
 
         if pm is not None and self.weights["poisson"] > 0:
@@ -669,6 +768,10 @@ class Ensemble:
             "1x2": blended,
             "models": [name for _, _, name in parts],
             "weights": {name: w / total_w for w, _, name in parts},
+            # M2: per-model 1X2 views, persisted on the snapshot so the
+            # ensemble weights can later be fitted from the log directly.
+            "parts": {name: {k: round(float(p[k]), 4) for k in ("home", "draw", "away")}
+                      for _, p, name in parts},
             "spread": round(spread, 4),
             "lambda_home": round(avg_lh, 4),
             "lambda_away": round(avg_la, 4),
@@ -830,6 +933,9 @@ def run_prediction_engine(
     if ens is None:
         return None
     p1x2 = ens["1x2"]
+    # P4 (2026-09-02): canonical-first Elo lookup candidates.
+    _hn = getattr(ctx, "home_elo_names", None) or (ctx.home,)
+    _an = getattr(ctx, "away_elo_names", None) or (ctx.away,)
 
     # Totals/BTTS: prefer the feature-based Poisson lambdas; fall back to Elo.
     # Thin form windows (fewer finished matches than the model can trust)
@@ -839,7 +945,7 @@ def run_prediction_engine(
     # ``shrinkage_samples`` the weight ramps linearly (option 2); at/above
     # ``shrinkage_samples`` the feature λ stands as-is (unchanged).
     pm = poisson.predict(ctx)
-    lh_e, la_e = elo.expected_lambdas(ctx.home, ctx.away)
+    lh_e, la_e = elo.expected_lambdas(_hn, _an)
     # Fix 2 (lambda source pinning): once a match has been evaluated, its
     # FIRST lambda_source is pinned for every later pre-match query of the
     # same fixture. The pin overrides the ``lambda_samples < min_samples``
@@ -943,10 +1049,10 @@ def run_prediction_engine(
         # between min_gap/full_gap rating points. Deterministic per query;
         # pin labels untouched (audit lives in model_probs.elo_anchor_t).
         _anchor_cfg = getattr(poisson, "elo_anchor", None) or {}
-        if _anchor_cfg.get("enabled", True) and elo.known(ctx.home, ctx.away):
+        if _anchor_cfg.get("enabled", True) and elo.known(_hn, _an):
             lh, la, elo_anchor_t = apply_elo_anchor(
                 lh, la,
-                float(elo.rating(ctx.home)), float(elo.rating(ctx.away)),
+                float(elo.rating(_hn)), float(elo.rating(_an)),
                 min_gap=float(_anchor_cfg.get("min_gap", 150.0)),
                 full_gap=float(_anchor_cfg.get("full_gap", 400.0)),
             )
@@ -994,7 +1100,7 @@ def run_prediction_engine(
     _league_norm = re.sub(r"[^a-z0-9]", "", str(ctx.league or "").lower())
     if _league_norm in {"kleague", "k league1", "liga1", "j1league", "saudiproleague", "mls", "aleague", "ligasupermalaysia"}:
         _is_fallback_league = True
-    if _is_fallback_league and ctx.has_odds and not elo.known(ctx.home, ctx.away):
+    if _is_fallback_league and ctx.has_odds and not elo.known(_hn, _an):
         try:
             _imp = _normalize_implied(ctx.consensus_odds)
             if _imp:
@@ -1026,21 +1132,11 @@ def run_prediction_engine(
     # Market comparison uses margin-free implied probabilities so model and
     # market are on the same scale (edge is honest).
     norm_implied = _normalize_implied(ctx.consensus_odds) if ctx.has_odds else None
-    market_edge: dict[str, float] = {}
-    model_vs_market: float | None = None
-    if norm_implied:
-        market_edge = {
-            side: round((p1x2[side] - norm_implied[side]) * 100.0, 2)
-            for side in ("home", "draw", "away")
-        }
-        model_vs_market = 1.0 - min(
-            1.0, sum(abs(p1x2[k] - norm_implied[k]) for k in ("home", "draw", "away"))
-        )
 
     model_vs_model: float | None = None
     if len(ens["models"]) >= 2:
         p_elo, _, _, _, _ = probs_from_matrix(
-            poisson_matrix(*elo.expected_lambdas(ctx.home, ctx.away), rho=0.0)
+            poisson_matrix(*elo.expected_lambdas(_hn, _an), rho=0.0)
         )
         model_vs_model = max(
             0.0,
@@ -1055,6 +1151,41 @@ def run_prediction_engine(
         if s > 0:
             p1x2 = {k: v / s for k, v in applied.items()}
         calib_info = calibrator.quality()
+
+    # ---- M1 (2026-09-02): market-anchored probabilities ------------------
+    # The LAST step before anything downstream reads the probabilities: the
+    # signal engine, the edge, the tier rule and the SUGGESTION conflict
+    # check all consume the anchored numbers; ``raw`` keeps the pre-anchor
+    # view for audit and for the calibration report.
+    _seeded_h = elo.resolve(_hn) is not None
+    _seeded_a = elo.resolve(_an) is not None
+    raw_probs = {
+        "1x2": {k: round(float(v), 4) for k, v in p1x2.items()},
+        "over_2.5": round(float(totals["over_2.5"]), 4),
+        "btts_yes": round(float(totals["btts_yes"]), 4),
+    }
+    _ma_cfg = getattr(ensemble, "market_anchor", None) or {}
+    anchor_alpha: float | None = None
+    anchor_applied = False
+    if _ma_cfg.get("enabled", False) and norm_implied:
+        anchor_alpha = market_anchor_alpha(_ma_cfg, _seeded_h, _seeded_a)
+        p1x2, totals, anchor_applied = apply_market_anchor(
+            p1x2, totals, norm_implied, ctx.market_totals, alpha=anchor_alpha,
+        )
+
+    # Market comparison on the FINAL probabilities (after calibration and
+    # the market anchor) so the edge the card shows is the edge the picks
+    # were chosen on.
+    market_edge: dict[str, float] = {}
+    model_vs_market: float | None = None
+    if norm_implied:
+        market_edge = {
+            side: round((p1x2[side] - norm_implied[side]) * 100.0, 2)
+            for side in ("home", "draw", "away")
+        }
+        model_vs_market = 1.0 - min(
+            1.0, sum(abs(p1x2[k] - norm_implied[k]) for k in ("home", "draw", "away"))
+        )
 
     components = scorer.components(
         ctx=ctx,
@@ -1096,18 +1227,29 @@ def run_prediction_engine(
         "uncertainty": round(ens.get("spread", 0.0), 4),
         # True once both teams exist in the seeded ratings; otherwise the Elo
         # contribution is only the home-advantage prior (honesty labeling).
-        "elo_seeded": elo.known(ctx.home, ctx.away),
+        "elo_seeded": elo.known(_hn, _an),
         # K1 (post-mortem 2026-08-28): per-side seeding + the ratings the
         # ensemble actually used. The combined flag cannot tell "one side on
         # a 1500 prior" (direction still informed by the seeded side) from
         # "both sides on the prior" (direction is pure home-advantage noise);
         # the pick gates need that distinction to veto directional markets
         # only when the model genuinely knows nothing.
-        "elo_home_seeded": elo.resolve(ctx.home) is not None,
-        "elo_away_seeded": elo.resolve(ctx.away) is not None,
-        "elo_home": round(float(_fallback_elo_home if _fallback_elo_home is not None else elo.rating(ctx.home)), 1),
-        "elo_away": round(float(_fallback_elo_away if _fallback_elo_away is not None else elo.rating(ctx.away)), 1),
+        "elo_home_seeded": _seeded_h,
+        "elo_away_seeded": _seeded_a,
+        "elo_home": round(float(_fallback_elo_home if _fallback_elo_home is not None else elo.rating(_hn)), 1),
+        "elo_away": round(float(_fallback_elo_away if _fallback_elo_away is not None else elo.rating(_an)), 1),
         "market_elo_fallback": market_elo_fallback,
+        # M1 audit trail: pre-anchor probabilities + the alpha that was used
+        # (None = anchor disabled or no market), so the calibration report
+        # can score raw vs anchored vs market from the log alone.
+        "raw": raw_probs,
+        "market_anchor_alpha": anchor_alpha,
+        "market_anchor_applied": anchor_applied,
+        # M2: sub-model 1X2 views (Elo / Poisson / market) for weight fitting.
+        "components_1x2": {
+            **{name: dict(p) for name, p in (ens.get("parts") or {}).items()},
+            **({"market": {k: round(float(v), 4) for k, v in norm_implied.items()}} if norm_implied else {}),
+        },
     }
 
     return PredictionResult(

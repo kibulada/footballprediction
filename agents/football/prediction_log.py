@@ -535,6 +535,8 @@ def classify_failure(
     *,
     kind: str = "best_pick",
     medium_score: float = 0.52,
+    elo_band: tuple[float, float] | None = None,
+    tier_cfg: dict[str, Any] | None = None,
 ) -> str | None:
     """Failure class of a LOST pick from the stored snapshot fields.
 
@@ -542,12 +544,28 @@ def classify_failure(
     on the prior, directional pick), K2 wrong entity (Elo out of band /
     source mismatch), K3 context ignored (second-leg tie), K4 forced
     suggestion (below the dominance floor), K5 weak pick published as BEST
-    PICK (LEAN tier). ``K0`` = none of the above (market variance). Only
-    losses are classified; returns None otherwise.
+    PICK (LEAN tier). 2026-09-02: K8 stale hold (the stability layer kept a
+    pick while a materially stronger candidate stood), K6 internal
+    disagreement (Elo-led 1X2 vs Poisson lambdas on direction), K7 no
+    conviction and no value (model_prob below the BEST PICK rule -- see
+    ``signal_engine.pick_tier_for``). Order: K2, K1, K3, K8, K6, K7, K5, K0.
+    ``K0`` = none of the above (market variance). Only losses are
+    classified; returns None otherwise.
+
+    ``elo_band`` is the G5 band for the snapshot's league (see
+    ``pick_gates.resolve_elo_band``); the global default is used when absent.
     """
     if result not in ("loss", "half_loss"):
         return None
-    from .pick_gates import is_directional_selection  # lazy: avoid cycle
+    from .pick_gates import (  # lazy: avoid cycle
+        DEFAULT_ELO_MAX,
+        DEFAULT_ELO_MIN,
+        is_directional_selection,
+        lambda_direction_conflict,
+    )
+    from .signal_engine import pick_tier_for  # lazy: avoid cycle
+
+    lo, hi = elo_band or (DEFAULT_ELO_MIN, DEFAULT_ELO_MAX)
 
     mp = snapshot.get("model_probs") or {}
     f = snapshot.get("features") or {}
@@ -565,7 +583,7 @@ def classify_failure(
 
     eh, ea = _elo("home"), _elo("away")
     if audit.get("entity_mismatch") or any(
-        v is not None and (v < 1300.0 or v > 2450.0) for v in (eh, ea)
+        v is not None and (v < lo or v > hi) for v in (eh, ea)
     ):
         return "K2"
     hs, as_ = mp.get("elo_home_seeded"), mp.get("elo_away_seeded")
@@ -593,12 +611,47 @@ def classify_failure(
         if adj is not None and adj < medium_score:
             return "K4"
         return "K0"
+    # K8: stale hold -- the stability layer kept this pick while the freshly
+    # computed top (a DIFFERENT bet) beat it by >= best_pick_margin.
+    st = pick.get("stability") or {}
+    sup = st.get("suppressed_top") or {}
+    if st.get("status") == "held" and sup.get("selection") and sup.get("selection") != sel:
+        try:
+            if float(sup.get("score") or 0.0) - float(pick.get("score") or 0.0) >= 0.06:
+                return "K8"
+        except (TypeError, ValueError):
+            pass
+    # K6: Elo-led blend and Poisson lambdas disagree on direction.
+    _mp_k6 = dict(mp)
+    if "lambda_home" not in _mp_k6 and pick.get("lambda_home") is not None:
+        _mp_k6["lambda_home"], _mp_k6["lambda_away"] = pick.get("lambda_home"), pick.get("lambda_away")
+    if "1x2" not in _mp_k6 and snapshot.get("prob_1x2"):
+        _mp_k6["1x2"] = snapshot.get("prob_1x2")
+    if lambda_direction_conflict(_mp_k6, market, sel, pick.get("side"))[0]:
+        return "K6"
+    # K7: no conviction and no value (the K7 tier rule, evaluated on the
+    # stored model_prob / edge; older rows fall back to the ranking entry).
+    prob = pick.get("model_prob")
+    if prob is None:
+        for e in snapshot.get("signal_engine_ranking") or []:
+            if e.get("market") == market and e.get("selection") == sel:
+                prob = e.get("model_prob")
+                break
+    if prob is not None:
+        _probe = {"score": 1.0, "confidence": "MEDIUM", "model_prob": prob, "edge_pp": pick.get("edge_pp")}
+        if pick_tier_for(_probe, tier_cfg)[0] == "LEAN":
+            return "K7"
     if _pick_tier(pick, medium_score) == "LEAN":
         return "K5"
     return "K0"
 
 
-def best_pick_evaluation(path: str | Path, *, medium_score: float = 0.52) -> dict[str, Any]:
+def best_pick_evaluation(
+    path: str | Path,
+    *,
+    medium_score: float = 0.52,
+    cfg: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Settle every stored signal-engine BEST PICK (and SUGGESTION) against its result.
 
     Each snapshot stores ``signal_engine_pick`` (market, selection, line,
@@ -615,6 +668,10 @@ def best_pick_evaluation(path: str | Path, *, medium_score: float = 0.52) -> dic
     """
     from .signal_engine import settle_signal  # lazy: avoid import cycle
     from .market_lean import suggestion_for_settlement
+    from .pick_gates import resolve_elo_band
+
+    _se_cfg = ((cfg or {}).get("models") or {}).get("signal_engine") or {}
+    _pg_cfg = _se_cfg.get("pick_gates") or {}
 
     rows = _read_lines(Path(path))
     settlements = {r["match_id"]: r for r in rows if r.get("event") == "settle"}
@@ -708,7 +765,10 @@ def best_pick_evaluation(path: str | Path, *, medium_score: float = 0.52) -> dic
             odds = _pick_odds(s)
             roi = _tally(_bucket(markets, market), res, float(settled["stake_return"]), odds)
             _tally(_bucket(tiers, tier), res, float(settled["stake_return"]), odds)
-            fclass = classify_failure(s, pick, res, kind="best_pick", medium_score=medium_score)
+            fclass = classify_failure(
+                s, pick, res, kind="best_pick", medium_score=medium_score,
+                elo_band=resolve_elo_band(_pg_cfg, s.get("league")), tier_cfg=_se_cfg,
+            )
             if fclass:
                 failure_classes[fclass] = failure_classes.get(fclass, 0) + 1
             pick_row = {
@@ -718,6 +778,7 @@ def best_pick_evaluation(path: str | Path, *, medium_score: float = 0.52) -> dic
                 "selection": pick.get("selection"),
                 "confidence": pick.get("confidence"),
                 "score": pick.get("score"),
+                "model_prob": pick.get("model_prob"),
                 "tier": tier,
                 "result": res,
                 "odds": odds,
@@ -738,7 +799,10 @@ def best_pick_evaluation(path: str | Path, *, medium_score: float = 0.52) -> dic
                     s_odds = 0.0
                 roi = _tally(_bucket(sug_markets, sug.get("market") or "?"), res,
                              float(settled["stake_return"]), s_odds if s_odds > 1.0 else None)
-                fclass = classify_failure(s, sug, res, kind="suggestion", medium_score=medium_score)
+                fclass = classify_failure(
+                    s, sug, res, kind="suggestion", medium_score=medium_score,
+                    elo_band=resolve_elo_band(_pg_cfg, s.get("league")), tier_cfg=_se_cfg,
+                )
                 if fclass:
                     sug_failure_classes[fclass] = sug_failure_classes.get(fclass, 0) + 1
                 row = {

@@ -424,19 +424,25 @@ class OddspapiClient:
             self._feed_cache[cache_key] = data
             items = data
 
-        candidates: list[dict[str, Any]] = []
+        from .team_identity import Identity, same_fixture
+
+        candidates: list[tuple[int, dict[str, Any]]] = []
         for fx in items:
             if not fx.get("hasOdds"):
                 continue
             h = fx.get("participant1Name") or ""
             a = fx.get("participant2Name") or ""
-            if _same_team(h, home) and _same_team(a, away):
-                candidates.append(fx)
+            # 2026-09-02: the pair must match in THIS orientation and must not
+            # be ambiguous (a name fitting both sides -> not this fixture).
+            if same_fixture(home, away, h, a) != "ordered":
+                continue
+            exact = int(Identity(h).folded == Identity(home).folded) + int(Identity(a).folded == Identity(away).folded)
+            candidates.append((exact, fx))
         if not candidates:
             return None
-        # Prefer the earliest kickoff when several legs match.
-        candidates.sort(key=lambda f: f.get("startTime") or "")
-        return candidates[0]
+        # Exact spellings beat tolerant hits; then the earliest kickoff.
+        candidates.sort(key=lambda t: (-t[0], t[1].get("startTime") or ""))
+        return candidates[0][1]
 
     # ---- odds ------------------------------------------------------------
 
@@ -585,35 +591,22 @@ def _norm_team(name: str) -> str:
 
 
 def _same_team(a: str, b: str) -> bool:
+    """Token-level team identity (2026-09-02: shared ``team_identity``)."""
+    from .team_identity import names_match
+
+    return names_match(a, b)
+
+
+def _legacy_same_team_unused(a: str, b: str) -> bool:  # pragma: no cover
     na, nb = _norm_team(a), _norm_team(b)
     if not na or not nb:
         return False
     if na == nb:
         return True
-    for pref in _TEAM_PREFIXES:
-        if na.startswith(pref + " ") and na[len(pref) + 1:] == nb:
-            return True
-        if nb.startswith(pref + " ") and nb[len(pref) + 1:] == na:
-            return True
-    # Token containment: every token of the shorter name must appear in the
-    # longer one (as an exact token or a substring, min 3 chars). Short names
-    # like "tobol"/"rfs" that the old len>=6 containment gate rejected now
-    # match ("Tobol (Kaz)" -> "tobol" in "Tobol Kostanay"). Containment is
-    # SYMMETRIC so "Hearts" matches the feed's "Heart of Midlothian FC"
-    # ("heart" in "hearts"). ponytail: a short token that is a substring of
-    # many feed names ("viking" -> "Vikingur") could match the wrong tie; the
-    # kickoff-window narrowing in find_fixture bounds that risk. Upgrade: real
-    # token-level aliases (teams.json) instead of substring heuristics.
     ta, tb = na.split(), nb.split()
     shorter, longer = (ta, tb) if len(ta) <= len(tb) else (tb, ta)
     if not shorter:
         return False
-    # Substring containment is only meaningful when BOTH tokens are at least
-    # 3 chars. Without the ``len(w) >= 3`` guard, a single-letter token on the
-    # longer side (e.g. "b" from a "B team" suffix) makes every name that
-    # contains that letter match -- e.g. "Cadiz B" matched "Genclerbirligi"
-    # ("b" in "genclerbirligi") and the wrong fixture was picked for a real
-    # match. Exact-token and prefix matches above are unaffected.
     return all(
         any(
             t == w or (len(t) >= 3 and len(w) >= 3 and (t in w or w in t))

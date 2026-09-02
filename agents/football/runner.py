@@ -879,6 +879,12 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
     if args.mode == "settle":
         pl_cfg = cfg.get("prediction_log") or {}
         log_path = ROOT / (pl_cfg.get("file") or "cache/football/predictions.jsonl")
+        # P0 (2026-09-02): ``--log`` points settle / --dedupe / --best-pick at
+        # another prediction log -- e.g. baseline/predictions_vps.jsonl after a
+        # VPS sync -- so a synced log can be settled and evaluated locally.
+        if getattr(args, "log", None):
+            _lp = Path(args.log)
+            log_path = _lp if _lp.is_absolute() else ROOT / _lp
         if args.dedupe:
             from .prediction_log import dedupe_settles
 
@@ -894,10 +900,13 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
             # the 1X2 model probability.
             from .prediction_log import best_pick_evaluation
 
-            ev = best_pick_evaluation(log_path)
+            ev = best_pick_evaluation(log_path, cfg=cfg)
             _fc_names = {
                 "K1": "tanpa evidensi (Elo prior)", "K2": "entitas/data salah",
                 "K3": "konteks leg-2", "K4": "suggestion dipaksa", "K5": "pick lemah (LEAN)",
+                "K6": "model internal tidak sepakat (Elo vs Poisson)",
+                "K7": "tanpa keyakinan & tanpa value (prob < 60%)",
+                "K8": "hold basi (kandidat lebih kuat ditahan)",
                 "K0": "variance pasar",
             }
 
@@ -938,9 +947,11 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
             for p in ev["picks"]:
                 roi = f" ROI {p['roi']:+.2f}" if p.get("roi") is not None else ""
                 fc = f" [{p['failure_class']}]" if p.get("failure_class") else ""
+                _mp = p.get("model_prob")
+                _mp_txt = f", prob {float(_mp):.0%}" if isinstance(_mp, (int, float)) else ""
                 body.append(
                     f"• [{p.get('tier', 'BEST PICK')}] {p['market']} {p['selection']} "
-                    f"({p['confidence']}) → {p['result']}{roi}{fc}"
+                    f"({p['confidence']}{_mp_txt}) → {p['result']}{roi}{fc}"
                 )
             for p in sug.get("picks") or []:
                 roi = f" ROI {p['roi']:+.2f}" if p.get("roi") is not None else ""
@@ -964,10 +975,35 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
         def _update_elo_from(results: list[dict[str, Any]]) -> dict[str, Any]:
             try:
                 from .elo import EloModel
+                from .prediction_log import _canonical_team_name
 
                 elo_cfg = (cfg.get("models") or {}).get("elo", {})
-                elo = EloModel(path=ROOT / elo_cfg.get("file", "cache/football/elo.json"))
-                applied = elo.update_from_results(results)
+                # 2026-09-02: same K / home advantage / prior as prediction,
+                # and the SAME canonical-first key resolution -- a settle on
+                # the display name "Lille" must move "Lille OSC", never fork
+                # a new 1500-rated "Lille".
+                elo = EloModel(
+                    k=float(elo_cfg.get("k", 32.0)),
+                    home_advantage=float(elo_cfg.get("home_advantage", 65.0)),
+                    initial_rating=float(elo_cfg.get("initial_rating", 1500.0)),
+                    base_total_goals=float(elo_cfg.get("base_total_goals", 2.7)),
+                    path=ROOT / elo_cfg.get("file", "cache/football/elo.json"),
+                )
+
+                def _key(name: Any, league: Any) -> Any:
+                    if not name:
+                        return name
+                    try:
+                        canon = _canonical_team_name(str(name), str(league) if league else None) or None
+                    except Exception:  # noqa: BLE001
+                        canon = None
+                    return elo.resolve_first((canon, str(name))) or canon or name
+
+                mapped = [
+                    {**r, "home": _key(r.get("home"), r.get("league")), "away": _key(r.get("away"), r.get("league"))}
+                    for r in (results or [])
+                ]
+                applied = elo.update_from_results(mapped)
                 return {"elo_updated": applied, "elo_file": str(elo.path)}
             except Exception as exc:  # noqa: BLE001 -- settle must never break
                 logger.warning("elo update after settle failed: %s", exc)
@@ -1317,7 +1353,14 @@ async def _run(args: argparse.Namespace) -> dict[str, Any]:
         cal_cfg = (cfg.get("models") or {}).get("calibration", {})
         cal_path = ROOT / cal_cfg.get("file", "cache/football/calibration.json")
         cal = Calibrator(path=cal_path)
-        report = cal.refresh_from_log(log_path, min_samples=int(args.min_samples))
+        # M3 (2026-09-02): the pooled guard follows config (min_samples 100,
+        # same as league_min_samples) unless overridden on the command line.
+        _min_samples = (
+            int(args.min_samples) if args.min_samples is not None
+            else int(cal_cfg.get("min_samples", 200))
+        )
+        report = cal.refresh_from_log(log_path, min_samples=_min_samples)
+        report["min_samples"] = _min_samples
         report["file"] = str(cal_path)
         # D2 (2026-08-17): also re-fit EVERY per-league calibration file
         # (incl. dynamic ``dyn:`` leagues) from the same live log -- per-
@@ -1453,11 +1496,15 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
         "--best-pick", action="store_true",
         help="evaluasi BEST PICK tersimpan vs hasil settle (hit-rate/ROI per market)",
     )
+    stl.add_argument(
+        "--log", default=None,
+        help="prediction log lain (mis. baseline/predictions_vps.jsonl hasil sync VPS); default cfg.prediction_log.file",
+    )
 
     crf = sub.add_parser("calib-refresh",
                          help="TODO-02: re-fit kalibrasi dari prediction log (pre-match prob of settled outcomes)")
-    crf.add_argument("--min-samples", type=int, default=200,
-                     help="minimal pasangan settled untuk refit (default 200)")
+    crf.add_argument("--min-samples", type=int, default=None,
+                     help="minimal pasangan settled untuk refit (default: models.calibration.min_samples)")
 
     aud = sub.add_parser("audit", help="TODO-14: leakage audit + source overview satu perintah")
     aud.add_argument("--fixtures", default=None, help="fixtures JSON lokal (default: cache/backtest terpasang)")

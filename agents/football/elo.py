@@ -49,9 +49,9 @@ _EXTRA_ALIASES: dict[str, str] = {
     "Benfica": "SL Benfica",
     "Hearts": "Heart of Midlothian",
     "Heart of Midlothian FC": "Heart of Midlothian",
-    "Copenhagen": "FC Kobenhavn",
-    "FC Copenhagen": "FC Kobenhavn",
-    "FC København": "FC Kobenhavn",
+    "Copenhagen": "FC København",
+    "FC Copenhagen": "FC København",
+    "FC København": "FC København",
     "Celtic": "Celtic FC",
     "Rangers": "Rangers FC",
     "Ajax": "AFC Ajax",
@@ -115,6 +115,19 @@ _EXTRA_ALIASES: dict[str, str] = {
     "Norwich": "Norwich City",
     "Lincoln": "Lincoln City",
     "Blackburn": "Blackburn Rovers",
+    # Super Lig: the live provider shortens the club to "Erzurum FK"; the
+    # elofootball store key is "Erzurumspor FK" (K2 residual, 2026-09-02).
+    "Erzurum FK": "Erzurumspor FK",
+    "Erzurum": "Erzurumspor FK",
+    # teams.json canonical names whose single significant token cannot
+    # partial-match the store key under the K2 guard (roster coverage test,
+    # tests/test_elo_roster_coverage.py, 2026-09-02).
+    "Olympiacos FC": "Olympiakos Piraeus",
+    "Olympiacos": "Olympiakos Piraeus",
+    "Sparta Prague": "AC Sparta Praha",
+    "AEK Athens FC": "AEK Athen",
+    "AEK Athens": "AEK Athen",
+    "Dynamo Kyiv": "Dinamo Kiev",
 }
 
 # K2: tokens that mark a SECOND team of the same club (reserve / B side /
@@ -317,7 +330,25 @@ class EloModel:
             pass
 
     # ---- accessors -----------------------------------------------------
-    def resolve(self, name: str) -> str | None:
+    def resolve_first(self, names: Any) -> str | None:
+        """First resolvable key from an ordered list of candidate names.
+
+        P4 (2026-09-02): the live display name ("Lille", "Genk") is a
+        single token, which the K2 guard below deliberately refuses to
+        partial-match against a longer store key ("Lille OSC", "KRC Genk").
+        The canonical teams.json name resolves exactly, so callers pass
+        ``(canonical_name, display_name)`` and the first hit wins. ``None``
+        / empty entries are skipped; returns None when nothing resolves.
+        """
+        for n in names or ():
+            if not n:
+                continue
+            key = self.resolve(n)
+            if key is not None:
+                return key
+        return None
+
+    def resolve(self, name: Any) -> str | None:
         """Map a live provider name to the seeded rating key, or None.
 
         Exact (case/diacritic-insensitive) match first; then the teams.json
@@ -325,9 +356,19 @@ class EloModel:
         "Royale Union Saint-Gilloise" matches "Union Saint-Gilloise" even
         though "royale" is absent from the seed). Ties prefer the key with
         the most games. Returns None only when nothing plausibly matches.
+
+        ``name`` may also be an ordered sequence of candidate names (see
+        ``resolve_first``); every accessor (``rating``, ``known``,
+        ``expected_lambdas``) inherits that behaviour.
         """
+        if isinstance(name, (list, tuple)):
+            return self.resolve_first(name)
         if not name:
             return None
+        # An exact store key is always itself (also covers ratings mutated
+        # after load without an index rebuild).
+        if name in self.ratings:
+            return name
         n = _norm(name)
         if n in self._norm_index:
             return self._norm_index[n]
@@ -386,22 +427,26 @@ class EloModel:
                 return firsts[0]
         return None
 
-    def rating(self, team: str) -> float:
+    def rating(self, team: Any) -> float:
         key = self.resolve(team)
         return self.ratings.get(key, self.initial_rating) if key else self.initial_rating
 
-    def games_played(self, team: str) -> int:
+    def rating_first(self, names: Any) -> float:
+        """Rating of the first resolvable candidate name (else the prior)."""
+        return self.rating(tuple(names or ()))
+
+    def games_played(self, team: Any) -> int:
         key = self.resolve(team)
         return self.games.get(key, 0) if key else 0
 
-    def known(self, home: str, away: str) -> bool:
+    def known(self, home: Any, away: Any) -> bool:
         return self.resolve(home) is not None and self.resolve(away) is not None
 
     def snapshot(self) -> dict[str, Any]:
         return {"ratings": self.ratings, "games": self.games}
 
     # ---- prediction ----------------------------------------------------
-    def expected_lambdas(self, home: str, away: str) -> tuple[float, float]:
+    def expected_lambdas(self, home: Any, away: Any) -> tuple[float, float]:
         """Map rating difference (with home advantage) to expected goals.
 
         share = logistic of the rating gap; total expected goals is split by

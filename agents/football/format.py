@@ -1478,6 +1478,11 @@ def _pick_label(se: dict[str, Any]) -> str:
     # K5 (2026-08-28): a pick below medium_score / labelled LOW is a LEAN,
     # never advertised as BEST PICK (25-27 Aug: LOW picks 8-4, MEDIUM+ 12-2).
     if se.get("pick_tier") == "LEAN":
+        # K7 (2026-09-02): say WHY it is a LEAN (score / confidence / model
+        # conviction / value) instead of a generic "pick lemah".
+        reason = se.get("tier_reason")
+        if reason:
+            return f"LEAN (bukan BEST PICK — {reason})"
         return "LEAN (pick lemah — bukan BEST PICK)"
     if label == "BEST PICK":
         return "BEST PICK"
@@ -1546,6 +1551,15 @@ def _best_pick_block(se: dict[str, Any], *, include_internal: bool = True) -> li
             lines.append(_high_risk_line(risk_reason))
         lines.append("")
         lines.append(f"Confidence: {bp.get('confidence')}")
+        # K7 (2026-09-02): the score is a composite (evidence confluence),
+        # NOT a probability -- print the model's own probability next to it
+        # so "64/100" is never read as 64%.
+        _mp = bp.get("model_prob")
+        if _mp is not None:
+            try:
+                lines.append(f"Peluang model: {float(_mp):.0%}")
+            except (TypeError, ValueError):
+                pass
         lines.append(f"{_edge_display(se, bp)}")
         lines.append("")
         lines.append("Why:")
@@ -1740,15 +1754,19 @@ def _market_lean_block(payload: dict[str, Any], se: dict[str, Any]) -> list[str]
         bp_market = bp.get("market")
         raw = str(sug.get("raw_label") or sug.get("label") or "")
         tag = ""
+        # P7 (2026-09-02): 17 of 34 suggestions in 26 Aug-1 Sep were the SAME
+        # bet as the BEST PICK -- say so explicitly, it is one position, not
+        # two independent picks.
+        _same_tag = " ✅ = BEST PICK (taruhan yang sama, bukan bet terpisah)"
         if bp_sel:
             sug_market = sug.get("market")
             if raw == bp_sel or sug.get("label") == bp_sel or (sug_market and raw == bp_sel.split(":")[-1].strip()):
-                tag = " ✅ selaras dengan BEST PICK"
+                tag = _same_tag
             elif sug_market and bp_market == sug_market:
                 if raw != bp_sel:
                     tag = " ⚠️ berlawanan arah (model vs pasar)"
             elif raw == bp_sel:
-                tag = " ✅ selaras dengan BEST PICK"
+                tag = _same_tag
         disp_label = sug.get("label") or raw
         imp_pct = int(round(float(sug.get("implied") or 0.0) * 100))
         lines.append("")
@@ -1949,6 +1967,13 @@ def format_compact(payload: dict[str, Any]) -> dict[str, Any]:
 
 def format_settle(payload: dict[str, Any]) -> dict[str, Any]:
     """Render the settle command result (manual + auto)."""
+    # ``settle --best-pick`` / ``--dedupe`` already return a rendered card
+    # (``render`` + ``raw``); pass it through instead of "Status tidak
+    # dikenal: None" (2026-09-02).
+    if isinstance(payload.get("render"), dict) and payload["render"].get("body"):
+        r = dict(payload["render"])
+        r.setdefault("footer", " ")
+        return r
     if payload.get("error"):
         return {
             "title": "🧾 Settle",

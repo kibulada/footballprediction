@@ -349,6 +349,8 @@ class MultiSourceStatsFetcher:
                     if provider == "football_data"
                     else await self._thesportsdb_team(search_name, league_meta)
                 )
+                if result and not self._fallback_identity_ok(provider, result, search_name, league_key):
+                    result = None
                 if result:
                     result["_role"] = "fallback"
                     result["_aliased"] = aliased is not None
@@ -370,6 +372,47 @@ class MultiSourceStatsFetcher:
                 continue
         logger.warning("no provider returned team for %s", name)
         return None
+
+    @staticmethod
+    def _fallback_identity_ok(
+        provider: str, result: dict[str, Any], query: str, league_key: str | None,
+    ) -> bool:
+        """2026-09-02 (wrong-team audit): a by-NAME provider result must be
+        the club that was asked for.
+
+        Three checks, all fail-closed: (1) when both the query and the
+        provider's name canonicalise through teams.json they must be the
+        SAME club; (2) the entity registry is READ: a (provider, id) already
+        mapped to a different canonical id is a wrong-club hit; (3) with no
+        alias evidence at all the names themselves must match token-wise.
+        """
+        from .entity_registry import canonical_team_id
+        from .team_alias import resolve_team_alias
+        from .team_identity import names_match
+
+        name = str(result.get("name") or "")
+        if not name:
+            return False
+        q_alias = resolve_team_alias(query, league_key)
+        r_alias = resolve_team_alias(name, league_key)
+        if q_alias and r_alias:
+            if q_alias != r_alias:
+                logger.warning("%s resolved %r to %r (%s) -- different club, rejected", provider, query, name, r_alias)
+                return False
+            return True
+        q_cid = canonical_team_id(league_key, query) if q_alias else None
+        prior = None
+        try:
+            prior = _entity_registry().resolve(result.get("provider") or provider, result.get("id"))
+        except Exception:  # noqa: BLE001 -- registry never breaks resolve
+            prior = None
+        if prior and q_cid and prior != q_cid:
+            logger.warning("%s id %s is registered as %s, query %r is %s -- rejected", provider, result.get("id"), prior, query, q_cid)
+            return False
+        if names_match(query, name) or (q_alias and names_match(q_alias, name)) or (r_alias and names_match(query, r_alias)):
+            return True
+        logger.warning("%s resolved %r to %r -- name does not identify the same club, rejected", provider, query, name)
+        return False
 
     async def search_teams_pair(
         self, home: str, away: str, league_meta: dict[str, Any]
@@ -649,6 +692,35 @@ class MultiSourceStatsFetcher:
             form = await self.fc.fetch_team_form(fs["slug"], fs["id"], limit=limit)
             return await self._store_form(key, form)
 
+        # LiveScore BY EVENT + TEAM ID (2026-09-02, wrong-team post-mortem):
+        # when the pair was resolved on LiveScore the match carries the event
+        # id and both team ids. The per-event ``/form-e`` payload is keyed by
+        # team id, so this can never return another club -- it runs BEFORE
+        # every by-name path below. Cache key = provider + event + team id.
+        _ls_match = (league_meta or {}).get("_livescore_match") if isinstance(league_meta, dict) else None
+        if (
+            isinstance(_ls_match, dict)
+            and _ls_match.get("source_id")
+            and str(team_id) in (str(_ls_match.get("home_id")), str(_ls_match.get("away_id")))
+            and getattr(self, "livescore", None) is not None
+            and getattr(self.livescore, "available", False)
+            and not analysis_budget_exhausted(margin_seconds=_BUDGET_MARGIN)
+        ):
+            try:
+                from .livescore import team_form_by_id
+
+                _eid = str(_ls_match["source_id"])
+                key = self._form_cache_key("livescore_event", _eid, team_id, limit)
+                hit = await self._cached_form(key)
+                if hit is not None:
+                    return hit
+                _raw = await self.livescore.fetch_form(_eid)
+                form = team_form_by_id(_raw, team_id, limit=limit)
+                if form and form.get("sequence"):
+                    return await self._store_form(key, form)
+            except Exception as exc:  # noqa: BLE001 -- best-effort, next source
+                logger.warning("livescore event form failed (best-effort): %s", exc)
+
         # Flashscore BY NAME: on the regular query path (no !livescore /
         # !flashscore prefix) the teams are resolved via football-data, so
         # ``_flashscore_match`` is never populated and the flashscore form
@@ -670,7 +742,22 @@ class MultiSourceStatsFetcher:
                 slug_id = await asyncio.to_thread(_suggest_team, team_name)
                 if slug_id:
                     slug, fsid = slug_id
-                    key = self._form_cache_key("flashscore", league_key or "unknown", team_id, limit)
+                    # 2026-09-02: the suggest API resolved a NAME; verify the
+                    # returned club is the requested one before trusting its
+                    # results page (the "name lottery" behind Copenhagen /
+                    # Lincoln Red Imps), and cache under the FLASHSCORE id --
+                    # never under a foreign provider's id.
+                    from .team_identity import names_match
+
+                    if not names_match(team_name, slug.replace("-", " ")):
+                        logger.warning(
+                            "flashscore by-name form: suggest returned %r for %r -- rejected",
+                            slug, team_name,
+                        )
+                        slug_id = None
+                if slug_id:
+                    slug, fsid = slug_id
+                    key = self._form_cache_key("flashscore", league_key or "unknown", fsid, limit)
                     hit = await self._cached_form(key)
                     if hit is not None:
                         return hit
@@ -696,16 +783,24 @@ class MultiSourceStatsFetcher:
                 if analysis_budget_exhausted(margin_seconds=_BUDGET_MARGIN):
                     logger.warning("livescore form skipped: analysis budget nearly spent (%.0fs elapsed)", analysis_elapsed())
                 else:
-                    key = self._form_cache_key("livescore", league_key or "unknown", team_id, limit)
+                    team_name = (league_meta.get("_team_names") or {}).get(str(team_id))
+                    # 2026-09-02: this is a BY-NAME lookup -- key it by the
+                    # name it looked up, never by a foreign provider's id.
+                    key = self._form_cache_key(
+                        "livescore_byname", league_key or "unknown",
+                        re.sub(r"[^a-z0-9]+", "-", str(team_name or team_id).lower()).strip("-"), limit,
+                    )
                     hit = await self._cached_form(key)
                     if hit is not None:
                         if thin_form is None or _form_depth(hit) >= _form_depth(thin_form):
                             return hit
                     else:
-                        team_name = (league_meta.get("_team_names") or {}).get(str(team_id))
                         # G5: pass league_key so cup / other-division matches
                         # between the same teams do not pollute the form window.
-                        form = await self._livescore_form(team_name, limit, league_key=league_key)
+                        form = await self._livescore_form(
+                            team_name, limit, league_key=league_key,
+                            league_country=(league_meta or {}).get("country"),
+                        )
                         if form and form.get("sequence"):
                             form["source"] = "livescore"
                             stored = await self._store_form(key, form)
@@ -835,6 +930,7 @@ class MultiSourceStatsFetcher:
         limit: int = FORM_WINDOW,
         lookback_days: int = 45,
         league_key: str | None = None,
+        league_country: str | None = None,
     ) -> dict[str, Any] | None:
         """Last-N form for ``team_name`` rebuilt from the LiveScore date feed.
 
@@ -855,13 +951,17 @@ class MultiSourceStatsFetcher:
         if not team_name or self.livescore is None or not getattr(self.livescore, "available", False):
             return None
         from .livescore import DATE_FEED_TTL_SECONDS, parse_soccer_payload
-        from .datasources import teams_match
+        from .team_identity import country_matches, match_side
 
         seq: list[str] = []
         gf_list: list[int] = []
         ga_list: list[int] = []
         home_w = home_d = home_l = 0
         away_w = away_d = away_l = 0
+        # 2026-09-02: feed pages overlap (the same event can sit on page 0 and
+        # page 1 of a date) -- one finished match must count once.
+        seen_events: set[str] = set()
+        matched_clubs: list[str] = []
         today = datetime.now(timezone.utc)
         for back in range(max(1, int(lookback_days))):
             if analysis_budget_exhausted(margin_seconds=_BUDGET_MARGIN):
@@ -893,6 +993,7 @@ class MultiSourceStatsFetcher:
                     except Exception:  # noqa: BLE001 -- guard never breaks form
                         pass
                     # G5: reject matches of a DIFFERENT resolved league.
+                    comp_key = None
                     if league_key and fx.get("competition"):
                         try:
                             from .league_resolver import competition_league_key
@@ -901,13 +1002,26 @@ class MultiSourceStatsFetcher:
                             if comp_key and comp_key != league_key:
                                 continue
                         except Exception:  # noqa: BLE001 -- guard never breaks form
-                            pass
-                    if teams_match(team_name, fx.get("home") or ""):
-                        is_home = True
-                    elif teams_match(team_name, fx.get("away") or ""):
-                        is_home = False
-                    else:
+                            comp_key = None
+                    # 2026-09-02 (wrong-team post-mortem): a by-NAME row must
+                    # also be geographically plausible -- an English club's
+                    # form never comes from USL League Two / NPL Victoria --
+                    # and, when the competition is not the analysed league
+                    # (unregistered cup, other tier), only a STRICT identity
+                    # match counts (no extra token: "Lyon" != "Lyon la Duchere").
+                    _same_country = country_matches(league_country, fx.get("country"))
+                    if _same_country is False:
                         continue
+                    _strict = not (comp_key and comp_key == league_key)
+                    side = match_side(team_name, fx.get("home") or "", fx.get("away") or "", strict=_strict)
+                    if side is None:
+                        continue
+                    _ev_key = str(fx.get("source_id") or "") or f"{fx.get('kickoff')}|{fx.get('home')}|{fx.get('away')}"
+                    if _ev_key in seen_events:
+                        continue
+                    seen_events.add(_ev_key)
+                    is_home = side == "home"
+                    matched_clubs.append(str(fx.get("home") if is_home else fx.get("away")))
                     gf, ga = (int(hg), int(ag)) if is_home else (int(ag), int(hg))
                     gf_list.append(gf)
                     ga_list.append(ga)
@@ -936,6 +1050,14 @@ class MultiSourceStatsFetcher:
             if len(seq) >= limit:
                 break
         if not seq:
+            return None
+        # 2026-09-02: rows from TWO different clubs ("Inter Milan" and
+        # "FC Inter Turku" for the query "Inter") mean the name is ambiguous
+        # here -- refuse rather than blend two clubs into one window.
+        from .team_identity import distinct_clubs
+
+        if distinct_clubs(matched_clubs) > 1:
+            logger.warning("livescore by-name form for %r matched several clubs %s -- refused", team_name, sorted(set(matched_clubs)))
             return None
         # Feed scanned newest-first -> reverse to OLDEST -> NEWEST.
         seq = list(reversed(seq))
@@ -1098,8 +1220,8 @@ class MultiSourceStatsFetcher:
                 # Lazy import (circular-import safe): _norm_team_name lives
                 # in analyse.py -- same pattern as datasources._norm().
                 from .analyse import _norm_team_name
-                home_variants_l = [team_a_name or home]
-                away_variants_l = [team_b_name or away]
+                home_variants_l = [team_a_name or ""]
+                away_variants_l = [team_b_name or ""]
                 _today = datetime.now(timezone.utc)
                 for _back in range(2):  # today + yesterday
                     _d8 = (_today - timedelta(days=_back)).strftime("%Y%m%d")

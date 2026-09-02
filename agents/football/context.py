@@ -29,6 +29,13 @@ class MatchContext:
     home: str
     away: str
     kickoff_utc: str | None = None
+    # P4 (2026-09-02): canonical teams.json names for the Elo lookup. The
+    # live display name ("Lille", "Genk") is a single token the K2 resolver
+    # guard refuses to partial-match against "Lille OSC" / "KRC Genk"; the
+    # canonical name resolves exactly. Optional: when absent the display
+    # name is the only candidate (byte-identical to the pre-P4 behaviour).
+    home_elo_key: str | None = None
+    away_elo_key: str | None = None
     as_of: str = field(default_factory=utc_now_iso)
     home_form: str | None = None
     away_form: str | None = None
@@ -78,6 +85,16 @@ class MatchContext:
     @property
     def input_hash(self) -> str:
         return input_hash(self.snapshot())
+
+    @property
+    def home_elo_names(self) -> tuple[str, ...]:
+        """Ordered Elo lookup candidates for the home side (canonical first)."""
+        return tuple(n for n in (self.home_elo_key, self.home) if n)
+
+    @property
+    def away_elo_names(self) -> tuple[str, ...]:
+        """Ordered Elo lookup candidates for the away side (canonical first)."""
+        return tuple(n for n in (self.away_elo_key, self.away) if n)
 
     @property
     def has_attack_defense(self) -> bool:
@@ -132,6 +149,8 @@ def build_match_context(
     odds: dict[str, Any] | None = None,
     sources: list[str] | None = None,
     source_meta: dict[str, Any] | None = None,
+    home_elo_key: str | None = None,
+    away_elo_key: str | None = None,
 ) -> MatchContext:
     """FeatureBuilder: assemble a MatchContext from analyse-style dicts.
 
@@ -154,6 +173,8 @@ def build_match_context(
         home=home,
         away=away,
         kickoff_utc=kickoff,
+        home_elo_key=home_elo_key or None,
+        away_elo_key=away_elo_key or None,
         home_form=stats.get("home_form") if stats.get("home_form") not in (None, "n/a") else None,
         away_form=stats.get("away_form") if stats.get("away_form") not in (None, "n/a") else None,
         home_gf_avg=_num(stats.get("home_gf_avg")),
