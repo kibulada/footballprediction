@@ -128,6 +128,15 @@ _EXTRA_ALIASES: dict[str, str] = {
     "AEK Athens FC": "AEK Athen",
     "AEK Athens": "AEK Athen",
     "Dynamo Kyiv": "Dinamo Kiev",
+    # Belgian Pro League 2025-26 — short/colloquial spellings (St. Truiden / Union SG)
+    # seed keys are "Sint-Truidense VV" / "Union Saint-Gilloise"; short forms share
+    # no significant token ("st truiden" vs "sint truidense") so K2 guard needs explicit
+    "St. Truiden": "Sint-Truidense VV",
+    "St Truiden": "Sint-Truidense VV",
+    "Sint Truiden": "Sint-Truidense VV",
+    "Union SG": "Union Saint-Gilloise",
+    "Royale Union SG": "Union Saint-Gilloise",
+    "Royale Union Saint Gilloise": "Union Saint-Gilloise",
 }
 
 # K2: tokens that mark a SECOND team of the same club (reserve / B side /

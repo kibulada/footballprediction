@@ -612,7 +612,18 @@
     "MEC": "KV Mechelen",
     "ZUL": "SV Zulte Waregem",
     "USG": "Union Saint-Gilloise",
+    "UNION SG": "Union Saint-Gilloise",
+    "ROYALE UNION SG": "Union Saint-Gilloise",
+    "ROYALE UNION SAINT GILLOISE": "Union Saint-Gilloise",
+    "ROYALE UNION SAINT-GILLOISE": "Union Saint-Gilloise",
+    "UNION SAINT GILLOISE": "Union Saint-Gilloise",
+    "UNION SAINT-GILLOISE": "Union Saint-Gilloise",
     "STV": "Sint-Truidense VV",
+    "ST TRUIDEN": "Sint-Truidense VV",
+    "ST. TRUIDEN": "Sint-Truidense VV",
+    "SINT TRUIDEN": "Sint-Truidense VV",
+    "SINT-TRUIDEN": "Sint-Truidense VV",
+    "SINT TRUIDENSE VV": "Sint-Truidense VV",
     "OHL": "Oud-Heverlee Leuven"
   },
   "Ligue 2": {
