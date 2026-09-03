@@ -2701,6 +2701,13 @@ def run_signal_engine(
             if not _ok_g11:
                 _veto(s, _rs_g11[0])
 
+    # BTTS negative edge: model kalah dari pasar (edge<0) -> BTTS bukan value.
+    # 7d: Alaves BTTS Yes -2.7 LOSS, wins BTTS semua edge>0 (Wrexham +1.9 etc) -> 0 win korban.
+    if bool(_pg_cfg.get("btts_negative_edge", True)):
+        for s in signals:
+            if s.market == "BTTS" and s.edge_pp is not None and float(s.edge_pp) < 0:
+                _veto(s, f"BTTS {s.selection} edge {float(s.edge_pp):+.1f}pp negatif — model kalah dari pasar, bukan value ( Alaves 1-0 )")
+
     # G10 (2026-08-31): 1X2 must be model favorite. A 1X2 underdog (e.g. Away 30% vs Home 44% favorite) has no model edge even if edge 0 vs market - picking it is pure market mirroring. Verified Monaco 2-0, Leeds 1-1, Pisa 2-1.
     if bool(_pg_cfg.get("require_model_favorite_1x2", True)):
         _p1x2 = (model_probs or {}).get("1x2") or {}

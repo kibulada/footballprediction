@@ -315,6 +315,7 @@
     "market_lean": {
       "suggestion": {
         "dominance_floor": 0.60,
+        "dominance_floor_total": 0.55,
         "dominance_floor_1x2": 0.55,
         "conflict_pp": 5.0,
         "min_form_len": 3,

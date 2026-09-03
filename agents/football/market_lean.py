@@ -40,6 +40,7 @@ DEFAULTS: dict[str, Any] = {
     # already strong (Home 2.20 -> 42% fair); 60% is rare. Totals/BTTS are
     # 2-way so 60% remains. Per-market floor applied in select_suggestion.
     "dominance_floor": 0.60,
+    "dominance_floor_total": 0.55,
     "dominance_floor_1x2": 0.55,
     "conflict_pp": 5.0,        # tighter than signal_engine 8pp - SUG must agree with model
     "min_form_len": 3,
@@ -230,10 +231,14 @@ def select_suggestion(
         raw = str(cand.get("raw_label") or "")
         imp = float(cand.get("implied") or 0.0)
         vig = max(0.0, min(0.9, float(cand.get("vig") or 0.0)))
-        # Dominance floor is per-market: 1X2 55% (3-way), others 60% (2-way).
-        # The floor is tested against PURE dominance (implied*(1-vig)) --
-        # never against the agreement-weighted score below.
-        _floor = float(c.get("dominance_floor_1x2", 0.55)) if market == "1X2" else floor
+        # Dominance floor is per-market: 1X2 55% (3-way), Total 55% (2026-09-02
+        # Lincoln/WBA Under 50-51% blocked 0.60 but won 0-0/1-1), others 60% (2-way).
+        if market == "1X2":
+            _floor = float(c.get("dominance_floor_1x2", 0.55))
+        elif market == "Total":
+            _floor = float(c.get("dominance_floor_total", 0.55))
+        else:
+            _floor = floor
         dominance = imp * (1.0 - vig)
         # Tweak (2026-08-31): rank by model-aligned dominance --
         # adjusted_score = dominance * (1 - |model - market| / 8pp), full
