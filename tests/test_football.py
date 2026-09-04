@@ -482,8 +482,19 @@ def test_format_analyse_with_prediction_engine():
 
 
 def test_leagues_count_31():
+    """Sanity floor, not an exact count (2026-09-04).
+
+    The old ``== 35`` was a magic number that went stale every time a league
+    was added (name still says 31, body said 35, file had 36) and the failure
+    told you nothing. Adding a league is normal; silently LOSING leagues is
+    the real bug, so assert a floor plus structural integrity instead.
+    """
     leagues = json.loads((ROOT / "agents" / "football" / "leagues.json").read_text(encoding="utf-8"))
-    assert len(leagues) == 35
+    assert len(leagues) >= 35, f"liga hilang: {len(leagues)} < 35"
+    assert len(set(leagues)) == len(leagues), "ada key liga duplikat"
+    for key, meta in leagues.items():
+        assert isinstance(meta, dict), f"{key} bukan objek"
+        assert meta.get("display"), f"{key} tanpa display name"
 
 
 def test_all_leagues_have_aliases():

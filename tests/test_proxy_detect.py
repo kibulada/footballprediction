@@ -305,15 +305,37 @@ def test_shutdown_tor_noop_when_nothing_launched():
 
 
 def test_shutdown_tor_terminates_own_proc():
+    """Cross-platform (2026-09-04): the test used to assume the Windows
+    ``taskkill`` branch and failed on Linux, where ``_shutdown_tor`` calls
+    ``proc.terminate()`` instead. Assert the branch that matches the host."""
     _reset_tor_state()
-    fake_proc = type("P", (), {"pid": 4242, "poll": lambda self: None})()
-    bot._TOR_PROC = fake_proc
+    calls: list[str] = []
+
+    class _P:
+        pid = 4242
+
+        def poll(self):
+            return None
+
+        def terminate(self):
+            calls.append("terminate")
+
+        def wait(self, timeout=None):
+            return 0
+
+        def kill(self):
+            calls.append("kill")
+
+    bot._TOR_PROC = _P()
     with patch.object(bot.subprocess, "run") as run:
         bot._shutdown_tor()
-    # Windows path: taskkill /PID <pid> /T /F
-    run.assert_called_once()
-    args = run.call_args.args[0]
-    assert "taskkill" in args and "4242" in args
+    if sys.platform == "win32":
+        run.assert_called_once()
+        args = run.call_args.args[0]
+        assert "taskkill" in args and "4242" in args
+    else:
+        run.assert_not_called()
+        assert calls == ["terminate"]
     assert bot._TOR_PROC is None  # cleared after shutdown
 
 

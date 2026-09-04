@@ -68,14 +68,22 @@ def test_key_from_meta_registered_and_dynamic():
 # D2 -- fixture-first detection in find_specific_match
 # --------------------------------------------------------------------------
 
-def _make_stats(fixture=None):
+def _make_stats(fixture=None, pair=None):
+    """``pair`` overrides the resolved team pair (2026-09-04).
+
+    The default Barcelona/Real Madrid pair is fine for tests that query those
+    clubs, but a test querying e.g. Pisa vs Empoli now trips the identity
+    firewall (G-B post_resolve: "query 'Pisa' tetapi sumber memberi
+    'Barcelona'") and dies before reaching the code under test. Pass ``pair``
+    so the mocked resolver agrees with the query.
+    """
     ms = AsyncMock()
-    ms.search_teams_pair = AsyncMock(
-        return_value=(
+    if pair is None:
+        pair = (
             {"id": 1, "name": "Barcelona", "provider": "flashscore"},
             {"id": 2, "name": "Real Madrid", "provider": "flashscore"},
         )
-    )
+    ms.search_teams_pair = AsyncMock(return_value=pair)
     ms.fetch_upcoming_fixture = AsyncMock(return_value=fixture if fixture is not None else {})
     ms.fetch_team_form = AsyncMock(
         return_value={"sequence": "W-W-D", "gf_avg": 1.5, "ga_avg": 0.8}
@@ -218,8 +226,10 @@ def test_find_specific_match_flashscore_without_competition_falls_to_livescore()
     detection died at ``if not competition: return None`` before ever
     consulting livescore.
     """
-    ms = _make_stats()
-    # Flashscore finds the fixture but carries NO competition title.
+    ms = _make_stats(pair=(
+        {"id": 1, "name": "Pisa", "provider": "flashscore"},
+        {"id": 2, "name": "Empoli", "provider": "flashscore"},
+    ))
     ms.fc = AsyncMock()
     ms.fc.available = True
     ms.fc.resolve_match = AsyncMock(

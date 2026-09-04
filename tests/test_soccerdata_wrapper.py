@@ -115,7 +115,10 @@ def test_read_team_form_separates_home_away_correctly(monkeypatch):
     monkeypatch.setitem(sys.modules, "soccerdata", _build_soccerdata_stub(df))
 
     async def runner():
-        return await SoccerDataWrapper().read_team_form("Primeira Liga", "Santa Clara", limit=5)
+        # "Primeira Liga" is NOT an FBref league (top-5 only), so the guard in
+        # read_team_form returned None before the stub was ever used and this
+        # test asserted nothing. Use a supported league (2026-09-04).
+        return await SoccerDataWrapper().read_team_form("EPL", "Santa Clara", limit=5)
     result = asyncio.run(runner())
     assert result is not None
     assert result["source"] == "soccerdata_fbref"
@@ -139,7 +142,8 @@ def test_read_h2h_counts_correctly(monkeypatch):
     monkeypatch.setitem(sys.modules, "soccerdata", _build_soccerdata_stub(df))
 
     async def runner():
-        return await SoccerDataWrapper().read_h2h("Primeira Liga", "Santa Clara", "Nacional", limit=5)
+        # See note above: "Primeira Liga" is not FBref-backed (2026-09-04).
+        return await SoccerDataWrapper().read_h2h("EPL", "Santa Clara", "Nacional", limit=5)
     result = asyncio.run(runner())
     assert result is not None
     assert result["wins"] + result["draws"] + result["losses"] >= 1

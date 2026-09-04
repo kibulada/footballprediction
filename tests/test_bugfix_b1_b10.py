@@ -221,8 +221,14 @@ def test_resolve_team_alias_not_hijacked_by_generic_alias():
     # partial names still resolve through the boundary fallback
     assert resolve_team_alias("Real Madrid", None) == "Real Madrid CF"
     # colliding short codes keep working league-restricted (Segunda codes
-    # must not shadow Eredivisie/EPL lookups)
-    assert resolve_team_alias("ALM", "Eredivisie") == "Almere City FC"
+    # must not shadow Eredivisie/EPL lookups).
+    # 2026-09-04: this used to assert ALM/Eredivisie -> "Almere City FC",
+    # but Almere City was removed from teams.json in 774ccfa (sync
+    # promosi/degradasi 2026/27) so the alias no longer exists and "ALM"
+    # only lives in LaLiga (UD Almería). Use a code that IS still present
+    # in both leagues so the league-scoping assertion stays meaningful.
+    assert resolve_team_alias("ALM", "LaLiga") == "UD Almería"
+    assert resolve_team_alias("AJX", "Eredivisie") == "AFC Ajax"
     assert resolve_team_alias("BUR", "EPL") == "Burnley FC"
     assert resolve_team_alias("CAS", "Primeira Liga") == "Casa Pia AC"
 
