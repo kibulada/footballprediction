@@ -256,7 +256,12 @@ def calibrate_total_to_market(
     matrix = poisson_matrix(float(lh), float(la), rho=0.0)
     _, _, model_over25, _, _ = probs_from_matrix(matrix)
     gap = fair_over - float(model_over25)
-    if abs(gap) < 0.01:
+    # 2026-09-04: sempat diturunkan ke 0.01, dikembalikan ke 0.05. Ambang
+    # 0.01 menyalakan kalibrasi di 34.8% baris Total (136/391) — perubahan
+    # besar yang TIDAK bisa diukur dari log tersimpan (butuh re-run engine),
+    # jadi tidak boleh dikirim tanpa bukti. Naikkan lagi hanya setelah
+    # A/B lambda vs FT aktual.
+    if abs(gap) < 0.05:
         return lh, la, False
     scale = max(0.7, min(1.8, 1.0 + gap * float(weight)))
     new_lh = float(lh) * scale
@@ -635,7 +640,7 @@ class Ensemble:
         # If model is too aggressive (Over too high), decrease lambda
         gap = market_p_over - model_p_over
 
-        if abs(gap) < 0.01:
+        if abs(gap) < 0.05:  # 2026-09-04: revert dari 0.01, lihat calibrate_total_to_market
             return lh, la  # gap too small, no adjustment needed
 
         # Adjust lambdas proportionally

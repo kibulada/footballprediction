@@ -244,7 +244,8 @@ def replay(paths: list[Path], since: str | None, until: str | None) -> dict[str,
                 tier_book["as_published"]["w" if res == "win" else "l"] += 1
                 prob, edge = _model_prob(s, pick)
                 probe = {"score": pick.get("score"), "confidence": pick.get("confidence"),
-                         "model_prob": prob, "edge_pp": edge}
+                         "model_prob": prob, "edge_pp": edge,
+                         "market": pick.get("market"), "selection": pick.get("selection")}
                 keep = pick_tier_for(probe, se_cfg)[0] == "BEST PICK"
                 name = f"{s.get('home')} v {s.get('away')} {pick.get('market')} {pick.get('selection')}"
                 if keep:

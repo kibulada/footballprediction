@@ -953,11 +953,15 @@ def pick_tier_for(best_pick: Any, cfg: dict[str, Any] | None = None) -> tuple[st
         ``best_pick_min_prob`` (0.60) AND it is not a value pick, i.e. not
         (probability >= ``best_pick_value_min_prob`` (0.50) with edge >= 0)
         (K7, 2026-09-02).
-      * Total/BTTS strict (2026-09-04): ``market`` in ("Total", "BTTS")
-        needs probability >= ``best_pick_min_prob`` MUTLAK -- the value
-        path is closed for goals markets. 27 Agu 10-0 discipline: Over/BTTS
-        nanggung 0.50-0.59 (Toulouse 0.529, Gent 0.501) jadi LEAN, bukan
-        BEST halu. 1X2/AH unchanged (Dortmund 0.65/-3.0 tetap BEST).
+      * Total/BTTS negative edge (2026-09-04, revisi): ``market`` in
+        ("Total", "BTTS") with ``edge_pp`` < 0 is LEAN -- model kalah dari
+        harga pasar, jadi bukan value walau probabilitasnya tinggi.
+        Terukur `scripts/eval_rules.py`: +12.21u vs +8.35u (rule 60% mutlak)
+        vs +11.57u (rule B polos) di 08-26..09-04, dan menang juga di
+        out-of-sample 09-01..09-04. Rule 60% mutlak yang lama membuang 6
+        WIN goals-market (Real Madrid/AGF/Borac BTTS, Partizan/Cambuur
+        Over) demi menangkap 3 loss = net -1.70u, jadi dicabut.
+        1X2/AH tidak berubah.
 
     ``model_prob`` for an Asian-Handicap quarter line is the expected-return
     probability (win + half of the half-win mass), not P(full win) -- the
@@ -994,9 +998,9 @@ def pick_tier_for(best_pick: Any, cfg: dict[str, Any] | None = None) -> tuple[st
             e = float(edge_raw) if edge_raw is not None else None
         except (TypeError, ValueError):
             e = None
-        if p is not None and is_goals_market and p < min_prob:
+        if p is not None and is_goals_market and e is not None and e < 0.0:
             reasons.append(
-                f"keyakinan model {p:.0%} < {min_prob:.0%} (Total/BTTS butuh >= {min_prob:.0%})"
+                f"edge {e:+.1f}pp negatif di {market_raw} — model kalah dari pasar, bukan value"
             )
         elif p is not None and p < min_prob and not (p >= value_min and e is not None and e >= 0.0):
             if p < value_min:
@@ -1036,11 +1040,20 @@ def _apply_evidence_floor(
     Phase 6.1 FIX: when market component > 0 (market price exists and
     supports the pick), do NOT apply the floor — market evidence counts
     as valid evidence even when statistical/movement are unavailable.
+
+    2026-09-04: bypass ini SEMPAT dicabut ("market tanpa statistical bukan
+    evidensi tebal") lalu DIKEMBALIKAN setelah diukur. Mencabutnya membalik
+    top-1 kandidat di 15 dari 126 match (11.9%), sistematis membuang 1X2
+    demi Total/BTTS, dan hasilnya 10-5 (-0.34u) -> 7-8 (-3.59u) = -3.25u.
+    Korban jelas: Coventry Home->Under (win jadi... sebenarnya untung), tapi
+    Sevilla Away +0.91 -> Under -1.00, Dortmund Home +0.33 -> BTTS -1.00,
+    Milan Home +0.48 -> Over -1.00, Al Diriyah Away +0.48 -> Over -1.00.
+    Ukur ulang dengan `scripts/eval_evidence_floor.py` sebelum mengubah.
     """
     cfg = cfg or {}
-    # FIX P2 (2026-09-04): evidence floor tetap berlaku walau market ada —
-    # market tanpa statistical+made-up movement bukan evidensi tebal.
-    # Old bypass `if market>0: return` bikin floor mati (09-03 semua pick lolos).
+    # Market price IS evidence — bypass restored 2026-09-04 (see docstring).
+    if components.get("market", 0.0) > 0.0:
+        return score
     has_stat = "statistical" in components
     has_mv = _movement_available(components.get("_movement_block"))
     missing = (not has_stat) + (not has_mv)
