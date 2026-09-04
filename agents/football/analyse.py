@@ -3187,6 +3187,10 @@ async def find_specific_match(
                         },
                     },
                     ah_rows=_ah_rows,
+                    # G12 (2026-09-04): Elo dipakai gate zona-maut (gap
+                    # 100-200 = favorit tanggung, realisasi hit 33%).
+                    elo_home=((prediction or {}).get("features") or {}).get("elo_home"),
+                    elo_away=((prediction or {}).get("features") or {}).get("elo_away"),
                     movement_snapshot=_mv_signal,
                     context=team_context or None,
                     completeness=(prediction or {}).get("data_completeness", 0.0),

@@ -2459,6 +2459,8 @@ def run_signal_engine(
     x2_market_dev_pp: float | None = None,
     odds_1x2: dict[str, Any] | None = None,
     team_form: dict[str, Any] | None = None,
+    elo_home: float | None = None,
+    elo_away: float | None = None,
 ) -> dict[str, Any]:
     """Build, score, rank signals and return the Best Pick (JSON-safe).
 
@@ -2745,6 +2747,46 @@ def run_signal_engine(
                         _veto(s, f"1X2 {s.selection} bukan favorit model ({_max_side} { _max_val:.0%} vs {s.model_prob:.0%}) - cegah pick underdog cuma karena mirip pasar (pola Monaco 2026-08-30)")
                     elif s.model_prob is not None and float(s.model_prob) < 0.35:
                         _veto(s, f"1X2 {s.selection} prob model {float(s.model_prob):.0%} <35% terlalu rendah untuk BEST PICK")
+
+    # G12 ZONA MAUT ELO (2026-09-04): selisih Elo 100-200 = "favorit yang
+    # tidak cukup favorit". Harga sudah dipatok seperti favorit (rata-rata
+    # 1.74) tapi hasilnya lempar koin -- realisasi hit 33.3% (4W/8L) vs
+    # 91.7% di luar zona ini.
+    #
+    # Bukti (scripts/eval_deadzone.py, 60 pick tersettle):
+    #   - hit rate: zona 33.3% vs sisanya 91.7%, selisih +58.3pp,
+    #     bootstrap CI95 [+29.2, +85.4]pp -> tidak menyentuh nol.
+    #   - permutasi placebo: gain +5.38u muncul 0/5000 kali saat label gap
+    #     diacak (p < 0.0002).
+    #   - walk-forward: bucket terburuk yang dipilih HANYA dari data <=08-30
+    #     tetap menguntungkan di data >08-30 (+2.74u, 2W/4L dibuang).
+    #   - leave-one-day-out: 0 dari 9 tanggal membalik gain jadi negatif.
+    #   - sebaran 11 liga & 7 tanggal -> bukan artefak satu hari/satu liga.
+    # Korban 03-09 yang tertangkap: Toulouse (gap 116), Gent (124),
+    # Cagliari (128). Juga Augsburg (125), Samsunspor (175), Stoke (123),
+    # Coventry (105), Copenhagen (182).
+    #
+    # CATATAN JUJUR: bootstrap pada UNIT gagal tipis (CI95 [-0.33, +11.57]u)
+    # karena unit sangat dipengaruhi variance harga; hit-rate jauh lebih
+    # stabil dan itu yang lolos. Ambang 100/200 ditemukan dari data ini,
+    # jadi WAJIB diukur ulang saat sampel bertambah -- jalankan
+    # `python scripts/eval_deadzone.py` sebelum mengubah/menghapus gate ini.
+    if bool(_pg_cfg.get("elo_gap_dead_zone", True)):
+        _dz_lo = float(_pg_cfg.get("elo_gap_dead_zone_min", 100.0))
+        _dz_hi = float(_pg_cfg.get("elo_gap_dead_zone_max", 200.0))
+        if elo_home is not None and elo_away is not None:
+            try:
+                _gap = abs(float(elo_home) - float(elo_away))
+            except (TypeError, ValueError):
+                _gap = None
+            if _gap is not None and _dz_lo <= _gap < _dz_hi:
+                for s in signals:
+                    _veto(
+                        s,
+                        f"selisih Elo {_gap:.0f} masuk zona maut {_dz_lo:.0f}-{_dz_hi:.0f} "
+                        f"— favorit tanggung: harga sudah mahal tapi realisasi 33% "
+                        f"(Toulouse/Gent/Cagliari 03-09)",
+                    )
 
     # G7 (per candidate): a pick without a tradeable price is not a pick.
     # Verified: Braga v Austria Wien Women 2026-08-20 shipped market_odds null.
