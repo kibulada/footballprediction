@@ -256,7 +256,7 @@ def calibrate_total_to_market(
     matrix = poisson_matrix(float(lh), float(la), rho=0.0)
     _, _, model_over25, _, _ = probs_from_matrix(matrix)
     gap = fair_over - float(model_over25)
-    if abs(gap) < 0.05:
+    if abs(gap) < 0.01:
         return lh, la, False
     scale = max(0.7, min(1.8, 1.0 + gap * float(weight)))
     new_lh = float(lh) * scale
@@ -635,7 +635,7 @@ class Ensemble:
         # If model is too aggressive (Over too high), decrease lambda
         gap = market_p_over - model_p_over
 
-        if abs(gap) < 0.05:
+        if abs(gap) < 0.01:
             return lh, la  # gap too small, no adjustment needed
 
         # Adjust lambdas proportionally

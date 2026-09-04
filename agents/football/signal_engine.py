@@ -953,6 +953,11 @@ def pick_tier_for(best_pick: Any, cfg: dict[str, Any] | None = None) -> tuple[st
         ``best_pick_min_prob`` (0.60) AND it is not a value pick, i.e. not
         (probability >= ``best_pick_value_min_prob`` (0.50) with edge >= 0)
         (K7, 2026-09-02).
+      * Total/BTTS strict (2026-09-04): ``market`` in ("Total", "BTTS")
+        needs probability >= ``best_pick_min_prob`` MUTLAK -- the value
+        path is closed for goals markets. 27 Agu 10-0 discipline: Over/BTTS
+        nanggung 0.50-0.59 (Toulouse 0.529, Gent 0.501) jadi LEAN, bukan
+        BEST halu. 1X2/AH unchanged (Dortmund 0.65/-3.0 tetap BEST).
 
     ``model_prob`` for an Asian-Handicap quarter line is the expected-return
     probability (win + half of the half-win mass), not P(full win) -- the
@@ -978,6 +983,8 @@ def pick_tier_for(best_pick: Any, cfg: dict[str, Any] | None = None) -> tuple[st
         reasons.append("confidence LOW")
     prob_raw = _bp_get(best_pick, "model_prob")
     edge_raw = _bp_get(best_pick, "edge_pp")
+    market_raw = _bp_get(best_pick, "market")
+    is_goals_market = market_raw in ("Total", "BTTS")
     if prob_raw is not None:
         try:
             p = float(prob_raw)
@@ -987,7 +994,11 @@ def pick_tier_for(best_pick: Any, cfg: dict[str, Any] | None = None) -> tuple[st
             e = float(edge_raw) if edge_raw is not None else None
         except (TypeError, ValueError):
             e = None
-        if p is not None and p < min_prob and not (p >= value_min and e is not None and e >= 0.0):
+        if p is not None and is_goals_market and p < min_prob:
+            reasons.append(
+                f"keyakinan model {p:.0%} < {min_prob:.0%} (Total/BTTS butuh >= {min_prob:.0%})"
+            )
+        elif p is not None and p < min_prob and not (p >= value_min and e is not None and e >= 0.0):
             if p < value_min:
                 reasons.append(f"keyakinan model {p:.0%} < {value_min:.0%}")
             elif e is None:
@@ -1027,10 +1038,9 @@ def _apply_evidence_floor(
     as valid evidence even when statistical/movement are unavailable.
     """
     cfg = cfg or {}
-    # If market component exists (price available), evidence floor does not
-    # apply — market data IS evidence.
-    if components.get("market", 0.0) > 0.0:
-        return score
+    # FIX P2 (2026-09-04): evidence floor tetap berlaku walau market ada —
+    # market tanpa statistical+made-up movement bukan evidensi tebal.
+    # Old bypass `if market>0: return` bikin floor mati (09-03 semua pick lolos).
     has_stat = "statistical" in components
     has_mv = _movement_available(components.get("_movement_block"))
     missing = (not has_stat) + (not has_mv)

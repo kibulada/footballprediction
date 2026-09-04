@@ -638,7 +638,7 @@ def classify_failure(
                 prob = e.get("model_prob")
                 break
     if prob is not None:
-        _probe = {"score": 1.0, "confidence": "MEDIUM", "model_prob": prob, "edge_pp": pick.get("edge_pp")}
+        _probe = {"score": 1.0, "confidence": "MEDIUM", "model_prob": prob, "edge_pp": pick.get("edge_pp"), "market": market, "selection": sel}
         if pick_tier_for(_probe, tier_cfg)[0] == "LEAN":
             return "K7"
     if _pick_tier(pick, medium_score) == "LEAN":

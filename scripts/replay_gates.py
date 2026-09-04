@@ -147,7 +147,7 @@ def classes_for_pick(
         out.append("K6-lambda-conflict")
     prob, edge = _model_prob(s, pick)
     if prob is not None:
-        probe = {"score": 1.0, "confidence": "MEDIUM", "model_prob": prob, "edge_pp": edge}
+        probe = {"score": 1.0, "confidence": "MEDIUM", "model_prob": prob, "edge_pp": edge, "market": market, "selection": sel}
         if pick_tier_for(probe, tier_cfg)[0] == "LEAN":
             out.append("K7-conviction")
         if market in ("Total", "BTTS") and prob < 0.5 and edge is not None and edge < 0:
